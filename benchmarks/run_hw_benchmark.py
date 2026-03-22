@@ -5,7 +5,8 @@ Simulates Domain 5 from S3's discovery: AssemblyGuard.
 """
 
 import sys
-sys.path.insert(0, "/home/claude/substrate-guard")
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from substrate_guard.hw_verifier import HardwareVerifier, HWSpec
 

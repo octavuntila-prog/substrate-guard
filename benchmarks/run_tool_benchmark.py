@@ -4,7 +4,8 @@ Tests safe and unsafe tool definitions against forbidden patterns.
 """
 
 import sys
-sys.path.insert(0, "/home/claude/substrate-guard")
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from substrate_guard.tool_verifier import (
     ToolDefinition,

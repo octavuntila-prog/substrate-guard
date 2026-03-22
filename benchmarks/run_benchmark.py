@@ -3,8 +3,9 @@
 import json
 import sys
 import time
+from pathlib import Path
 
-sys.path.insert(0, "/home/claude/substrate-guard")
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from benchmarks.llm_functions import BENCHMARKS
 from substrate_guard.code_verifier import verify_code
@@ -148,7 +149,8 @@ def run_benchmarks():
         "results": results,
     }
 
-    with open("/home/claude/substrate-guard/results/code_verifier_benchmark.json", "w") as f:
+    results_path = Path(__file__).resolve().parent.parent / "results" / "code_verifier_benchmark.json"
+    with open(results_path, "w") as f:
         json.dump(output, f, indent=2)
 
     print(f"\n  Results saved to results/code_verifier_benchmark.json")
