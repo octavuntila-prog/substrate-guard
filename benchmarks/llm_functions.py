@@ -576,3 +576,283 @@ def commission(sales: int, tier: int) -> int:
     postconditions=["__return__ >= 0"],
     description="commission non-negative"
 ), expected=True, category="financial")
+
+# ═══════════════════════════════════════════════════════════════════════
+# MULTI-BRANCH / COMPLEX CONTROL FLOW (10)
+# ═══════════════════════════════════════════════════════════════════════
+
+bench("complex_01_nested_clamp_scale", """
+def clamp_and_scale(x: int, lo: int, hi: int, factor: int) -> int:
+    if x < lo:
+        x = lo
+    if x > hi:
+        x = hi
+    return x * factor
+""", Spec(
+    preconditions=["lo >= 0", "hi >= lo", "hi <= 100", "factor >= 1", "factor <= 10"],
+    postconditions=["__return__ >= lo * factor", "__return__ <= hi * factor"],
+    description="clamp then scale stays in bounds"
+), expected=True, category="complex")
+
+bench("complex_02_accumulator", """
+def accumulate(a: int, b: int, c: int) -> int:
+    result = 0
+    if a > 0:
+        result = result + a
+    if b > 0:
+        result = result + b
+    if c > 0:
+        result = result + c
+    return result
+""", Spec(
+    postconditions=["__return__ >= 0"],
+    description="accumulate positives is non-negative"
+), expected=True, category="complex")
+
+bench("complex_03_multi_return_paths", """
+def classify_temp(temp: int) -> int:
+    if temp < 0:
+        return 0
+    if temp < 15:
+        return 1
+    if temp < 25:
+        return 2
+    if temp < 35:
+        return 3
+    return 4
+""", Spec(
+    postconditions=["__return__ >= 0", "__return__ <= 4"],
+    description="temperature classification 0-4"
+), expected=True, category="complex")
+
+bench("complex_04_buggy_classify", """
+def classify_temp(temp: int) -> int:
+    if temp < 0:
+        return -1
+    if temp < 15:
+        return 1
+    if temp < 25:
+        return 2
+    return 3
+""", Spec(
+    postconditions=["__return__ >= 0", "__return__ <= 3"],
+    description="BUG: returns -1 for negative temps"
+), expected=False, bug_type="negative_classification", category="complex")
+
+bench("complex_05_conditional_swap", """
+def sort_two(a: int, b: int) -> int:
+    if a > b:
+        return b
+    return a
+""", Spec(
+    postconditions=["__return__ <= a", "__return__ <= b"],
+    description="returns the smaller of two"
+), expected=True, category="complex")
+
+bench("complex_06_three_way_min", """
+def min3(a: int, b: int, c: int) -> int:
+    if a <= b:
+        if a <= c:
+            return a
+        return c
+    if b <= c:
+        return b
+    return c
+""", Spec(
+    postconditions=["__return__ <= a", "__return__ <= b", "__return__ <= c"],
+    description="min of three"
+), expected=True, category="complex")
+
+bench("complex_07_buggy_min3", """
+def min3(a: int, b: int, c: int) -> int:
+    if a <= b:
+        if a <= c:
+            return a
+        return c
+    return b
+""", Spec(
+    postconditions=["__return__ <= a", "__return__ <= b", "__return__ <= c"],
+    description="BUG: missing b vs c in else branch"
+), expected=False, bug_type="missing_comparison_min3", category="complex")
+
+bench("complex_08_graduated_fee", """
+def fee(amount: int) -> int:
+    if amount <= 100:
+        return 0
+    if amount <= 500:
+        return (amount - 100) // 10
+    return 40 + (amount - 500) // 5
+""", Spec(
+    preconditions=["amount >= 0"],
+    postconditions=["__return__ >= 0"],
+    description="graduated fee is non-negative"
+), expected=True, category="complex")
+
+bench("complex_09_normalize", """
+def normalize(x: int, min_val: int, max_val: int) -> int:
+    result = x - min_val
+    if result < 0:
+        result = 0
+    range_val = max_val - min_val
+    if result > range_val:
+        result = range_val
+    return result
+""", Spec(
+    preconditions=["max_val > min_val"],
+    postconditions=["__return__ >= 0"],
+    description="normalized value is non-negative"
+), expected=True, category="complex")
+
+bench("complex_10_buggy_normalize", """
+def normalize(x: int, min_val: int, max_val: int) -> int:
+    result = x - min_val
+    range_val = max_val - min_val
+    if result > range_val:
+        result = range_val
+    return result
+""", Spec(
+    preconditions=["max_val > min_val"],
+    postconditions=["__return__ >= 0"],
+    description="BUG: no lower bound guard"
+), expected=False, bug_type="missing_lower_guard", category="complex")
+
+# ═══════════════════════════════════════════════════════════════════════
+# REAL LLM PATTERNS (10)
+# Functions that mimic actual LLM-generated code patterns
+# ═══════════════════════════════════════════════════════════════════════
+
+bench("llm_01_access_score", """
+def access_score(role: int, clearance: int) -> int:
+    base = role * 10
+    bonus = clearance * 5
+    total = base + bonus
+    if total > 100:
+        return 100
+    if total < 0:
+        return 0
+    return total
+""", Spec(
+    preconditions=["role >= 0", "role <= 5", "clearance >= 0", "clearance <= 5"],
+    postconditions=["__return__ >= 0", "__return__ <= 100"],
+    description="access score clamped 0-100"
+), expected=True, category="llm_patterns")
+
+bench("llm_02_retry_backoff", """
+def backoff_ms(attempt: int) -> int:
+    if attempt <= 0:
+        return 100
+    if attempt >= 10:
+        return 30000
+    return 100 * attempt * attempt
+""", Spec(
+    preconditions=["attempt >= 0"],
+    postconditions=["__return__ >= 100"],
+    description="backoff always >= 100ms"
+), expected=True, category="llm_patterns")
+
+bench("llm_03_buggy_backoff", """
+def backoff_ms(attempt: int) -> int:
+    if attempt >= 10:
+        return 30000
+    return 100 * attempt
+""", Spec(
+    preconditions=["attempt >= 0"],
+    postconditions=["__return__ >= 100"],
+    description="BUG: attempt=0 returns 0"
+), expected=False, bug_type="zero_backoff", category="llm_patterns")
+
+bench("llm_04_priority", """
+def priority(severity: int, age: int) -> int:
+    base = severity * 100
+    urgency = age // 60
+    total = base + urgency
+    if total > 1000:
+        return 1000
+    return total
+""", Spec(
+    preconditions=["severity >= 0", "severity <= 5", "age >= 0"],
+    postconditions=["__return__ >= 0", "__return__ <= 1000"],
+    description="priority capped at 1000"
+), expected=True, category="llm_patterns")
+
+bench("llm_05_token_cost", """
+def cost_cents(tokens: int, tier: int) -> int:
+    if tier == 1:
+        return tokens // 1000
+    if tier == 2:
+        return tokens // 500
+    return tokens // 250
+""", Spec(
+    preconditions=["tokens >= 0", "tier >= 1", "tier <= 3"],
+    postconditions=["__return__ >= 0"],
+    description="token cost non-negative"
+), expected=True, category="llm_patterns")
+
+bench("llm_06_confidence_bucket", """
+def bucket(score: int) -> int:
+    if score >= 90:
+        return 3
+    if score >= 70:
+        return 2
+    if score >= 50:
+        return 1
+    return 0
+""", Spec(
+    preconditions=["score >= 0", "score <= 100"],
+    postconditions=["__return__ >= 0", "__return__ <= 3"],
+    description="confidence bucket 0-3"
+), expected=True, category="llm_patterns")
+
+bench("llm_07_buggy_rate_limit", """
+def remaining(quota: int, used: int) -> int:
+    return quota - used
+""", Spec(
+    preconditions=["quota >= 0", "used >= 0"],
+    postconditions=["__return__ >= 0"],
+    description="BUG: used > quota gives negative"
+), expected=False, bug_type="no_floor_on_remaining", category="llm_patterns")
+
+bench("llm_08_safe_rate_limit", """
+def remaining(quota: int, used: int) -> int:
+    if used >= quota:
+        return 0
+    return quota - used
+""", Spec(
+    preconditions=["quota >= 0", "used >= 0"],
+    postconditions=["__return__ >= 0"],
+    description="safe remaining with floor"
+), expected=True, category="llm_patterns")
+
+bench("llm_09_health_score", """
+def health(cpu: int, mem: int, disk: int) -> int:
+    score = 100
+    if cpu > 80:
+        score = score - 30
+    if mem > 80:
+        score = score - 30
+    if disk > 90:
+        score = score - 40
+    if score < 0:
+        return 0
+    return score
+""", Spec(
+    preconditions=["cpu >= 0", "cpu <= 100", "mem >= 0", "mem <= 100", "disk >= 0", "disk <= 100"],
+    postconditions=["__return__ >= 0", "__return__ <= 100"],
+    description="health score 0-100"
+), expected=True, category="llm_patterns")
+
+bench("llm_10_buggy_health", """
+def health(cpu: int, mem: int, disk: int) -> int:
+    score = 100
+    if cpu > 80:
+        score = score - 30
+    if mem > 80:
+        score = score - 30
+    if disk > 90:
+        score = score - 50
+    return score
+""", Spec(
+    preconditions=["cpu >= 0", "cpu <= 100", "mem >= 0", "mem <= 100", "disk >= 0", "disk <= 100"],
+    postconditions=["__return__ >= 0"],
+    description="BUG: all bad gives 100-30-30-50=-10"
+), expected=False, bug_type="negative_health_score", category="llm_patterns")

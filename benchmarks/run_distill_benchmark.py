@@ -327,7 +327,143 @@ check_compare("distilled wrong final: 7x + 14 = 49",
     expected_error_by_distillation=True,
 )
 
-# ── Summary ─────────────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════
+# EXTENDED ARITHMETIC — larger numbers, fractions, powers
+# ══════════════════════════════════════════════════════════════════════
+
+print("\n-- Extended arithmetic --")
+
+check("power computation", verifier.verify_trace(
+    "What is 2^10?",
+    [{"expression": "2**10", "value": "1024"}]
+), True)
+
+check("wrong power", verifier.verify_trace(
+    "What is 2^8?",
+    [{"expression": "2**8", "value": "128"}]  # BUG: 256
+), False)
+
+check("chain multiplication", verifier.verify_trace(
+    "Calculate 5 * 6 * 7",
+    [
+        {"expression": "5 * 6", "value": "30"},
+        {"expression": "30 * 7", "value": "210"},
+    ]
+), True)
+
+check("wrong chain multiplication", verifier.verify_trace(
+    "Calculate 5 * 6 * 7",
+    [
+        {"expression": "5 * 6", "value": "30"},
+        {"expression": "30 * 7", "value": "200"},  # BUG
+    ]
+), False)
+
+check("modulo arithmetic", verifier.verify_trace(
+    "What is 17 mod 5?",
+    [{"expression": "17 % 5", "value": "2"}]
+), True)
+
+check("wrong modulo", verifier.verify_trace(
+    "What is 23 mod 7?",
+    [{"expression": "23 % 7", "value": "3"}]  # BUG: should be 2
+), False)
+
+# ══════════════════════════════════════════════════════════════════════
+# EXTENDED ALGEBRA — more complex equations
+# ══════════════════════════════════════════════════════════════════════
+
+print("\n-- Extended algebra --")
+
+check("solve with fractions", verifier.verify_trace(
+    "Solve 2x = 7",
+    [{"claim": "2*x = 7 → x = 7/2", "operation": "divide by 2"}]
+), True)
+
+check("wrong fraction solve", verifier.verify_trace(
+    "Solve 3x = 10",
+    [{"claim": "3*x = 10 → x = 3", "operation": "divide by 3"}]  # BUG: 10/3 != 3
+), False)
+
+check("multi-variable substitution", verifier.verify_trace(
+    "If x=2 verify 3x^2 + 2x + 1 = 17",
+    [
+        {"expression": "3 * 2**2 + 2 * 2 + 1", "value": "17"},
+    ]
+), True)
+
+check("wrong substitution", verifier.verify_trace(
+    "If x=3 verify x^2 + x = 12",
+    [
+        {"expression": "3**2 + 3", "value": "11"},  # BUG: 9+3=12
+    ]
+), False)
+
+# ══════════════════════════════════════════════════════════════════════
+# MORE DISTILLED vs REFERENCE comparisons
+# ══════════════════════════════════════════════════════════════════════
+
+print("\n-- Extended distilled vs reference --")
+
+check_compare("both correct different speed: 6x = 42",
+    verifier.compare_traces(
+        "Solve 6x = 42",
+        reference_trace=[
+            {"claim": "6*x = 42 → x = 7", "operation": "divide by 6"},
+        ],
+        distilled_trace=[
+            {"claim": "6*x = 42 → x = 7", "operation": "divide by 6"},
+        ],
+    ),
+    expected_error_by_distillation=False,
+)
+
+check_compare("distilled multiplication error: 8x - 16 = 48",
+    verifier.compare_traces(
+        "Solve 8x - 16 = 48",
+        reference_trace=[
+            {"claim": "8*x - 16 = 48 → 8*x = 64", "operation": "add 16"},
+            {"claim": "8*x = 64 → x = 8", "operation": "divide by 8"},
+        ],
+        distilled_trace=[
+            {"claim": "8*x - 16 = 48 → 8*x = 64", "operation": "add 16"},
+            {"claim": "8*x = 64 → x = 6", "operation": "divide by 8"},  # BUG
+        ],
+    ),
+    expected_error_by_distillation=True,
+)
+
+check_compare("distilled first step error: 9x + 27 = 0",
+    verifier.compare_traces(
+        "Solve 9x + 27 = 0",
+        reference_trace=[
+            {"claim": "9*x + 27 = 0 → 9*x = -27", "operation": "subtract 27"},
+            {"claim": "9*x = -27 → x = -3", "operation": "divide by 9"},
+        ],
+        distilled_trace=[
+            {"claim": "9*x + 27 = 0 → 9*x = 27", "operation": "subtract 27"},  # BUG: sign
+            {"claim": "9*x = 27 → x = 3", "operation": "divide by 9"},
+        ],
+    ),
+    expected_error_by_distillation=True,
+)
+
+check_compare("both correct: verify 5^2 + 12^2 = 13^2",
+    verifier.compare_traces(
+        "Verify Pythagorean triple 5,12,13",
+        reference_trace=[
+            {"expression": "5**2", "value": "25"},
+            {"expression": "12**2", "value": "144"},
+            {"expression": "25 + 144", "value": "169"},
+            {"expression": "13**2", "value": "169"},
+        ],
+        distilled_trace=[
+            {"expression": "5**2 + 12**2", "value": "169"},
+            {"expression": "13**2", "value": "169"},
+        ],
+    ),
+    expected_error_by_distillation=False,
+)
 
 total = passed + failed
 print(f"\n{'=' * 70}")

@@ -274,7 +274,153 @@ check("free_text_query_tool", verify_tool(
     forbidden=DATABASE_FORBIDDEN,
 ), False)
 
-# ── Summary ─────────────────────────────────────────────────────────
+# ── Mixed/realistic tool definitions ──────────────────────────────
+
+print("\n-- Realistic production tools --")
+
+check("safe_email_sender", verify_tool(
+    ToolDefinition(
+        name="send_email",
+        description="Send email to predefined recipients",
+        params=[
+            ToolParam(name="recipient", type="enum",
+                      enum_values=["team@company.com", "alerts@company.com", "support@company.com"]),
+            ToolParam(name="priority", type="enum", enum_values=["low", "normal", "high"]),
+        ],
+    ),
+), True)
+
+check("safe_deploy_tool", verify_tool(
+    ToolDefinition(
+        name="deploy",
+        description="Deploy to predefined environments",
+        params=[
+            ToolParam(name="env", type="enum", enum_values=["staging", "production"]),
+            ToolParam(name="version", type="string"),
+        ],
+    ),
+    forbidden=FILESYSTEM_FORBIDDEN,
+), False)  # String version param is unconstrained
+
+check("safe_metrics_tool", verify_tool(
+    ToolDefinition(
+        name="get_metrics",
+        description="Fetch system metrics",
+        params=[
+            ToolParam(name="metric", type="enum",
+                      enum_values=["cpu", "memory", "disk", "network"]),
+            ToolParam(name="period", type="enum",
+                      enum_values=["1h", "6h", "24h", "7d"]),
+        ],
+    ),
+), True)
+
+check("safe_search_tool", verify_tool(
+    ToolDefinition(
+        name="search_docs",
+        description="Search internal documentation",
+        params=[
+            ToolParam(name="index", type="enum",
+                      enum_values=["docs", "wiki", "faq"]),
+            ToolParam(name="limit", type="int", min_value=1, max_value=50),
+        ],
+    ),
+), True)
+
+check("unsafe_deploy_with_rollback", verify_tool(
+    ToolDefinition(
+        name="deploy_mgr",
+        description="Deployment manager",
+        params=[
+            ToolParam(name="action", type="enum",
+                      enum_values=["deploy", "rollback", "rm -rf /tmp/deploy", "status"]),
+        ],
+    ),
+    forbidden=FILESYSTEM_FORBIDDEN,
+), False)
+
+check("safe_cache_tool", verify_tool(
+    ToolDefinition(
+        name="cache_ops",
+        description="Cache operations",
+        params=[
+            ToolParam(name="op", type="enum", enum_values=["get", "set", "invalidate"]),
+            ToolParam(name="ttl", type="int", min_value=1, max_value=86400),
+        ],
+    ),
+), True)
+
+check("unsafe_log_with_path", verify_tool(
+    ToolDefinition(
+        name="write_log",
+        description="Write application logs",
+        params=[
+            ToolParam(name="level", type="enum", enum_values=["DEBUG", "INFO", "WARN", "ERROR"]),
+            ToolParam(name="path", type="string"),
+        ],
+    ),
+    forbidden=FILESYSTEM_FORBIDDEN,
+), False)  # String path
+
+check("safe_feature_flag", verify_tool(
+    ToolDefinition(
+        name="feature_flag",
+        description="Toggle feature flags",
+        params=[
+            ToolParam(name="flag", type="enum",
+                      enum_values=["dark_mode", "new_dashboard", "beta_api"]),
+            ToolParam(name="enabled", type="bool"),
+        ],
+    ),
+), True)
+
+check("unsafe_db_with_alter", verify_tool(
+    ToolDefinition(
+        name="schema_tool",
+        description="Database schema operations",
+        params=[
+            ToolParam(name="action", type="enum",
+                      enum_values=["describe", "ALTER TABLE users ADD col", "show_tables"]),
+        ],
+    ),
+    forbidden=DATABASE_FORBIDDEN,
+), False)
+
+check("safe_notification_tool", verify_tool(
+    ToolDefinition(
+        name="notify",
+        description="Send notifications",
+        params=[
+            ToolParam(name="channel", type="enum", enum_values=["slack", "email", "sms"]),
+            ToolParam(name="urgency", type="enum", enum_values=["low", "medium", "critical"]),
+        ],
+    ),
+), True)
+
+check("unsafe_backup_with_shell", verify_tool(
+    ToolDefinition(
+        name="backup",
+        description="Backup management",
+        params=[
+            ToolParam(name="action", type="enum",
+                      enum_values=["list", "create", "sudo restore latest", "verify"]),
+        ],
+    ),
+    forbidden=FILESYSTEM_FORBIDDEN,
+), False)
+
+check("safe_enum_only_api", verify_tool(
+    ToolDefinition(
+        name="api_gateway",
+        description="API gateway management",
+        params=[
+            ToolParam(name="method", type="enum", enum_values=["GET", "POST"]),
+            ToolParam(name="endpoint", type="enum",
+                      enum_values=["users", "products", "orders"]),
+            ToolParam(name="format", type="enum", enum_values=["json", "csv"]),
+        ],
+    ),
+), True)
 
 total = passed + failed
 print(f"\n{'=' * 70}")

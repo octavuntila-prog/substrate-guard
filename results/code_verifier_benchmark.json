@@ -3,10 +3,10 @@
     "tool": "substrate-guard",
     "version": "0.1.0",
     "verifier": "code",
-    "total_functions": 50,
+    "total_functions": 70,
     "accuracy": 100.0,
-    "total_time_ms": 3075.63,
-    "avg_time_ms": 61.51,
+    "total_time_ms": 4224.71,
+    "avg_time_ms": 60.35,
     "true_positive_rate": 100.0,
     "false_positive_rate": 0.0
   },
@@ -17,7 +17,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 22.63,
+      "time_ms": 41.36,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -28,7 +28,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 11.48,
+      "time_ms": 11.56,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -39,7 +39,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 31.46,
+      "time_ms": 11.28,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -50,7 +50,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 1.94,
+      "time_ms": 1.95,
       "bug_type": "wrong_postcondition_for_average",
       "counterexample": {
         "a": "0",
@@ -64,7 +64,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.67,
+      "time_ms": 2.96,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -75,7 +75,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.92,
+      "time_ms": 3.37,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -86,7 +86,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 0.79,
+      "time_ms": 0.8,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -97,7 +97,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 1.51,
+      "time_ms": 1.87,
       "bug_type": "negate_positive_not_nonneg",
       "counterexample": {
         "x": "1"
@@ -110,7 +110,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 0.82,
+      "time_ms": 0.77,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -121,7 +121,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 25.79,
+      "time_ms": 28.55,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -132,7 +132,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.27,
+      "time_ms": 3.17,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -143,7 +143,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.09,
+      "time_ms": 3.35,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -154,7 +154,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 2.05,
+      "time_ms": 2.59,
       "bug_type": "swapped_branches",
       "counterexample": {
         "a": "1",
@@ -168,7 +168,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.68,
+      "time_ms": 16.73,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -179,7 +179,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.67,
+      "time_ms": 3.21,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -190,7 +190,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 3.84,
+      "time_ms": 4.9,
       "bug_type": "wrong_spec_median",
       "counterexample": {
         "a": "1",
@@ -205,7 +205,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 3.05,
+      "time_ms": 3.79,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -216,7 +216,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 2.66,
+      "time_ms": 3.36,
       "bug_type": "missing_comparison",
       "counterexample": {
         "a": "-1",
@@ -231,7 +231,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.15,
+      "time_ms": 2.39,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -242,7 +242,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 1.54,
+      "time_ms": 1.94,
       "bug_type": "missing_abs",
       "counterexample": {
         "a": "-1",
@@ -256,7 +256,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.81,
+      "time_ms": 2.29,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -267,7 +267,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.48,
+      "time_ms": 1.77,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -278,7 +278,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.83,
+      "time_ms": 2.2,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -289,7 +289,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 1.56,
+      "time_ms": 1.79,
       "bug_type": "negative_leak",
       "counterexample": {
         "x": "-10"
@@ -302,7 +302,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.12,
+      "time_ms": 2.81,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -313,7 +313,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.35,
+      "time_ms": 2.74,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -324,7 +324,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 17.51,
+      "time_ms": 3.04,
       "bug_type": "negative_return",
       "counterexample": {
         "x": "-1"
@@ -337,7 +337,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.68,
+      "time_ms": 2.05,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -348,7 +348,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.98,
+      "time_ms": 2.58,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -359,7 +359,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.25,
+      "time_ms": 2.94,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -370,7 +370,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.51,
+      "time_ms": 3.38,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -381,7 +381,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 2.63,
+      "time_ms": 3.34,
       "bug_type": "off_by_one_boundary",
       "counterexample": {
         "idx": "2",
@@ -395,7 +395,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.78,
+      "time_ms": 2.33,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -406,7 +406,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.41,
+      "time_ms": 1.62,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -417,7 +417,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.27,
+      "time_ms": 1.43,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -428,7 +428,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.1,
+      "time_ms": 2.31,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -439,7 +439,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 2.21,
+      "time_ms": 2.43,
       "bug_type": "off_by_one_256",
       "counterexample": {
         "x": "256"
@@ -463,7 +463,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.91,
+      "time_ms": 2.38,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -474,7 +474,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 2.03,
+      "time_ms": 2.42,
       "bug_type": "missing_guard",
       "counterexample": {
         "total": "0",
@@ -488,7 +488,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1904.96,
+      "time_ms": 3594.57,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -499,7 +499,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 949.54,
+      "time_ms": 167.4,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -510,7 +510,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 2.79,
+      "time_ms": 3.16,
       "bug_type": "discount_exceeds_price",
       "counterexample": {
         "price": "0",
@@ -524,7 +524,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 23.54,
+      "time_ms": 22.84,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -535,7 +535,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.8,
+      "time_ms": 3.29,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -546,7 +546,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.99,
+      "time_ms": 3.16,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -557,7 +557,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.6,
+      "time_ms": 3.28,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -568,7 +568,7 @@
       "expected": "unsafe",
       "actual": "unsafe",
       "correct": true,
-      "time_ms": 2.48,
+      "time_ms": 2.58,
       "bug_type": "cost_exceeds_revenue",
       "counterexample": {
         "revenue": "100",
@@ -582,7 +582,7 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 1.97,
+      "time_ms": 4.92,
       "bug_type": "none",
       "counterexample": null,
       "warnings": []
@@ -593,9 +593,248 @@
       "expected": "verified",
       "actual": "verified",
       "correct": true,
-      "time_ms": 2.32,
+      "time_ms": 4.18,
       "bug_type": "none",
       "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "complex_01_nested_clamp_scale",
+      "category": "complex",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 80.93,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "complex_02_accumulator",
+      "category": "complex",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 21.91,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "complex_03_multi_return_paths",
+      "category": "complex",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 3.66,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "complex_04_buggy_classify",
+      "category": "complex",
+      "expected": "unsafe",
+      "actual": "unsafe",
+      "correct": true,
+      "time_ms": 3.48,
+      "bug_type": "negative_classification",
+      "counterexample": {
+        "temp": "-1"
+      },
+      "warnings": []
+    },
+    {
+      "name": "complex_05_conditional_swap",
+      "category": "complex",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 2.82,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "complex_06_three_way_min",
+      "category": "complex",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 3.77,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "complex_07_buggy_min3",
+      "category": "complex",
+      "expected": "unsafe",
+      "actual": "unsafe",
+      "correct": true,
+      "time_ms": 3.28,
+      "bug_type": "missing_comparison_min3",
+      "counterexample": {
+        "a": "1",
+        "b": "0",
+        "c": "-1"
+      },
+      "warnings": []
+    },
+    {
+      "name": "complex_08_graduated_fee",
+      "category": "complex",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 2.42,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "complex_09_normalize",
+      "category": "complex",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 5.88,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "complex_10_buggy_normalize",
+      "category": "complex",
+      "expected": "unsafe",
+      "actual": "unsafe",
+      "correct": true,
+      "time_ms": 4.17,
+      "bug_type": "missing_lower_guard",
+      "counterexample": {
+        "x": "-1",
+        "min_val": "0",
+        "max_val": "1"
+      },
+      "warnings": []
+    },
+    {
+      "name": "llm_01_access_score",
+      "category": "llm_patterns",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 8.88,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "llm_02_retry_backoff",
+      "category": "llm_patterns",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 12.33,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "llm_03_buggy_backoff",
+      "category": "llm_patterns",
+      "expected": "unsafe",
+      "actual": "unsafe",
+      "correct": true,
+      "time_ms": 3.36,
+      "bug_type": "zero_backoff",
+      "counterexample": {
+        "attempt": "0"
+      },
+      "warnings": []
+    },
+    {
+      "name": "llm_04_priority",
+      "category": "llm_patterns",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 4.68,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "llm_05_token_cost",
+      "category": "llm_patterns",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 3.94,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "llm_06_confidence_bucket",
+      "category": "llm_patterns",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 2.93,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "llm_07_buggy_rate_limit",
+      "category": "llm_patterns",
+      "expected": "unsafe",
+      "actual": "unsafe",
+      "correct": true,
+      "time_ms": 3.2,
+      "bug_type": "no_floor_on_remaining",
+      "counterexample": {
+        "quota": "0",
+        "used": "1"
+      },
+      "warnings": []
+    },
+    {
+      "name": "llm_08_safe_rate_limit",
+      "category": "llm_patterns",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 16.57,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "llm_09_health_score",
+      "category": "llm_patterns",
+      "expected": "verified",
+      "actual": "verified",
+      "correct": true,
+      "time_ms": 18.54,
+      "bug_type": "none",
+      "counterexample": null,
+      "warnings": []
+    },
+    {
+      "name": "llm_10_buggy_health",
+      "category": "llm_patterns",
+      "expected": "unsafe",
+      "actual": "unsafe",
+      "correct": true,
+      "time_ms": 10.66,
+      "bug_type": "negative_health_score",
+      "counterexample": {
+        "cpu": "81",
+        "mem": "81",
+        "disk": "91"
+      },
       "warnings": []
     }
   ]
