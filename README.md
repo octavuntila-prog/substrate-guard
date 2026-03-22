@@ -1,5 +1,7 @@
 # substrate-guard
 
+[![CI](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml)
+
 **Formal verification safety layer for AI outputs.**
 
 A unified Z3-based framework that mathematically proves (not tests) that AI-generated code, tool invocations, CLI commands, assembly, and reasoning traces are safe and correct.
