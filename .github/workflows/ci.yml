@@ -31,19 +31,19 @@ jobs:
         run: python tests/smoke_test.py
 
       - name: Code verifier benchmark (70 functions)
-        run: python benchmarks/run_benchmark.py
+        run: python -m benchmarks.run_benchmark
 
       - name: Tool API verifier benchmark (30 definitions)
-        run: python benchmarks/run_tool_benchmark.py
+        run: python -m benchmarks.run_tool_benchmark
 
       - name: CLI verifier benchmark (20 commands)
-        run: python substrate_guard/cli.py benchmark --type cli
+        run: python -m substrate_guard.cli benchmark --type cli
 
       - name: Hardware verifier benchmark (21 RISC-V tests)
-        run: python benchmarks/run_hw_benchmark.py
+        run: python -m benchmarks.run_hw_benchmark
 
       - name: Distillation verifier benchmark (40 traces)
-        run: python benchmarks/run_distill_benchmark.py
+        run: python -m benchmarks.run_distill_benchmark
 
       - name: Summary
         run: |
