@@ -1,0 +1,62 @@
+# substrate-guard — Add to AI Research Agency stack
+#
+# This connects to the EXISTING postgres container and internal network.
+# Place this file at: /opt/ai-research-agency/docker-compose.guard.yml
+#
+# Usage:
+#   # Build
+#   docker compose -f docker-compose.guard.yml build
+#
+#   # Run benchmark (verify it works)
+#   docker compose -f docker-compose.guard.yml run --rm substrate-guard \
+#     python -m substrate_guard.combo_cli benchmark
+#
+#   # Run REAL audit against PostgreSQL
+#   docker compose -f docker-compose.guard.yml run --rm substrate-guard \
+#     python -m substrate_guard.audit --db-url postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+#
+#   # Run audit for last 24 hours only
+#   docker compose -f docker-compose.guard.yml run --rm substrate-guard \
+#     python -m substrate_guard.audit --db-url postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB} --hours 24
+#
+#   # Start as persistent service
+#   docker compose -f docker-compose.guard.yml up -d
+
+services:
+  substrate-guard:
+    build:
+      context: ./substrate-guard
+      dockerfile: Dockerfile
+    container_name: substrate-guard
+    restart: unless-stopped
+    env_file:
+      - .env  # Inherits POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB from main .env
+    environment:
+      - GUARD_MODE=mock
+      - GUARD_LOG_LEVEL=INFO
+      - PYTHONPATH=/app
+    volumes:
+      - guard-logs:/var/log/substrate-guard
+      - ./substrate-guard/scripts/config_docker.json:/app/config/substrate.json:ro
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+        reservations:
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "python", "-c", "from substrate_guard.integrations import SubstrateGuard; print('ok')"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+    networks:
+      - ai-research-agency_internal  # Join the existing internal network where postgres lives
+
+volumes:
+  guard-logs:
+
+# Connect to the existing internal network created by the main docker-compose.yml
+networks:
+  ai-research-agency_internal:
+    external: true
