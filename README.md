@@ -174,6 +174,7 @@ Octavian Untilă — Aisophical SRL / SUBSTRATE Research
 
 ## Links
 
+- **ArXiv preprint**: https://arxiv.org/abs/2603.21149
 - **Repository**: https://github.com/octavuntila-prog/substrate-guard
 - **Companion paper**: [Emergent Philosophy and Safety Principles in Autonomous AI Ecosystems](https://doi.org/10.5281/zenodo.19157572)
 - **Blog**: https://aisophical.com
