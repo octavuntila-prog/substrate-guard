@@ -79,14 +79,16 @@ substrate-guard/
 ├── chain.py          # HMAC-SHA256 tamper-evident chain
 ├── compliance.py     # SOC2 / ISO 27001 / ISO 42001 exports
 └── tests/            # 270 tests, 3,159 LOC
-    ├── test_observe.py    # 20 tests — L1 observation
-    ├── test_policy.py     # 80 tests — L2 policy decisions
-    ├── test_guard.py      # 59 tests — guard pipeline + substrate + vendor + audit
-    ├── test_chain.py      # 23 tests — HMAC chain integrity
-    ├── test_attest.py     # 26 tests — L5 attestation
-    ├── test_offline.py    # 26 tests — L6 offline sync
-    ├── test_comply.py     # 27 tests — L4 ZK compliance
-    └── test_substrate.py  # 438 LOC — integration tests
+    ├── test_policy.py     # 541 LOC — L2 policy decisions
+    ├── test_substrate.py  # 438 LOC — integration tests
+    ├── test_comply.py     # 347 LOC — L4 ZK compliance
+    ├── test_chain.py      # 325 LOC — HMAC chain integrity
+    ├── test_vendor.py     # 309 LOC — vendor integrations
+    ├── test_offline.py    # 295 LOC — L6 offline sync
+    ├── test_attest.py     # 248 LOC — L5 attestation
+    ├── test_audit.py      # 234 LOC — audit pipeline
+    ├── test_guard.py      # 227 LOC — guard pipeline
+    └── test_observe.py    # 195 LOC — L1 observation
 ```
 
 **This repo: 9,205 LOC** (6,046 production + 3,159 tests).
@@ -97,17 +99,16 @@ The complete system deployed on SUBSTRATE includes additional components not in 
 
 | Component | LOC | Location | Function |
 |-----------|-----|----------|----------|
-| substrate-v2 core | 4,690 | CPX52 server | 9 ecosystem engines, peer-to-peer mesh |
+| substrate-v2 core | 4,690 | CPX52 server | 9 ecosystem engines (base.py 541, persistence 213, runner 70, 9 ecosystems 1,815) |
 | Guard daemon | 583 | CPX52 (in v9-oracle) | Production guard chain, hourly audits |
-| Mirror | 322 | CPX52 | Anomaly detection, 30-min reflection cycles |
-| Kalshi Collector | 271 | CPX52 | Prediction market signal collection |
-| Market Judge | 235 | CPX52 | Diversity monitoring, monoculture alerts |
-| Blog Judge Gate | 213 | CPX52 | Content filtering, duplicate detection |
-| Blog Judge | 210 | CPX52 | Pattern matching, quality assessment |
-| Synthesizer | 290 | CPX52 | Cross-ecosystem synthesis |
-| Host scripts | 448 | CPX52 | Deployment, monitoring |
+| Mirror | 322 | CPX52 (in v9-oracle) | Anomaly detection, 30-min reflection cycles |
+| Synthesizer | 290 | CPX52 (in v9-oracle) | Cross-ecosystem synthesis |
+| Kalshi Collector | 271 | CPX52 (in v9-oracle) | Prediction market signal collection |
+| Market Judge | 235 | CPX52 (in v9-oracle) | Diversity monitoring, monoculture alerts |
+| Blog Judge Gate | 213 | CPX52 (in v9-oracle) | Content filtering, duplicate detection |
+| Blog Judge | 210 | CPX52 (in v9-oracle) | Pattern matching, quality assessment |
 
-**Total production stack: 16,467 LOC** across 2 servers (9,205 Research + 7,262 CPX52).
+**Total production stack: 16,019 LOC** across 2 servers (9,205 Research + 6,814 CPX52). Zero tests on production.
 
 **Tests: 270** — all on Research server. Zero tests on CPX52 production (daemon services tested through integration, not unit tests).
 
