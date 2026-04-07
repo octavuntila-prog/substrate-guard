@@ -235,6 +235,41 @@ class DistillationVerifier:
     def __init__(self, timeout_ms: int = 5000):
         self.timeout_ms = timeout_ms
 
+    def verify(self, artifact: str) -> TraceVerification:
+        """Entry point for ``Guard.verify_artifact(..., artifact_type='distill')``.
+
+        Expects JSON with ``problem`` and ``steps`` (list of step dicts). Non-JSON input
+        yields ``PARSE_FAILURE``.
+        """
+        import json
+
+        try:
+            payload = json.loads(artifact)
+        except (json.JSONDecodeError, TypeError, ValueError):
+            return TraceVerification(
+                status=TraceStatus.PARSE_FAILURE,
+                steps=[],
+                valid_count=0,
+                invalid_count=0,
+                unparseable_count=0,
+                time_ms=0.0,
+                problem=str(artifact)[:200],
+            )
+        if not isinstance(payload, dict):
+            return TraceVerification(
+                status=TraceStatus.PARSE_FAILURE,
+                steps=[],
+                valid_count=0,
+                invalid_count=0,
+                unparseable_count=0,
+                time_ms=0.0,
+                problem=str(artifact)[:200],
+            )
+        return self.verify_trace(
+            str(payload.get("problem", "")),
+            list(payload.get("steps", [])),
+        )
+
     def verify_trace(self, problem: str, steps: list[dict]) -> TraceVerification:
         """Verify a reasoning trace.
 
@@ -565,3 +600,7 @@ class DistillationVerifier:
 def verify_distillation(problem: str, steps: list[dict]) -> TraceVerification:
     """One-shot trace verification."""
     return DistillationVerifier().verify_trace(problem, steps)
+
+
+# Backwards-compatible name for ``Guard.verify_artifact(..., artifact_type='distill')``.
+DistillVerifier = DistillationVerifier

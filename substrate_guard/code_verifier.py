@@ -98,6 +98,17 @@ class Spec:
     description: str = ""
 
 
+def spec_from_mapping(data: dict | None) -> Spec:
+    """Build a :class:`Spec` from a plain dict (e.g. ``Guard.verify_artifact(..., spec={...})``)."""
+    if not data:
+        return Spec()
+    return Spec(
+        preconditions=[str(x) for x in data.get("preconditions", [])],
+        postconditions=[str(x) for x in data.get("postconditions", [])],
+        description=str(data.get("description", "")),
+    )
+
+
 class CodeVerifier:
     """Verify that a Python function satisfies a formal specification.
 

@@ -362,6 +362,42 @@ class ToolVerifier:
 # ── Convenience ─────────────────────────────────────────────────────
 
 
+def tool_definition_from_payload(payload: str | dict) -> ToolDefinition:
+    """Build a :class:`ToolDefinition` from JSON text or a dict (Guard / CLI).
+
+    Shape matches ``substrate_guard.cli`` tool file loading: ``name``, ``params`` /
+    ``parameters``, optional ``operation_template``.
+    """
+    import json
+
+    if isinstance(payload, str):
+        if not payload.strip():
+            return ToolDefinition(name="unknown", description="", params=[])
+        data = json.loads(payload)
+    else:
+        data = payload
+    if not isinstance(data, dict):
+        raise TypeError("tool payload must be a dict or JSON object")
+    params: list[ToolParam] = []
+    for p in data.get("params", data.get("parameters", [])):
+        params.append(
+            ToolParam(
+                name=p["name"],
+                type=p.get("type", "string"),
+                enum_values=p.get("enum", p.get("enum_values")),
+                min_value=p.get("min"),
+                max_value=p.get("max"),
+                pattern=p.get("pattern"),
+            )
+        )
+    return ToolDefinition(
+        name=data.get("name", "unknown"),
+        description=data.get("description", ""),
+        params=params,
+        operation_template=data.get("operation_template"),
+    )
+
+
 def verify_tool(
     tool: ToolDefinition,
     forbidden: list[ForbiddenPattern] | None = None,

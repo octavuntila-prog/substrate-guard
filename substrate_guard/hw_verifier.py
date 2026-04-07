@@ -98,6 +98,31 @@ class HWSpec:
     description: str = ""
 
 
+def hw_spec_from_mapping(data: dict | None) -> HWSpec:
+    """Build an :class:`HWSpec` from a JSON-friendly dict.
+
+    Register conditions use ``{ "x10": [">=", 0] }`` (list/tuple of operator and int).
+    """
+    if not data:
+        return HWSpec()
+    pre: dict[str, tuple[str, int]] = {}
+    for k, v in data.get("preconditions", {}).items():
+        if isinstance(v, (list, tuple)) and len(v) == 2:
+            pre[str(k)] = (str(v[0]), int(v[1]))
+    post: dict[str, tuple[str, int]] = {}
+    for k, v in data.get("postconditions", {}).items():
+        if isinstance(v, (list, tuple)) and len(v) == 2:
+            post[str(k)] = (str(v[0]), int(v[1]))
+    return HWSpec(
+        preconditions=pre,
+        postconditions=post,
+        forbidden_instructions=[str(x) for x in data.get("forbidden_instructions", [])],
+        memory_lower=int(data.get("memory_lower", 0)),
+        memory_upper=int(data.get("memory_upper", 0xFFFF)),
+        description=str(data.get("description", "")),
+    )
+
+
 class RISCVSimulator:
     """Symbolic RISC-V RV32I simulator using Z3 bitvectors."""
 

@@ -12,5 +12,6 @@ venv/
 *.so
 .mypy_cache/
 .pytest_cache/
+.hypothesis/
 .ruff_cache/
 *.docx

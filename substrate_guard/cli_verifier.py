@@ -96,6 +96,225 @@ DANGEROUS_PATTERNS = [
         "description": "System shutdown or reboot",
         "patterns": [r"\bshutdown\b", r"\breboot\b", r"\binit\s+0\b", r"\binit\s+6\b"],
     },
+    {
+        "name": "pipe_to_shell",
+        "description": "Piping downloads or data into bash/sh",
+        "patterns": [
+            r"\bcurl\b[^\n]*\|\s*(bash|sh)\b",
+            r"\bwget\b[^\n]*\|\s*(bash|sh)\b",
+            r"\|\s*(bash|sh)\s*(-c|\s|<)",
+        ],
+    },
+    {
+        "name": "chmod_recursive_root",
+        "description": "Recursive chmod targeting filesystem root",
+        "patterns": [
+            r"\bchmod\s+(-R|--recursive)\s+\S+\s+/\s*$",
+            r"\bchmod\s+(-R|--recursive)\s+/\s",
+        ],
+    },
+    {
+        "name": "kubectl_destructive",
+        "description": "Kubernetes destructive operations",
+        "patterns": [r"\bkubectl\s+delete\b", r"\bkubectl\s+drain\b"],
+    },
+    {
+        "name": "cloud_exfil_or_wide_sync",
+        "description": "Cloud CLI bulk copy/sync (exfil risk)",
+        "patterns": [r"\baws\s+s3\s+(sync|cp)\b", r"\bgcloud\s+.*\brsync\b"],
+    },
+    {
+        "name": "raw_disk_redirect",
+        "description": "Redirect to block device",
+        "patterns": [r">\s*/dev/sd[a-z]", r">>\s*/dev/sd[a-z]"],
+    },
+    {
+        "name": "netcat_exec",
+        "description": "Netcat / ncat with -e (bind or reverse shell)",
+        "patterns": [
+            r"\bnc\s+[^\n]*-e\s+",
+            r"\bnetcat\s+[^\n]*-e\s+",
+            r"\bncat\s+[^\n]*-e\s+",
+        ],
+    },
+    {
+        "name": "user_account_create",
+        "description": "POSIX useradd with flags (new login-capable account)",
+        "patterns": [
+            r"\buseradd\s+-",
+            r"\badduser\s+--",
+        ],
+    },
+    {
+        "name": "iptables_destructive",
+        "description": "Firewall flush or permissive default policy",
+        "patterns": [
+            r"\biptables\s+(-F|--flush)\b",
+            r"\biptables\s+-P\s+INPUT\s+ACCEPT\b",
+        ],
+    },
+    {
+        "name": "pip_insecure_install",
+        "description": "pip install from plain http:// or git+http (MITM / malicious package)",
+        "patterns": [
+            r"\bpip3?\s+install\s+http://",
+            r"\bpip3?\s+install\s+git\+http://",
+        ],
+    },
+    {
+        "name": "systemd_disable_or_mask",
+        "description": "Disable or mask systemd units (SSH, audit, etc.)",
+        "patterns": [
+            r"\bsystemctl\s+disable\b",
+            r"\bsystemctl\s+mask\b",
+        ],
+    },
+    {
+        "name": "package_manager_remove",
+        "description": "Remove packages via distro package manager",
+        "patterns": [
+            r"\bapt-get\s+(-y\s+)?(remove|purge)\b",
+            r"\bapt\s+(-y\s+)?(remove|purge)\b",
+            r"\byum\s+remove\b",
+            r"\bdnf\s+remove\b",
+            r"\brpm\s+-e\b",
+        ],
+    },
+    {
+        "name": "mount_block_device",
+        "description": "Mount raw block devices (data theft / persistence)",
+        "patterns": [
+            r"\bmount\s+/dev/sd[a-z0-9]+\s+",
+            r"\bmount\s+/dev/nvme\d+n\d+p\d+\s+",
+            r"\bmount\s+/dev/vd[a-z]\d*\s+",
+        ],
+    },
+    {
+        "name": "sed_system_paths",
+        "description": "sed edits targeting /etc or /boot (config tampering)",
+        "patterns": [
+            r"\bsed\s+[^\n]*/etc/\S+",
+            r"\bsed\s+[^\n]*/boot/\S+",
+        ],
+    },
+    {
+        "name": "docker_compose_remote_spec",
+        "description": "docker compose using compose file from http(s) URL",
+        "patterns": [r"\bdocker\s+compose\b.*\s-f\s+https?://"],
+    },
+    {
+        "name": "git_clone_sensitive_target",
+        "description": "git clone into /etc, /root, or bootloader paths",
+        "patterns": [
+            r"\bgit\s+clone\s+\S+\s+/etc\b",
+            r"\bgit\s+clone\s+\S+\s+/root\b",
+            r"\bgit\s+clone\s+\S+\s+/boot\b",
+        ],
+    },
+    {
+        "name": "eval_or_shell_c_remote_fetch",
+        "description": "eval / shell -c / source with command substitution fetching curl or wget output",
+        "patterns": [
+            r"\beval\s+[\"']?\$\(curl\b",
+            r"\beval\s+[\"']?\$\(wget\b",
+            r"\b(?:bash|sh|dash|zsh)\s+-c\s+[\"']\$\(curl\b",
+            r"\b(?:bash|sh|dash|zsh)\s+-c\s+[\"']\$\(wget\b",
+            r"\bsource\s+<\s*\(\s*curl\b",
+            r"\bsource\s+<\s*\(\s*wget\b",
+            r"\.\s+<\s*\(\s*curl\b",
+            r"\.\s+<\s*\(\s*wget\b",
+        ],
+    },
+    {
+        "name": "strace_attach_init",
+        "description": "strace attached to PID 1 (init / invasive system tracing)",
+        "patterns": [r"\bstrace\s+[^\n]*-p\s+1\b"],
+    },
+    {
+        "name": "tcpdump_any_interface",
+        "description": "tcpdump capture on all interfaces (wide sniffing)",
+        "patterns": [r"\btcpdump\s+[^\n]*-i\s+any\b"],
+    },
+    {
+        "name": "openssl_server_or_pkcs12_export",
+        "description": "openssl TLS test server or PKCS#12 export (credential handling)",
+        "patterns": [
+            r"\bopenssl\s+s_server\b",
+            r"\bopenssl\s+pkcs12\b[^\n]*\s-export\b",
+        ],
+    },
+    {
+        "name": "curl_or_wget_insecure_tls",
+        "description": "curl/wget TLS verification disabled (MITM risk)",
+        "patterns": [
+            r"\bcurl\s+-k(\s|$)",
+            r"\bcurl\s+--insecure(\s|$)",
+            r"\bcurl\s+[^\n]*\s--insecure(\s|$)",
+            r"\bcurl\s+[^\n]*\s-k(\s|$)",
+            r"\bwget\s+[^\n]*--no-check-certificate\b",
+        ],
+    },
+    {
+        "name": "ssh_host_key_bypass",
+        "description": "ssh with host key / known_hosts verification disabled",
+        "patterns": [
+            r"\bssh\s+[^\n]*StrictHostKeyChecking=no\b",
+            r"\bssh\s+[^\n]*UserKnownHostsFile=/dev/null\b",
+        ],
+    },
+    {
+        "name": "socat_exec_or_system",
+        "description": "socat EXEC or SYSTEM address (arbitrary command / shell)",
+        "patterns": [
+            r"\bsocat\s+[^\n]*\bEXEC:",
+            r"\bsocat\s+[^\n]*\bSYSTEM:",
+        ],
+    },
+    {
+        "name": "socat_listen_fork",
+        "description": "socat TCP listener with fork (concurrent binds / bind-shell style)",
+        "patterns": [r"\bsocat\s+[^\n]*-LISTEN[^\n]*\bfork\b"],
+    },
+    {
+        "name": "chmod_loose_ssh_material",
+        "description": "Overly permissive chmod on .ssh paths or SSH key files",
+        "patterns": [
+            r"\bchmod\s+[^\n]*(?:777|666)\s+[^\n]*\.ssh",
+            r"\bchmod\s+[^\n]*(?:777|666)\s+[^\n]*authorized_keys\b",
+            r"\bchmod\s+[^\n]*(?:777|666)\s+[^\n]*id_rsa\b",
+            r"\bchmod\s+[^\n]*(?:777|666)\s+[^\n]*id_ed25519\b",
+        ],
+    },
+    {
+        "name": "docker_run_privileged",
+        "description": "docker run with full host privileges",
+        "patterns": [r"\bdocker\s+run\b[^\n]*\s--privileged\b"],
+    },
+    {
+        "name": "docker_run_host_namespaces",
+        "description": "docker run sharing host PID or network namespace",
+        "patterns": [
+            r"\bdocker\s+run\b[^\n]*--pid=host\b",
+            r"\bdocker\s+run\b[^\n]*\s--network\s+host\b",
+            r"\bdocker\s+run\b[^\n]*--network=host\b",
+        ],
+    },
+    {
+        "name": "nsenter_init",
+        "description": "nsenter targeting PID 1 (host namespaces / breakout)",
+        "patterns": [
+            r"\bnsenter\s+[^\n]*-t\s+1\b",
+            r"\bnsenter\s+[^\n]*--target\s+1\b",
+        ],
+    },
+    {
+        "name": "iptables_nat_redirect",
+        "description": "iptables NAT REDIRECT/DNAT (traffic interception / forwarding)",
+        "patterns": [
+            r"\biptables\s+-t\s+nat\s+[^\n]*-j\s+REDIRECT\b",
+            r"\biptables\s+-t\s+nat\s+[^\n]*-j\s+DNAT\b",
+        ],
+    },
 ]
 
 

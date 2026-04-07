@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "substrate-guard"
-version = "0.1.0"
+version = "13.1.0"
 description = "Formal verification safety layer for AI outputs"
 readme = "README.md"
 license = {text = "MIT"}
@@ -21,6 +21,7 @@ dependencies = [
 dev = [
     "pytest>=7.4",
     "pytest-asyncio>=0.24",
+    "hypothesis>=6.92",
 ]
 postgres = [
     "psycopg2-binary>=2.9",
@@ -49,4 +50,5 @@ filterwarnings = [
 ]
 markers = [
     "postgres_ci: integration tests for CI Postgres job (POSTGRES_CI=1)",
+    "fuzz: property-based / random short-input stress (hypothesis)",
 ]

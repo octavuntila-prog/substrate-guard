@@ -26,8 +26,21 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 | HMAC-SHA256 chain | VERIFIED (14,649 entries, intact) |
 | Cron audits | 45 reports, 16 consecutive days, zero missed |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
-| Tests | 270, all passing, 100% accuracy on 5 benchmark scenarios |
+| Tests | **328** passing, 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
+
+### Release v13.1 (April 7, 2026)
+
+| Area | v13 | v13.1 |
+|------|-----|-------|
+| Tests | 270 | **328** |
+| Verifier integration bugs (Guard ↔ cli / tool / code / hw) | 4 | **0** |
+| CLI dangerous patterns | ~30 | **45+** |
+| HMAC chain entry types | observe events + policy decision | **+ `formal_verification`** (`verifier_type`, `verified`, `counterexample`, `proof_time_ms`, `agent_id`) |
+| Honest gap inventory | ad hoc | **curated frontier** |
+| Counterexample in audit trail | `repr()` / lost outside `GuardEvent` | **human-readable** + **tamper-evident chain export** |
+
+**Observability loop:** auditors (SOC2 / ISO 27001) can follow agent → command → time → **pattern** → **counterexample** in the signed chain, not only allow/deny.
 
 ## 6-Layer Architecture
 
@@ -58,7 +71,7 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 
 **Prove (L3):** Z3 SMT solver generates formal mathematical proofs that agent behavior satisfies safety invariants. Not statistical confidence — mathematical certainty.
 
-**Chain:** Every event is recorded in an HMAC-SHA256 tamper-evident chain. Each entry references the hash of the previous entry. Any modification breaks the chain — detectable instantly.
+**Chain:** Every event is recorded in an HMAC-SHA256 tamper-evident chain. Each entry references the hash of the previous entry. Any modification breaks the chain — detectable instantly. Formal verification outcomes (`verify_artifact` / `session.verify`) append **`formal_verification`** entries with **`counterexample`** when a command or artifact is rejected, so audit exports retain *why* a check failed, not only that it failed.
 
 **Audit:** Daily automated audits (cron 04:00 UTC) verify chain integrity, count violations, measure latency, and export compliance reports.
 
@@ -76,13 +89,13 @@ substrate-guard/
 ├── comply/           # L4 — ZK semantic non-membership proofs
 ├── attest/           # L5 — Ed25519 cryptographic attestation
 ├── offline/          # L6 — SQLite + CRDT offline verification
-├── guard.py          # 378 LOC — main guard pipeline
+├── guard.py          # main guard pipeline (observe → policy → verify → chain)
 ├── audit.py          # 440 LOC — automated audit and reporting
 ├── combo_cli.py      # 478 LOC — CLI for all layers
 ├── integrations/     # 404 LOC — SUBSTRATE ecosystem connectors
 ├── chain.py          # HMAC-SHA256 tamper-evident chain
 ├── compliance.py     # SOC2 / ISO 27001 / ISO 42001 exports
-└── tests/            # 270 tests, 3,159 LOC
+└── tests/            # 328 tests, ~3,410 LOC (incl. adversarial + fuzz + agent CLI suite)
     ├── test_policy.py     # 541 LOC — L2 policy decisions
     ├── test_substrate.py  # 438 LOC — integration tests
     ├── test_comply.py     # 347 LOC — L4 ZK compliance
@@ -95,7 +108,7 @@ substrate-guard/
     └── test_observe.py    # 195 LOC — L1 observation
 ```
 
-**This repo: 9,205 LOC** (6,046 production + 3,159 tests).
+**This repo: ~9,456 LOC** (6,046 production + ~3,410 tests; rounded).
 
 ### Full Production Stack
 
@@ -114,7 +127,7 @@ The complete system deployed on SUBSTRATE includes additional components not in 
 
 **Total production stack: 16,019 LOC** across 2 servers (9,205 Research + 6,814 CPX52). Zero tests on production.
 
-**Tests: 270** — all on Research server. Zero tests on CPX52 production (daemon services tested through integration, not unit tests).
+**Tests: 328** in this repository — all on Research server. Zero tests on CPX52 production (daemon services tested through integration, not unit tests).
 
 ## Benchmark Results
 
