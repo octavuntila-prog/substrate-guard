@@ -1,4 +1,10 @@
-"""Smoke tests — verify the engine handles all patterns correctly."""
+"""Manual smoke runner for the code verifier (not collected by pytest).
+
+Run from repo root:
+    python tests/smoke_test.py
+
+Pytest only collects test_*.py; this file is excluded from automated runs.
+"""
 
 import sys
 from pathlib import Path
@@ -15,7 +21,7 @@ def check(name, result, expected_verified):
     ok = result.verified == expected_verified
     status = "PASS" if ok else "FAIL"
     icon = "+" if ok else "X"
-    print(f"  {icon} {status}: {name} — got {result.status.value}, "
+    print(f"  {icon} {status}: {name} - got {result.status.value}, "
           f"expected {'verified' if expected_verified else 'unsafe'} "
           f"({result.time_ms:.1f}ms)")
     if not ok:
@@ -26,7 +32,7 @@ def check(name, result, expected_verified):
 
 
 print("=" * 60)
-print("SUBSTRATE-GUARD CODE VERIFIER — Smoke Tests")
+print("SUBSTRATE-GUARD CODE VERIFIER - Smoke Tests")
 print("=" * 60)
 
 # ── Functions that SHOULD verify ────────────────────────────────────
@@ -205,3 +211,5 @@ def unsafe_div(a: int, b: int) -> int:
 print(f"\n{'=' * 60}")
 print(f"Results: {passed} passed, {failed} failed, {passed + failed} total")
 print(f"{'=' * 60}")
+import sys
+sys.exit(1 if failed else 0)

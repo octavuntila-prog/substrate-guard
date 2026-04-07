@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
-"""substrate-guard — Unified formal verification for AI outputs.
+"""substrate-guard — Single entry: Z3 verify + Black Box pipeline.
 
 Usage:
     substrate-guard verify --type code   <file> --spec <spec_file>
     substrate-guard verify --type tool   <tool_json>
-    substrate-guard verify --type cli    "<command>"
-    substrate-guard benchmark [--type code|tool|cli|all]
+    substrate-guard verify --type cli -c "<command>"
+    substrate-guard benchmark [--type code|tool|cli|all]   # Z3 verifier benchmarks
+    substrate-guard demo [--scenario safe] [--chain]
+    substrate-guard stack-benchmark                        # full pipeline scenarios
+    substrate-guard attest demo                            # Layer 5 device signing
+    substrate-guard offline demo                           # Layer 6 SQLite + sync
+    substrate-guard audit [--db-url ...]                   # PostgreSQL pipeline audit
 """
 
 import argparse
 import json
-import sys
 import os
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sys
 
 
 def cmd_verify_code(args):
@@ -92,6 +95,18 @@ def cmd_verify_cli(args):
     result = verify_cli(args.command)
     print(result)
     sys.exit(0 if result.safe else 1)
+
+
+def cmd_audit(args):
+    from substrate_guard.audit import resolve_db_url, run_audit
+
+    db_url = resolve_db_url(args.db_url, args.env)
+    if not db_url:
+        print("Error: No database URL found.")
+        print(f"Tried .env at: {args.env}, then process environment (POSTGRES_* / DATABASE_URL).")
+        print("Use --db-url or set credentials in .env / environment.")
+        return 1
+    return run_audit(db_url, hours=args.hours, output_dir=args.output)
 
 
 def cmd_benchmark(args):
@@ -174,15 +189,20 @@ def cmd_benchmark(args):
               f"{unsafe_correct}/{len(unsafe_cmds)} unsafe)")
 
 
-def main():
+def main() -> None:
+    from substrate_guard.combo_cli import STACK_HANDLERS, register_stack_parsers
+    from substrate_guard.comply.cli_commands import cmd_comply, register_comply_parser
+    from substrate_guard.attest.cli_commands import cmd_attest, register_attest_parser
+    from substrate_guard.offline.cli_commands import cmd_offline, register_offline_parser
+
     parser = argparse.ArgumentParser(
         prog="substrate-guard",
-        description="Formal verification safety layer for AI outputs",
+        description="Formal verification (Z3) + AI Black Box pipeline (observe, policy, chain)",
     )
     subparsers = parser.add_subparsers(dest="command")
 
     # verify subcommand
-    verify_parser = subparsers.add_parser("verify", help="Verify an AI output")
+    verify_parser = subparsers.add_parser("verify", help="Verify an AI output with Z3")
     verify_parser.add_argument("--type", "-t", required=True,
                                choices=["code", "tool", "cli"],
                                help="Type of verification")
@@ -196,14 +216,47 @@ def main():
     verify_parser.add_argument("--categories", nargs="+",
                                help="Forbidden pattern categories for tool verification")
 
-    # benchmark subcommand
-    bench_parser = subparsers.add_parser("benchmark", help="Run benchmarks")
+    # Z3-only benchmarks (distinct from stack-benchmark)
+    bench_parser = subparsers.add_parser(
+        "benchmark",
+        help="Run Z3 verifier benchmarks (code / tool / CLI harnesses)",
+    )
     bench_parser.add_argument("--type", "-t",
                               choices=["code", "tool", "cli", "all"],
                               default="all",
                               help="Benchmark type")
 
+    register_stack_parsers(subparsers)
+    audit_parser = subparsers.add_parser(
+        "audit",
+        help="Audit PostgreSQL (pipeline_traces / agent_runs) through the Guard pipeline",
+    )
+    audit_parser.add_argument("--db-url", help="PostgreSQL connection URL")
+    audit_parser.add_argument(
+        "--env",
+        default="/opt/ai-research-agency/.env",
+        help="Path to .env with DATABASE_URL or POSTGRES_*",
+    )
+    audit_parser.add_argument(
+        "--hours",
+        type=int,
+        default=None,
+        help="Only audit records from the last N hours (default: all)",
+    )
+    audit_parser.add_argument(
+        "--output",
+        default="/var/log/substrate-guard",
+        help="Directory for JSON audit report",
+    )
+    register_comply_parser(subparsers)
+    register_attest_parser(subparsers)
+    register_offline_parser(subparsers)
+
     args = parser.parse_args()
+
+    if args.command is None:
+        parser.print_help()
+        sys.exit(0)
 
     if args.command == "verify":
         if args.type == "code":
@@ -217,8 +270,19 @@ def main():
             cmd_verify_cli(args)
     elif args.command == "benchmark":
         cmd_benchmark(args)
+    elif args.command == "audit":
+        sys.exit(cmd_audit(args))
+    elif args.command == "comply":
+        sys.exit(cmd_comply(args))
+    elif args.command == "attest":
+        sys.exit(cmd_attest(args))
+    elif args.command == "offline":
+        sys.exit(cmd_offline(args))
+    elif args.command in STACK_HANDLERS:
+        sys.exit(STACK_HANDLERS[args.command](args))
     else:
         parser.print_help()
+        sys.exit(0)
 
 
 if __name__ == "__main__":

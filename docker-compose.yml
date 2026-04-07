@@ -1,0 +1,36 @@
+# Local / CI-style run: build from this repo root (Dockerfile here).
+# No external Docker networks required.
+#
+#   docker compose build
+#   docker compose run --rm substrate-guard python -m substrate_guard.cli stack-benchmark
+#   docker compose run --rm substrate-guard python -m substrate_guard.cli --help
+
+services:
+  substrate-guard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: substrate-guard:local
+    container_name: substrate-guard-local
+    environment:
+      GUARD_MODE: mock
+      GUARD_LOG_LEVEL: INFO
+      PYTHONPATH: /app
+    volumes:
+      - guard-logs:/var/log/substrate-guard
+    working_dir: /app
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import substrate_guard; print(substrate_guard.__version__)",
+        ]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+    command: ["python", "-m", "substrate_guard.cli", "stack-benchmark"]
+
+volumes:
+  guard-logs:
