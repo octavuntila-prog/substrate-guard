@@ -1,12 +1,16 @@
 # substrate-guard — AI Black Box
 
-**The first known formal verification system for autonomous multi-agent emergent behavior.**
+[![CI](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml) · [Reproduce checks locally](REPRODUCING.md) · [Deploy Postgres + audit](DEPLOY.md) · `docker compose build` (see `docker-compose.yml`)
 
 Others record what AI does. We prove it was correct.
 
 ---
 
-## What It Does
+### Unified CLI
+
+One command: `substrate-guard` (also `ai-blackbox`). Z3 workflows use `verify` / `benchmark`; the Black Box pipeline uses `demo`, `monitor`, `evaluate`, `export`, and `stack-benchmark` (all mock scenarios through observe → policy → Z3 — not the same as Z3-only `benchmark`). **Layer 4:** `comply demo` — semantic non-membership prototype (deterministic embeddings + Merkle + threshold; optional `sentence-transformers`). **Layer 5:** `attest demo` — device fingerprint + Ed25519 signing + local short-lived cert (`cryptography`). **Layer 6:** `offline demo` — SQLite append-only + HMAC chain + sync către o a doua bază (ex. PostgreSQL sau un al doilea fișier SQLite cu tabel `guard_events`). `python -m substrate_guard.combo_cli` delegates to the same entry point.
+
+## The Thesis
 
 substrate-guard is a 6-layer verification architecture that observes, decides, proves, and audits every action taken by autonomous AI agents — in real time, with cryptographic evidence.
 

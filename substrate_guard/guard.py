@@ -170,7 +170,7 @@ class Guard:
             layers.append("verify(Z3)")
         if self._chain:
             layers.append("chain(HMAC)")
-        logger.info(f"Guard initialized: [{' → '.join(layers)}]")
+        logger.info(f"Guard initialized: [{' -> '.join(layers)}]")
 
     @contextmanager
     def monitor(self, agent_id: str, pid: Optional[int] = None):

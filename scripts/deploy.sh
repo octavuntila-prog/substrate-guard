@@ -177,7 +177,7 @@ CONFIG
     cat > /usr/local/bin/substrate-guard << WRAPPER
 #!/bin/bash
 export PYTHONPATH=$INSTALL_DIR
-exec python3 -m substrate_guard.combo_cli "\$@"
+exec python3 -m substrate_guard.cli "\$@"
 WRAPPER
     chmod +x /usr/local/bin/substrate-guard
     
@@ -234,20 +234,8 @@ build_docker() {
         || { fail "Docker build failed"; exit 1; }
     
     echo ""
-    log "Add to docker-compose.yml:"
-    echo ""
-    echo "  substrate-guard:"
-    echo "    image: substrate-guard:latest"
-    echo "    environment:"
-    echo "      - GUARD_MODE=mock"
-    echo "    deploy:"
-    echo "      resources:"
-    echo "        limits:"
-    echo "          memory: 512M"
-    echo "          cpus: '0.5'"
-    echo "    networks:"
-    echo "      - internal"
-    echo "    restart: unless-stopped"
+    log "Local compose (repo root): docker compose build && docker compose run --rm substrate-guard python -m substrate_guard.cli --help"
+    log "Agency stack: see docker-compose.guard.yml + scripts/config_docker.json"
     echo ""
 }
 

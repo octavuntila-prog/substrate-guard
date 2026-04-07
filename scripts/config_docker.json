@@ -1,0 +1,6 @@
+{
+  "platform": "docker",
+  "clusters": {},
+  "policy": {},
+  "observe": {}
+}

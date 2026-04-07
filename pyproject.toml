@@ -10,10 +10,43 @@ readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [{name = "Octavian Untilă", email = "octav@aisophical.com"}]
-dependencies = ["z3-solver>=4.12", "sympy>=1.12"]
+dependencies = [
+    "z3-solver>=4.12",
+    "sympy>=1.12",
+    "numpy>=1.24",
+    "cryptography>=41.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-asyncio>=0.24",
+]
+postgres = [
+    "psycopg2-binary>=2.9",
+]
+# Real semantic embeddings (optional; tests skip if not installed)
+comply-ml = [
+    "sentence-transformers>=3.0.0",
+]
 
 [project.scripts]
 substrate-guard = "substrate_guard.cli:main"
+# Alias: același CLI unificat (verify + demo + export + ...)
+ai-blackbox = "substrate_guard.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["substrate_guard*"]
+
+# Only collect test_*.py (exclude tests/smoke_test.py — manual runner, not pytest)
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "ignore:The configuration option \"asyncio_default_fixture_loop_scope\":pytest.PytestDeprecationWarning",
+]
+markers = [
+    "postgres_ci: integration tests for CI Postgres job (POSTGRES_CI=1)",
+]

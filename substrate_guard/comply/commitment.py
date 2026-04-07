@@ -1,187 +1,111 @@
-"""Training Data Commitment — Merkle tree over embedding hashes.
-
-The model provider commits to their training data embeddings via a
-Merkle tree. The root is public; individual embeddings remain private.
-This is binding (cannot change data after commitment) and hiding
-(commitment reveals nothing about underlying embeddings).
-
-This is Phase 2 of the ZK-SNM protocol.
-
-Usage:
-    commitment = TrainingDataCommitment()
-    commitment.add_embedding(embedding1)
-    commitment.add_embedding(embedding2)
-    root = commitment.commit()
-    
-    # Later: prove non-membership
-    path = commitment.get_proof_path(leaf_index)
-"""
+"""Merkle commitment over embedding fingerprints (public root, private leaves)."""
 
 from __future__ import annotations
 
 import hashlib
-import json
-import logging
-import math
+from typing import List, Optional
+
 import numpy as np
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Optional
-
-logger = logging.getLogger("substrate_guard.comply.commitment")
 
 
-@dataclass
-class MerkleProof:
-    """A Merkle inclusion/exclusion proof."""
-    leaf_hash: str
-    leaf_index: int
-    path: list[tuple[str, str]]  # [(hash, "left"|"right"), ...]
-    root: str
-
-    def to_dict(self) -> dict:
-        return {
-            "leaf_hash": self.leaf_hash,
-            "leaf_index": self.leaf_index,
-            "path": self.path,
-            "root": self.root,
-        }
+def _leaf_hash(embedding: np.ndarray, doc_hash: str = "") -> str:
+    leaf_data = np.asarray(embedding, dtype=np.float32).tobytes()
+    if doc_hash:
+        leaf_data += doc_hash.encode()
+    return hashlib.sha256(leaf_data).hexdigest()
 
 
-class TrainingDataCommitment:
-    """Merkle tree commitment over training data embeddings.
-    
-    Each training document is fingerprinted (by SemanticFingerprinter),
-    then its embedding hash becomes a leaf in the Merkle tree.
-    The root hash is the public commitment.
-    
-    Args:
-        hash_fn: Hash function for tree nodes (default SHA-256).
-    """
+def _pair_hash(left: str, right: str) -> str:
+    return hashlib.sha256(f"{left}{right}".encode()).hexdigest()
 
-    def __init__(self):
-        self._leaves: list[str] = []  # SHA-256 hashes of embeddings
-        self._embeddings: list[np.ndarray] = []  # Raw embeddings (private)
-        self._tree: list[list[str]] = []  # Full Merkle tree
-        self._committed = False
+
+class EmbeddingCommitment:
+    """Binary Merkle tree over leaf hashes of embeddings."""
+
+    def __init__(self) -> None:
+        self.leaves: List[str] = []
+        self.embeddings: List[np.ndarray] = []
         self._root: Optional[str] = None
+        self._levels: List[List[str]] = []
 
-    def add_embedding(self, embedding: np.ndarray):
-        """Add a training document embedding to the commitment."""
-        if self._committed:
-            raise RuntimeError("Cannot add after commitment — tree is sealed")
-        
-        leaf_hash = hashlib.sha256(embedding.tobytes()).hexdigest()
-        self._leaves.append(leaf_hash)
-        self._embeddings.append(embedding.copy())
+    def add_embedding(self, embedding: np.ndarray, doc_hash: str = "") -> None:
+        self.leaves.append(_leaf_hash(embedding, doc_hash))
+        self.embeddings.append(np.asarray(embedding, dtype=np.float32).copy())
+        self._root = None
+        self._levels = []
 
-    def add_embeddings_batch(self, embeddings: np.ndarray):
-        """Add multiple embeddings at once."""
+    def add_batch(self, embeddings: np.ndarray) -> None:
         for emb in embeddings:
-            self.add_embedding(emb)
+            self.add_embedding(np.asarray(emb))
 
     def commit(self) -> str:
-        """Build Merkle tree and return root hash.
-        
-        After commit(), no more embeddings can be added.
-        """
-        if not self._leaves:
-            raise ValueError("No embeddings to commit")
-        
-        self._tree = self._build_tree(self._leaves)
-        self._root = self._tree[-1][0]
-        self._committed = True
-        
-        logger.info(
-            f"Committed {len(self._leaves)} embeddings, "
-            f"root={self._root[:16]}..."
-        )
+        if self._root is not None:
+            return self._root
+        if not self.leaves:
+            self._root = hashlib.sha256(b"empty").hexdigest()
+            self._levels = []
+            return self._root
+
+        current = list(self.leaves)
+        self._levels = [current]
+        while len(current) > 1:
+            nxt: List[str] = []
+            for i in range(0, len(current), 2):
+                left = current[i]
+                right = current[i + 1] if i + 1 < len(current) else left
+                nxt.append(_pair_hash(left, right))
+            self._levels.append(nxt)
+            current = nxt
+        self._root = current[0]
         return self._root
 
-    def _build_tree(self, leaves: list[str]) -> list[list[str]]:
-        """Build a full binary Merkle tree from leaves."""
-        # Pad to power of 2
-        n = len(leaves)
-        next_pow2 = 1
-        while next_pow2 < n:
-            next_pow2 *= 2
-        
-        padded = leaves + [hashlib.sha256(b"empty").hexdigest()] * (next_pow2 - n)
-        
-        tree = [padded]
-        current = padded
-        
-        while len(current) > 1:
-            next_level = []
-            for i in range(0, len(current), 2):
-                combined = current[i] + current[i + 1]
-                parent = hashlib.sha256(combined.encode()).hexdigest()
-                next_level.append(parent)
-            tree.append(next_level)
-            current = next_level
-        
-        return tree
+    def proof_of_inclusion(self, index: int) -> dict:
+        if not self.leaves:
+            raise IndexError("empty commitment")
+        if index < 0 or index >= len(self.leaves):
+            raise IndexError(index)
+        if not self._levels:
+            self.commit()
 
-    def get_proof(self, leaf_index: int) -> MerkleProof:
-        """Get a Merkle proof for a specific leaf."""
-        if not self._committed:
-            raise RuntimeError("Must commit before generating proofs")
-        if leaf_index >= len(self._leaves):
-            raise IndexError(f"Leaf index {leaf_index} out of range")
-        
-        path = []
-        idx = leaf_index
-        
-        for level in self._tree[:-1]:
+        path: list[dict[str, str]] = []
+        idx = index
+        for lev in range(len(self._levels) - 1):
+            level = self._levels[lev]
             if idx % 2 == 0:
-                sibling = level[idx + 1] if idx + 1 < len(level) else level[idx]
-                path.append((sibling, "right"))
+                sibling_idx = idx + 1 if idx + 1 < len(level) else idx
             else:
-                sibling = level[idx - 1]
-                path.append((sibling, "left"))
+                sibling_idx = idx - 1
+            path.append({"sibling": level[sibling_idx], "leaf_idx": str(idx)})
             idx //= 2
-        
-        return MerkleProof(
-            leaf_hash=self._leaves[leaf_index],
-            leaf_index=leaf_index,
-            path=path,
-            root=self._root,
-        )
+
+        return {
+            "leaf_index": index,
+            "leaf_hash": self.leaves[index],
+            "root": self._root,
+            "path": path,
+        }
 
     @staticmethod
-    def verify_proof(proof: MerkleProof) -> bool:
-        """Verify a Merkle proof against its claimed root."""
-        current = proof.leaf_hash
-        
-        for sibling_hash, direction in proof.path:
-            if direction == "left":
-                combined = sibling_hash + current
+    def verify_inclusion_proof(leaf_hash: str, path: list[dict[str, str]], root: str, leaf_start_idx: int) -> bool:
+        """Recompute root from leaf hash and sibling path (bottom-up)."""
+        cur = leaf_hash
+        idx = leaf_start_idx
+        for step in path:
+            sib = step["sibling"]
+            if idx % 2 == 0:
+                cur = _pair_hash(cur, sib)
             else:
-                combined = current + sibling_hash
-            current = hashlib.sha256(combined.encode()).hexdigest()
-        
-        return current == proof.root
-
-    def get_embedding(self, index: int) -> np.ndarray:
-        """Get a stored embedding by index (private operation)."""
-        return self._embeddings[index].copy()
-
-    @property
-    def root(self) -> Optional[str]:
-        return self._root
+                cur = _pair_hash(sib, cur)
+            idx //= 2
+        return cur == root
 
     @property
     def size(self) -> int:
-        return len(self._leaves)
-
-    @property
-    def committed(self) -> bool:
-        return self._committed
+        return len(self.leaves)
 
     def summary(self) -> dict:
         return {
-            "documents": len(self._leaves),
-            "committed": self._committed,
-            "root": self._root[:16] + "..." if self._root else None,
-            "tree_depth": len(self._tree) if self._tree else 0,
+            "root": self.commit(),
+            "num_documents": self.size,
+            "tree_depth": len(self._levels) if self._levels else 0,
         }

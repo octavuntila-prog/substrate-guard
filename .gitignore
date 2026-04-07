@@ -1,4 +1,4 @@
-__pycache__/
+﻿__pycache__/
 *.pyc
 *.pyo
 *.egg-info/
@@ -13,3 +13,4 @@ venv/
 .mypy_cache/
 .pytest_cache/
 .ruff_cache/
+*.docx

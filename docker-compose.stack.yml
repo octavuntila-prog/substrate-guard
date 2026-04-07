@@ -1,0 +1,72 @@
+# Self-contained stack: PostgreSQL + substrate-guard on one Docker network.
+# Use this to run a real audit without the full "ai-research-agency" monorepo.
+#
+#   cp .env.example .env   # edit POSTGRES_PASSWORD
+#   docker compose -f docker-compose.stack.yml up -d --build
+#   docker compose -f docker-compose.stack.yml exec substrate-guard \
+#     substrate-guard audit
+#
+# Or with explicit URL:
+#   docker compose -f docker-compose.stack.yml exec substrate-guard \
+#     substrate-guard audit --db-url "postgresql://guard:YOURPASS@db:5432/substrate"
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: guard
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: substrate
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/sql:/docker-entrypoint-initdb.d:ro
+    networks:
+      - guard_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U guard -d substrate"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  substrate-guard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: substrate-guard:local
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PYTHONPATH: /app
+      GUARD_MODE: mock
+      GUARD_LOG_LEVEL: INFO
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: guard
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: substrate
+    volumes:
+      - guard-logs:/var/log/substrate-guard
+      - ./scripts/config_docker.json:/app/config/substrate.json:ro
+    networks:
+      - guard_net
+    working_dir: /app
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import substrate_guard; print(substrate_guard.__version__)",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: ["sleep", "infinity"]
+
+networks:
+  guard_net:
+
+volumes:
+  pgdata:
+  guard-logs:
