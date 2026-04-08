@@ -128,4 +128,4 @@ Config montat: `scripts/config_docker.json` → `/app/config/substrate.json`. Pe
 
 **Securitate open-source:** politica de raportare vulnerabilități și scope: [SECURITY.md](SECURITY.md). Pe GitHub rulează și job-uri **pip-audit** / **CodeQL** (vezi `.github/workflows/`). Local, după `pip install -e ".[dev]"`, rulează și **`pytest tests/test_bandit_policy.py`** (sau întreg `tests/` — include politica Bandit din **`bandit.yaml`**).
 
-**Deploy în ordine (eBPF, Postgres, orchestrator):** [docs/RUNBOOK_ORDERED.md](docs/RUNBOOK_ORDERED.md).
+**Deploy în ordine (eBPF, Postgres, orchestrator):** [docs/RUNBOOK_ORDERED.md](docs/RUNBOOK_ORDERED.md). **CI end-to-end Docker stack + audit** (manual sau cron): [`.github/workflows/docker-stack-audit.yml`](.github/workflows/docker-stack-audit.yml) în GitHub → Actions.

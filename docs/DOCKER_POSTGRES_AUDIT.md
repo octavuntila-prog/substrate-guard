@@ -60,8 +60,13 @@ docker compose -f docker-compose.stack.yml down
 
 ## Scripturi rapide
 
-- **Linux/macOS:** `scripts/stack_audit.sh` — pornește stack-ul și rulează `doctor` + `audit`.
-- **Windows:** `scripts/stack_audit.ps1`
+- **Linux/macOS:** `scripts/stack_audit.sh` — pornește stack-ul, așteaptă **pg_isready** (max 120s), rulează `doctor` + `audit`, apoi **`docker compose down`** (curățenie). Dacă Postgres nu devine gata sau `doctor`/`audit` eșuează, scriptul iese cu **cod non-zero** și oprește stack-ul.
+- **Windows:** `scripts/stack_audit.ps1` — același comportament.
+- **Păstrează containerele** după rulare (debug): `SKIP_CLEANUP=1 ./scripts/stack_audit.sh` (Linux) sau `$env:SKIP_CLEANUP="1"; .\scripts\stack_audit.ps1` (PowerShell).
+
+## CI (GitHub Actions)
+
+Workflow **[`.github/workflows/docker-stack-audit.yml`](../.github/workflows/docker-stack-audit.yml)** — **`workflow_dispatch`** + **cron săptămânal** (luni). Rulează același flux ca `stack_audit.sh` pe `ubuntu-latest` (build imagine + pytest la build, apoi audit).
 
 ## Detalii suplimentare
 

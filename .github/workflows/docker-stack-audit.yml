@@ -1,0 +1,26 @@
+# End-to-end: docker-compose.stack.yml → doctor → audit (same as scripts/stack_audit.sh).
+# Heavy (image build runs pytest). Manual + weekly; not on every PR.
+name: Docker stack audit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  stack-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      POSTGRES_PASSWORD: ci_stack_audit_${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make stack_audit.sh executable
+        run: chmod +x scripts/stack_audit.sh
+
+      - name: Run stack (build, doctor, audit, teardown)
+        run: ./scripts/stack_audit.sh

@@ -29,6 +29,10 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 | Tests | **354** passing, 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
 
+### Release v13.2.6 (April 8, 2026) — stack scripts + CI e2e
+
+`stack_audit` robust (exit codes, teardown, `SKIP_CLEANUP`); workflow **[docker-stack-audit](.github/workflows/docker-stack-audit.yml)** (manual + săptămânal). [docs/releases/v13.2.6.md](docs/releases/v13.2.6.md).
+
 ### Release v13.2.5 (April 8, 2026) — runbook în ordine
 
 [docs/RUNBOOK_ORDERED.md](docs/RUNBOOK_ORDERED.md), [DOCKER_EBPF.md](docs/DOCKER_EBPF.md), [DOCKER_POSTGRES_AUDIT.md](docs/DOCKER_POSTGRES_AUDIT.md), `scripts/stack_audit.sh` / `.ps1`, [examples/orchestrator_inject_events.py](examples/orchestrator_inject_events.py). Vezi [docs/releases/v13.2.5.md](docs/releases/v13.2.5.md).

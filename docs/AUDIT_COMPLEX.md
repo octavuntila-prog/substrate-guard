@@ -1,7 +1,7 @@
 # Audit complex — substrate-guard (stare actuală)
 
 **Data referință:** 7 aprilie 2026  
-**Versiune pachet:** `13.2.5` (`pyproject.toml`)  
+**Versiune pachet:** `13.2.6` (`pyproject.toml`)  
 **Scop:** inventar tehnic, capabilități, teste, lanț de audit, gap-uri și limitări — fără a înlocui un audit SOC2/ISO extern.
 
 ---
@@ -98,6 +98,7 @@ Ordine logică (nume interne):
 - **Workflow `supply-chain`:** `pip>=25.3`, `pip install -e ".[dev]"`, **`pip-audit`** pe mediul curat (CVE-uri în dependențe declarate).  
 - **Workflow `CodeQL`:** analiză statică Python pe push/PR + săptămânal.  
 - **Bandit:** politică în **`bandit.yaml`**, verificare în **`pytest`** (`tests/test_bandit_policy.py`) odată cu suite-ul principal.  
+- **Docker stack audit:** workflow **`docker-stack-audit.yml`** — `docker-compose.stack.yml` + `doctor` + `audit` (manual + cron săptămânal).  
 - **Dependabot:** actualizări săptămânale `pip` + GitHub Actions. Politică raportare: [SECURITY.md](../SECURITY.md).
 
 ---
