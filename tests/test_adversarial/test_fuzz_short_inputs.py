@@ -21,6 +21,7 @@ from substrate_guard.guard import Guard
 from substrate_guard.integrations.vendor_bridge import PipelineTraceAdapter
 from substrate_guard.observe.events import EventType, FileEvent
 
+from fuzz_helpers import fuzz_max_examples
 
 # Short ASCII / Unicode text — typical “token” scale from LLM fragments
 _short_text = st.text(
@@ -34,7 +35,7 @@ _short_text = st.text(
 
 
 @settings(
-    max_examples=120,
+    max_examples=fuzz_max_examples(120),
     deadline=None,
     suppress_health_check=[HealthCheck.filter_too_much, HealthCheck.too_slow],
 )
@@ -48,7 +49,7 @@ def test_fuzz_verify_cli_never_raises_and_status_binary(s: str):
     assert r.time_ms >= 0.0
 
 
-@settings(max_examples=80, deadline=None)
+@settings(max_examples=fuzz_max_examples(80), deadline=None)
 @given(_short_text)
 @pytest.mark.fuzz
 def test_fuzz_cliverifier_consistent_with_second_call(s: str):
@@ -59,7 +60,7 @@ def test_fuzz_cliverifier_consistent_with_second_call(s: str):
     assert len(a.violations) == len(b.violations)
 
 
-@settings(max_examples=100, deadline=None)
+@settings(max_examples=fuzz_max_examples(100), deadline=None)
 @given(st.one_of(st.none(), _short_text, st.dictionaries(st.text(), st.text())))
 @pytest.mark.fuzz
 def test_fuzz_parse_json_field_total(payload):
@@ -73,7 +74,7 @@ def test_fuzz_parse_json_field_total(payload):
         assert isinstance(out, (dict, list, str, int, float, bool))
 
 
-@settings(max_examples=80, deadline=None)
+@settings(max_examples=fuzz_max_examples(80), deadline=None)
 @given(
     st.dictionaries(
         keys=st.sampled_from(
@@ -98,7 +99,7 @@ def test_fuzz_build_db_url_never_raises(env: dict):
     assert url is None or isinstance(url, str)
 
 
-@settings(max_examples=60, deadline=None)
+@settings(max_examples=fuzz_max_examples(60), deadline=None)
 @given(_short_text)
 @pytest.mark.fuzz
 def test_fuzz_pipeline_trace_adapter_row_never_raises(summary: str):
@@ -126,7 +127,7 @@ def test_fuzz_pipeline_trace_adapter_row_never_raises(summary: str):
     assert isinstance(events, list)
 
 
-@settings(max_examples=80, deadline=None)
+@settings(max_examples=fuzz_max_examples(80), deadline=None)
 @given(_short_text)
 @pytest.mark.fuzz
 def test_fuzz_guard_file_event_never_raises(path: str):
@@ -137,7 +138,7 @@ def test_fuzz_guard_file_event_never_raises(path: str):
     assert ge.policy_decision.allowed in (True, False)
 
 
-@settings(max_examples=40, deadline=None)
+@settings(max_examples=fuzz_max_examples(40), deadline=None)
 @given(st.lists(_short_text, min_size=0, max_size=12))
 @pytest.mark.fuzz
 def test_fuzz_verify_cli_batch_concat(lines: list[str]):

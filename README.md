@@ -1,6 +1,9 @@
 # substrate-guard — AI Black Box
 
-[![CI](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml) · [Security](SECURITY.md) · [Reproduce checks locally](REPRODUCING.md) · [Deploy Postgres + audit](DEPLOY.md) · `docker compose build` (see `docker-compose.yml`)
+[![CI](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml)
+[![Adversarial fuzz](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/adversarial-fuzz.yml/badge.svg)](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/adversarial-fuzz.yml)
+[![Comply ML smoke](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/comply-ml-smoke.yml/badge.svg)](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/comply-ml-smoke.yml)
+· [Security](SECURITY.md) · [Reproduce checks locally](REPRODUCING.md) · [Deploy Postgres + audit](DEPLOY.md) · `docker compose build` (see `docker-compose.yml`)
 
 Others record what AI does. We prove it was correct.
 
@@ -26,8 +29,12 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 | HMAC-SHA256 chain | VERIFIED (14,649 entries, intact) |
 | Cron audits | 45 reports, 16 consecutive days, zero missed |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
-| Tests | **354** passing, 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
+| Tests | **358** passing (365 collected), 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
+
+### Release v13.2.7 (April 7, 2026) — adversarial fuzz CI + SBERT smoke
+
+Workflows **[adversarial-fuzz](.github/workflows/adversarial-fuzz.yml)** (`SUBSTRATE_FUZZ_MULTIPLIER`, Hypothesis mai dens) + **[comply-ml-smoke](.github/workflows/comply-ml-smoke.yml)** (`sentence-transformers`). `tests/fuzz_helpers.py`, vezi [docs/releases/v13.2.7.md](docs/releases/v13.2.7.md).
 
 ### Release v13.2.6 (April 8, 2026) — stack scripts + CI e2e
 
@@ -111,7 +118,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 
 ## Codebase
 
-**Internal audit snapshot:** [docs/AUDIT_COMPLEX.md](docs/AUDIT_COMPLEX.md) (inventory tests, layers, gaps). **What “production-ready” means in this repo:** [docs/FUNCTIONAL_ROADMAP.md](docs/FUNCTIONAL_ROADMAP.md).
+**Internal audit snapshot:** [docs/AUDIT_COMPLEX.md](docs/AUDIT_COMPLEX.md) (inventory tests, layers, gaps). **Extreme/adversarial tests & how to read failures:** [docs/EXTREME_TEST_AUDIT.md](docs/EXTREME_TEST_AUDIT.md). **What “production-ready” means in this repo:** [docs/FUNCTIONAL_ROADMAP.md](docs/FUNCTIONAL_ROADMAP.md).
 
 ### This Repository (substrate-guard core)
 
@@ -132,7 +139,7 @@ substrate-guard/
 ├── integrations/     # 404 LOC — SUBSTRATE ecosystem connectors
 ├── chain.py          # HMAC-SHA256 tamper-evident chain
 ├── compliance.py     # SOC2 / ISO 27001 / ISO 42001 exports
-└── tests/            # 354 tests, ~3,410 LOC (incl. adversarial + fuzz + agent CLI suite)
+└── tests/            # 365 tests collected, ~3,410 LOC (incl. adversarial + fuzz + agent CLI suite)
     ├── test_policy.py     # 541 LOC — L2 policy decisions
     ├── test_substrate.py  # 438 LOC — integration tests
     ├── test_comply.py     # 347 LOC — L4 ZK compliance
@@ -164,7 +171,7 @@ The complete system deployed on SUBSTRATE includes additional components not in 
 
 **Total production stack: 16,019 LOC** across 2 servers (9,205 Research + 6,814 CPX52). Zero tests on production.
 
-**Tests: 354** in this repository — all on Research server. Zero tests on CPX52 production (daemon services tested through integration, not unit tests).
+**Tests: 365** collected (**358** passed in a typical local run; 7 skipped) — all on Research server. Zero tests on CPX52 production (daemon services tested through integration, not unit tests).
 
 ## Benchmark Results
 

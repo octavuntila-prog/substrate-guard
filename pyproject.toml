@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "substrate-guard"
-version = "13.2.6"
+version = "13.2.7"
 description = "Formal verification safety layer for AI outputs"
 readme = "README.md"
 license = {text = "MIT"}
@@ -43,6 +43,7 @@ include = ["substrate_guard*"]
 # Only collect test_*.py (exclude tests/smoke_test.py — manual runner, not pytest)
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-ra"
 asyncio_default_fixture_loop_scope = "function"
