@@ -124,10 +124,10 @@ class LocalStore:
     def mark_synced(self, event_ids: list[str]) -> None:
         if not event_ids:
             return
-        placeholders = ",".join("?" * len(event_ids))
-        self.conn.execute(
-            "UPDATE events SET synced = 1 WHERE id IN (" + placeholders + ")",  # nosec B608
-            event_ids,
+        # One bound parameter per row (no dynamic IN (...) SQL); sqlite3.executemany batches safely.
+        self.conn.executemany(
+            "UPDATE events SET synced = 1 WHERE id = ?",
+            [(eid,) for eid in event_ids],
         )
         self.conn.commit()
 

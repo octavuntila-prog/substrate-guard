@@ -29,6 +29,10 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 | Tests | **350** passing, 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
 
+### Release v13.2.3 (April 8, 2026)
+
+**`LocalStore.mark_synced`:** `executemany` + SQL static (fără `IN` dinamic / fără nosec Bandit). [docs/releases/v13.2.3.md](docs/releases/v13.2.3.md).
+
 ### Release v13.2.2 (April 8, 2026) — Bandit + remedieri
 
 **`bandit.yaml`**, **`bandit>=1.7`** în dev, **`tests/test_bandit_policy.py`** (Bandit ca test). Remedieri: SQL static în **`audit.py`**, excepții explicite în **`tracer`/`sync`/`attest`**, policy **`nosec B108`** documentat. See [docs/releases/v13.2.2.md](docs/releases/v13.2.2.md).

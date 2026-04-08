@@ -1,7 +1,7 @@
 # Audit complex — substrate-guard (stare actuală)
 
 **Data referință:** 7 aprilie 2026  
-**Versiune pachet:** `13.2.2` (`pyproject.toml`)  
+**Versiune pachet:** `13.2.3` (`pyproject.toml`)  
 **Scop:** inventar tehnic, capabilități, teste, lanț de audit, gap-uri și limitări — fără a înlocui un audit SOC2/ISO extern.
 
 ---
