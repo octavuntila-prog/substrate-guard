@@ -26,8 +26,12 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 | HMAC-SHA256 chain | VERIFIED (14,649 entries, intact) |
 | Cron audits | 45 reports, 16 consecutive days, zero missed |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
-| Tests | **353** passing, 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
+| Tests | **354** passing, 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
+
+### Release v13.2.5 (April 8, 2026) — runbook în ordine
+
+[docs/RUNBOOK_ORDERED.md](docs/RUNBOOK_ORDERED.md), [DOCKER_EBPF.md](docs/DOCKER_EBPF.md), [DOCKER_POSTGRES_AUDIT.md](docs/DOCKER_POSTGRES_AUDIT.md), `scripts/stack_audit.sh` / `.ps1`, [examples/orchestrator_inject_events.py](examples/orchestrator_inject_events.py). Vezi [docs/releases/v13.2.5.md](docs/releases/v13.2.5.md).
 
 ### Release v13.2.4 (April 8, 2026) — „funcțional pe bune” (clarificare)
 
@@ -49,7 +53,7 @@ Supply chain (**`pip-audit`**, Dependabot), **CodeQL**, **[SECURITY.md](SECURITY
 
 | Area | v13.1 | v13.2 |
 |------|-------|-------|
-| Tests | 328 | **353** |
+| Tests | 328 | **354** |
 | `ProcessEvent` + CLI safety | manual `verify --type cli` only | **`Guard(verify_process_cli=True)`** + **`demo` / `export` / `stack-benchmark`** default on (`--no-verify-process-cli`) |
 | `monitor` / `SubstrateGuard` / env | — | **`--verify-process-cli`**, **`SUBSTRATE_GUARD_VERIFY_PROCESS_CLI`**, config **`verify_process_cli`**, **`SessionReport.cli_process_verifications`** |
 
@@ -109,7 +113,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 
 ```
 substrate-guard/
-├── examples/         # sample configs (e.g. SubstrateGuard JSON)
+├── examples/         # sample configs + orchestrator_inject_events.py
 ├── observe/          # L1 — eBPF tracer, pipeline integration
 │   └── tracer.py     # 417 LOC — event capture and normalization
 ├── policy/           # L2 — OPA/Rego policy engine
@@ -124,7 +128,7 @@ substrate-guard/
 ├── integrations/     # 404 LOC — SUBSTRATE ecosystem connectors
 ├── chain.py          # HMAC-SHA256 tamper-evident chain
 ├── compliance.py     # SOC2 / ISO 27001 / ISO 42001 exports
-└── tests/            # 353 tests, ~3,410 LOC (incl. adversarial + fuzz + agent CLI suite)
+└── tests/            # 354 tests, ~3,410 LOC (incl. adversarial + fuzz + agent CLI suite)
     ├── test_policy.py     # 541 LOC — L2 policy decisions
     ├── test_substrate.py  # 438 LOC — integration tests
     ├── test_comply.py     # 347 LOC — L4 ZK compliance
@@ -156,7 +160,7 @@ The complete system deployed on SUBSTRATE includes additional components not in 
 
 **Total production stack: 16,019 LOC** across 2 servers (9,205 Research + 6,814 CPX52). Zero tests on production.
 
-**Tests: 353** in this repository — all on Research server. Zero tests on CPX52 production (daemon services tested through integration, not unit tests).
+**Tests: 354** in this repository — all on Research server. Zero tests on CPX52 production (daemon services tested through integration, not unit tests).
 
 ## Benchmark Results
 
@@ -219,7 +223,7 @@ python -m substrate_guard.cli demo --scenario safe
 python -m substrate_guard.cli audit --db-url postgresql://...
 ```
 
-What is **fully functional without Linux eBPF** vs. what needs a **real kernel / OPA / DB** is documented in [docs/FUNCTIONAL_ROADMAP.md](docs/FUNCTIONAL_ROADMAP.md).
+What is **fully functional without Linux eBPF** vs. what needs a **real kernel / OPA / DB** is documented in [docs/FUNCTIONAL_ROADMAP.md](docs/FUNCTIONAL_ROADMAP.md). **Ordered runbook (eBPF → Postgres → orchestrator example):** [docs/RUNBOOK_ORDERED.md](docs/RUNBOOK_ORDERED.md).
 
 ## Known Limitations
 

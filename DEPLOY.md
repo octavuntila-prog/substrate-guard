@@ -1,5 +1,7 @@
 # Deploy „pe bine” — PostgreSQL + audit real
 
+**Index pas-cu-pas (ordine recomandată):** [docs/RUNBOOK_ORDERED.md](docs/RUNBOOK_ORDERED.md) · Postgres+Docker: [docs/DOCKER_POSTGRES_AUDIT.md](docs/DOCKER_POSTGRES_AUDIT.md) · eBPF: [docs/DOCKER_EBPF.md](docs/DOCKER_EBPF.md).
+
 Acest ghid presupune că vrei **conexiune la Postgres** și rularea **`substrate_guard.audit`** (citește `pipeline_traces` și `agent_runs`, evaluează prin Guard).
 
 ## 1. Dependențe Python (pe host sau în venv)

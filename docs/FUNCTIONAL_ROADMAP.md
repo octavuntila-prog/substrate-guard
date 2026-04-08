@@ -63,6 +63,10 @@ Codul există și este acoperit de teste; „funcțional pe bune” în sens **r
 3. Pentru demo „ca în producție”: Linux VM + Docker cu capabilități BPF sau integrare prin **evenimente injectate** din orchestratorul vostru.
 4. Urmăriți **Dependabot / pip-audit / CodeQL** și actualizați `cryptography` etc. ca în workflow-uri.
 
+## Pași în ordine (deploy + integrare)
+
+Vezi **[RUNBOOK_ORDERED.md](RUNBOOK_ORDERED.md)** — eBPF → Postgres/audit → exemplu orchestrator.
+
 ---
 
 *Ultima actualizare: aliniată versiunii din `pyproject.toml`.*
