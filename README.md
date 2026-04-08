@@ -1,6 +1,6 @@
 # substrate-guard — AI Black Box
 
-[![CI](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml) · [Reproduce checks locally](REPRODUCING.md) · [Deploy Postgres + audit](DEPLOY.md) · `docker compose build` (see `docker-compose.yml`)
+[![CI](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/octavuntila-prog/substrate-guard/actions/workflows/ci.yml) · [Security](SECURITY.md) · [Reproduce checks locally](REPRODUCING.md) · [Deploy Postgres + audit](DEPLOY.md) · `docker compose build` (see `docker-compose.yml`)
 
 Others record what AI does. We prove it was correct.
 
@@ -28,6 +28,10 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
 | Tests | **348** passing, 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
+
+### Release v13.2.1 (April 8, 2026) — hardening
+
+Supply chain (**`pip-audit`**, Dependabot), **CodeQL**, **[SECURITY.md](SECURITY.md)**, `cryptography>=46.0.6`, fix **`os.system`** în benchmark tool. See [docs/releases/v13.2.1.md](docs/releases/v13.2.1.md).
 
 ### Release v13.2 (April 7, 2026)
 

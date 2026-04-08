@@ -16,8 +16,9 @@ Usage:
 
 import argparse
 import json
-import os
+import subprocess
 import sys
+from pathlib import Path
 
 
 def cmd_verify_code(args):
@@ -124,8 +125,8 @@ def cmd_benchmark(args):
         print("\n" + "=" * 70)
         print("TOOL API VERIFIER BENCHMARK")
         print("=" * 70)
-        # Import and run inline
-        os.system(f"python3 {os.path.join(os.path.dirname(__file__), '..', 'benchmarks', 'run_tool_benchmark.py')}")
+        script = Path(__file__).resolve().parent.parent / "benchmarks" / "run_tool_benchmark.py"
+        subprocess.run([sys.executable, str(script)], check=False)
 
     if bench_type in ("cli", "all"):
         print("\n" + "=" * 70)

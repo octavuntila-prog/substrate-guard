@@ -122,3 +122,5 @@ Config montat: `scripts/config_docker.json` → `/app/config/substrate.json`. Pe
 ---
 
 **Regulă:** dacă `pip install -e ".[dev]"` + `pytest tests/` trec pe mașina ta, ai aceeași poartă minimă ca pipeline-ul `test` din CI. Pentru parity completă cu `postgres-ci`, rulează și pașii din secțiunea *Integrare Postgres* de mai sus.
+
+**Securitate open-source:** politica de raportare vulnerabilități și scope: [SECURITY.md](SECURITY.md). Pe GitHub rulează și job-uri **pip-audit** / **CodeQL** (vezi `.github/workflows/`).

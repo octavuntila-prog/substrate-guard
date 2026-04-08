@@ -1,0 +1,32 @@
+# pip-audit: known CVEs in dependencies after a clean install (complements Dependabot).
+name: Supply chain
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install project + dev
+        run: |
+          python -m pip install --upgrade "pip>=25.3"
+          pip install -e ".[dev]"
+          pip install pip-audit
+
+      - name: pip-audit (direct environment)
+        run: pip-audit

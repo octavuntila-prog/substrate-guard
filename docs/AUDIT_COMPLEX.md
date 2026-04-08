@@ -1,7 +1,7 @@
 # Audit complex — substrate-guard (stare actuală)
 
 **Data referință:** 7 aprilie 2026  
-**Versiune pachet:** `13.2.0` (`pyproject.toml`)  
+**Versiune pachet:** `13.2.1` (`pyproject.toml`)  
 **Scop:** inventar tehnic, capabilități, teste, lanț de audit, gap-uri și limitări — fără a înlocui un audit SOC2/ISO extern.
 
 ---
@@ -95,6 +95,9 @@ Ordine logică (nume interne):
 
 - **Job `test`:** Python 3.10 / 3.11 / 3.12, `pip install -e ".[dev]"`, `pytest tests/ -q`, apoi `python tests/smoke_test.py`.  
 - **Job `postgres-ci`:** Postgres 16 service, `POSTGRES_CI=1`, schemă audit, teste Postgres dedicate.
+- **Workflow `supply-chain`:** `pip>=25.3`, `pip install -e ".[dev]"`, **`pip-audit`** pe mediul curat (CVE-uri în dependențe declarate).  
+- **Workflow `CodeQL`:** analiză statică Python pe push/PR + săptămânal.  
+- **Dependabot:** actualizări săptămânale `pip` + GitHub Actions. Politică raportare: [SECURITY.md](../SECURITY.md).
 
 ---
 
@@ -120,7 +123,7 @@ Ordine logică (nume interne):
 
 ## 9. Concluzie audit
 
-**Puncte forte:** acoperire teste largă (335), integrare Guard ↔ verificatori corectată, lanț de audit cu **motiv formal** (`counterexample`) pentru conformitate și investigații interne, CLI extins cu grupuri clare, CI multi-Python + Postgres.
+**Puncte forte:** acoperire teste largă (348), integrare Guard ↔ verificatori corectată, lanț de audit cu **motiv formal** (`counterexample`) pentru conformitate și investigații interne, CLI extins cu grupuri clare, CI multi-Python + Postgres.
 
 **Următori pași posibili (nu sunt defecte):** extindere structurală dincolo de regex pentru shell; integrare automată verify la anumite tipuri de eveniment; mediu CI cu SBERT pentru zero skip.
 
