@@ -38,5 +38,6 @@ You should receive an acknowledgment within a few business days. We will coordin
 - CI runs **`pip-audit`** on the installed package environment to surface known CVEs in declared dependencies.
 - **Dependabot** is enabled for `pip` and GitHub Actions.
 - **CodeQL** runs on the default branch and pull requests for Python analysis.
+- **Bandit** is run against `substrate_guard/` using **`bandit.yaml`** (policy) and **`tests/test_bandit_policy.py`** so regressions fail CI the same way as unit tests.
 
 Hardening is iterative; patches that tighten boundaries without breaking public APIs are especially welcome.

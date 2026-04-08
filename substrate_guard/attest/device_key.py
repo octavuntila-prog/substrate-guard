@@ -62,11 +62,13 @@ class DeviceKey:
             self._public_path.write_bytes(pub)
 
     def sign(self, data: bytes) -> bytes:
-        assert self._signing_key is not None
+        if self._signing_key is None:
+            raise RuntimeError("DeviceKey has no signing key")
         return self._signing_key.sign(data)
 
     def verify(self, data: bytes, signature: bytes) -> bool:
-        assert self._verify_key is not None
+        if self._verify_key is None:
+            return False
         try:
             self._verify_key.verify(signature, data)
             return True
@@ -75,7 +77,8 @@ class DeviceKey:
 
     @property
     def public_key_hex(self) -> str:
-        assert self._verify_key is not None
+        if self._verify_key is None:
+            raise RuntimeError("DeviceKey has no verify key")
         raw = self._verify_key.public_bytes(
             serialization.Encoding.Raw,
             serialization.PublicFormat.Raw,

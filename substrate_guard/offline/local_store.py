@@ -126,7 +126,7 @@ class LocalStore:
             return
         placeholders = ",".join("?" * len(event_ids))
         self.conn.execute(
-            f"UPDATE events SET synced = 1 WHERE id IN ({placeholders})",
+            "UPDATE events SET synced = 1 WHERE id IN (" + placeholders + ")",  # nosec B608
             event_ids,
         )
         self.conn.commit()

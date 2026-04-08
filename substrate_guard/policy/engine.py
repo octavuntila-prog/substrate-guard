@@ -374,8 +374,8 @@ def _check_workspace_boundary(action, agent, context) -> Optional[str]:
     path = action.get("path", "")
     workspace = context.get("workspace", "/workspace/")
     
-    # Allow workspace and /tmp
-    if path.startswith(workspace) or path.startswith("/tmp/"):
+    # Allow workspace and /tmp (path prefix check, not mkstemp — policy sandbox)
+    if path.startswith(workspace) or path.startswith("/tmp/"):  # nosec B108
         return None
     
     # Everything else is denied for non-admin agents

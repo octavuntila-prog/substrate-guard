@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+from contextlib import suppress
 from typing import Any, Callable
 
 logger = logging.getLogger("substrate_guard.offline.sync")
@@ -63,14 +64,10 @@ class SyncEngine:
                 except Exception as e:
                     logger.warning("Failed to sync event %s: %s", event["id"], e)
             conn.commit()
-            try:
+            with suppress(Exception):
                 cur.close()
-            except Exception:
-                pass
-            try:
+            with suppress(Exception):
                 conn.close()
-            except Exception:
-                pass
 
             if synced_ids:
                 self.local.mark_synced(synced_ids)

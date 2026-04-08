@@ -26,8 +26,12 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 | HMAC-SHA256 chain | VERIFIED (14,649 entries, intact) |
 | Cron audits | 45 reports, 16 consecutive days, zero missed |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
-| Tests | **348** passing, 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
+| Tests | **350** passing, 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
+
+### Release v13.2.2 (April 8, 2026) — Bandit + remedieri
+
+**`bandit.yaml`**, **`bandit>=1.7`** în dev, **`tests/test_bandit_policy.py`** (Bandit ca test). Remedieri: SQL static în **`audit.py`**, excepții explicite în **`tracer`/`sync`/`attest`**, policy **`nosec B108`** documentat. See [docs/releases/v13.2.2.md](docs/releases/v13.2.2.md).
 
 ### Release v13.2.1 (April 8, 2026) — hardening
 
@@ -37,7 +41,7 @@ Supply chain (**`pip-audit`**, Dependabot), **CodeQL**, **[SECURITY.md](SECURITY
 
 | Area | v13.1 | v13.2 |
 |------|-------|-------|
-| Tests | 328 | **348** |
+| Tests | 328 | **350** |
 | `ProcessEvent` + CLI safety | manual `verify --type cli` only | **`Guard(verify_process_cli=True)`** + **`demo` / `export` / `stack-benchmark`** default on (`--no-verify-process-cli`) |
 | `monitor` / `SubstrateGuard` / env | — | **`--verify-process-cli`**, **`SUBSTRATE_GUARD_VERIFY_PROCESS_CLI`**, config **`verify_process_cli`**, **`SessionReport.cli_process_verifications`** |
 
@@ -112,7 +116,7 @@ substrate-guard/
 ├── integrations/     # 404 LOC — SUBSTRATE ecosystem connectors
 ├── chain.py          # HMAC-SHA256 tamper-evident chain
 ├── compliance.py     # SOC2 / ISO 27001 / ISO 42001 exports
-└── tests/            # 348 tests, ~3,410 LOC (incl. adversarial + fuzz + agent CLI suite)
+└── tests/            # 350 tests, ~3,410 LOC (incl. adversarial + fuzz + agent CLI suite)
     ├── test_policy.py     # 541 LOC — L2 policy decisions
     ├── test_substrate.py  # 438 LOC — integration tests
     ├── test_comply.py     # 347 LOC — L4 ZK compliance
@@ -144,7 +148,7 @@ The complete system deployed on SUBSTRATE includes additional components not in 
 
 **Total production stack: 16,019 LOC** across 2 servers (9,205 Research + 6,814 CPX52). Zero tests on production.
 
-**Tests: 348** in this repository — all on Research server. Zero tests on CPX52 production (daemon services tested through integration, not unit tests).
+**Tests: 350** in this repository — all on Research server. Zero tests on CPX52 production (daemon services tested through integration, not unit tests).
 
 ## Benchmark Results
 

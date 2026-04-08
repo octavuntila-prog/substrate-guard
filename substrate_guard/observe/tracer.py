@@ -24,7 +24,7 @@ import logging
 import threading
 import time
 from pathlib import Path
-from queue import Queue, Empty
+from queue import Queue, Empty, Full
 from typing import Optional, Generator, Set
 
 from .events import (
@@ -197,8 +197,8 @@ class AgentTracer:
         self._stream.add(event)
         try:
             self._event_queue.put_nowait(event)
-        except:
-            pass  # Queue full, skip
+        except Full:
+            pass  # bounded queue: drop when saturated
 
     # --- BPF callbacks ---
 
@@ -292,7 +292,7 @@ class AgentTracer:
         self._stream.add(event)
         try:
             self._event_queue.put_nowait(event)
-        except:
+        except Full:
             pass
 
     def _bpf_poll_loop(self):

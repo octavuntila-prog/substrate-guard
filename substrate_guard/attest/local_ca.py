@@ -70,7 +70,8 @@ class LocalCA:
     def current(self) -> dict[str, Any]:
         if not self._current_cert or not self._is_valid(self._current_cert):
             self._issue_new()
-        assert self._current_cert is not None
+        if self._current_cert is None:
+            raise RuntimeError("LocalCA failed to obtain a valid certificate")
         return self._current_cert
 
     def verify_cert(self, cert: dict[str, Any]) -> bool:

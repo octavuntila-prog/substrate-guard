@@ -1,0 +1,14 @@
+# Bandit static analysis policy for substrate-guard (enforced in CI + tests/test_bandit_policy.py).
+# Docs: https://bandit.readthedocs.io/en/latest/config.html
+
+exclude_dirs:
+  - "tests"
+  - "benchmarks"
+  - "build"
+  - "dist"
+  - ".venv"
+
+skips:
+  # subprocess without shell is intentional (OPA binary, benchmarks).
+  - B404
+  - B603

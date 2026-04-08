@@ -133,6 +133,58 @@ def query_db(db_url: str, query: str, params: tuple = ()) -> list[dict]:
         conn.close()
 
 
+# Static SQL only (no dynamic identifiers): parameters use psycopg placeholders.
+_SQL_PIPELINE_WITH_HOURS = """
+    SELECT id, trace_id, pipeline_run_id, step_index, agent_id,
+           agent_name, status, model_used, input_summary, output_summary,
+           tokens_in, tokens_out, cost_usd, duration_ms, error,
+           started_at, completed_at, confidence
+    FROM pipeline_traces
+    WHERE started_at >= %s
+    ORDER BY started_at DESC
+    LIMIT %s
+"""
+
+_SQL_PIPELINE_NO_HOURS = """
+    SELECT id, trace_id, pipeline_run_id, step_index, agent_id,
+           agent_name, status, model_used, input_summary, output_summary,
+           tokens_in, tokens_out, cost_usd, duration_ms, error,
+           started_at, completed_at, confidence
+    FROM pipeline_traces
+    ORDER BY started_at DESC
+    LIMIT %s
+"""
+
+_SQL_AGENT_RUNS_WITH_HOURS = """
+    SELECT id, agent_id, agent_name, status, duration_ms,
+           confidence, error, input_summary, output_summary,
+           trace_id, created_at
+    FROM agent_runs
+    WHERE created_at >= %s
+    ORDER BY created_at DESC
+    LIMIT %s
+"""
+
+_SQL_AGENT_RUNS_NO_HOURS = """
+    SELECT id, agent_id, agent_name, status, duration_ms,
+           confidence, error, input_summary, output_summary,
+           trace_id, created_at
+    FROM agent_runs
+    ORDER BY created_at DESC
+    LIMIT %s
+"""
+
+_COUNT_QUERIES: dict[str, str] = {
+    "pipeline_traces": "SELECT COUNT(*) as cnt FROM pipeline_traces",
+    "agent_runs": "SELECT COUNT(*) as cnt FROM agent_runs",
+    "pipeline_runs": "SELECT COUNT(*) as cnt FROM pipeline_runs",
+    "ideas": "SELECT COUNT(*) as cnt FROM ideas",
+    "qa_reports": "SELECT COUNT(*) as cnt FROM qa_reports",
+    "audit_log": "SELECT COUNT(*) as cnt FROM audit_log",
+    "notifications": "SELECT COUNT(*) as cnt FROM notifications",
+}
+
+
 def fetch_pipeline_traces(db_url: str, hours: Optional[int] = None, limit: int = 5000) -> list[dict]:
     """Fetch pipeline_traces from PostgreSQL.
     
@@ -141,28 +193,10 @@ def fetch_pipeline_traces(db_url: str, hours: Optional[int] = None, limit: int =
     tokens_in, tokens_out, cost_usd, duration_ms, error, started_at,
     completed_at, confidence
     """
-    cols = """id, trace_id, pipeline_run_id, step_index, agent_id,
-              agent_name, status, model_used, input_summary, output_summary,
-              tokens_in, tokens_out, cost_usd, duration_ms, error,
-              started_at, completed_at, confidence"""
     if hours:
         since = datetime.utcnow() - timedelta(hours=hours)
-        query = f"""
-            SELECT {cols}
-            FROM pipeline_traces
-            WHERE started_at >= %s
-            ORDER BY started_at DESC
-            LIMIT %s
-        """
-        return query_db(db_url, query, (since, limit))
-    else:
-        query = f"""
-            SELECT {cols}
-            FROM pipeline_traces
-            ORDER BY started_at DESC
-            LIMIT %s
-        """
-        return query_db(db_url, query, (limit,))
+        return query_db(db_url, _SQL_PIPELINE_WITH_HOURS, (since, limit))
+    return query_db(db_url, _SQL_PIPELINE_NO_HOURS, (limit,))
 
 
 def fetch_agent_runs(db_url: str, hours: Optional[int] = None, limit: int = 5000) -> list[dict]:
@@ -171,39 +205,18 @@ def fetch_agent_runs(db_url: str, hours: Optional[int] = None, limit: int = 5000
     Real schema: id, agent_id (int), agent_name, status, duration_ms,
     confidence, error, input_summary, output_summary, trace_id, created_at
     """
-    cols = """id, agent_id, agent_name, status, duration_ms,
-              confidence, error, input_summary, output_summary,
-              trace_id, created_at"""
     if hours:
         since = datetime.utcnow() - timedelta(hours=hours)
-        query = f"""
-            SELECT {cols}
-            FROM agent_runs
-            WHERE created_at >= %s
-            ORDER BY created_at DESC
-            LIMIT %s
-        """
-        return query_db(db_url, query, (since, limit))
-    else:
-        query = f"""
-            SELECT {cols}
-            FROM agent_runs
-            ORDER BY created_at DESC
-            LIMIT %s
-        """
-        return query_db(db_url, query, (limit,))
+        return query_db(db_url, _SQL_AGENT_RUNS_WITH_HOURS, (since, limit))
+    return query_db(db_url, _SQL_AGENT_RUNS_NO_HOURS, (limit,))
 
 
 def fetch_table_counts(db_url: str) -> dict:
     """Get record counts for key tables."""
-    tables = [
-        "pipeline_traces", "agent_runs", "pipeline_runs",
-        "ideas", "qa_reports", "audit_log", "notifications",
-    ]
-    counts = {}
-    for table in tables:
+    counts: dict[str, int] = {}
+    for table, query in _COUNT_QUERIES.items():
         try:
-            rows = query_db(db_url, f"SELECT COUNT(*) as cnt FROM {table}")
+            rows = query_db(db_url, query)
             counts[table] = rows[0]["cnt"] if rows else 0
         except Exception:
             counts[table] = -1
