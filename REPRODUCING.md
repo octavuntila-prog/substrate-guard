@@ -60,6 +60,14 @@ python -m substrate_guard.cli attest demo
 python -m substrate_guard.cli offline demo
 ```
 
+### Variabile de mediu (v13.2+): CLI pe `ProcessEvent`
+
+Pentru **`SubstrateGuard`** și comanda **`monitor`**, poți activa/dezactiva verificarea regex pe linia de comandă reconstruită din evenimente proces fără să editezi cod:
+
+- **`SUBSTRATE_GUARD_VERIFY_PROCESS_CLI`** — `1` / `true` / `on` (pornește), `0` / `false` / `off` (oprește). La **`demo`**, **`export`**, **`stack-benchmark`**, valoarea `off` dezactivează comportamentul implicit „pipeline complet” fără flag-uri (util în CI).
+
+Exemplu minimal de JSON pentru integrare: [`examples/substrate.json`](examples/substrate.json). Detalii: [`docs/releases/v13.2.md`](docs/releases/v13.2.md).
+
 ## Opțional: encoder semantic (Comply ML)
 
 ```bash

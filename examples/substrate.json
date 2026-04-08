@@ -1,5 +1,5 @@
 {
-  "platform": "docker",
+  "platform": "example.local",
   "verify_process_cli": false,
   "clusters": {},
   "policy": {},

@@ -16,6 +16,10 @@ import time
 import logging
 
 from .guard import Guard, SessionReport
+from .runtime_env import (
+    monitor_verify_process_cli,
+    pipeline_verify_process_cli,
+)
 from .observe.events import (
     Event, EventType, FileEvent, NetworkEvent, ProcessEvent,
 )
@@ -30,6 +34,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger("substrate_guard.cli")
 
+# Single source of truth: pipeline showcase commands (demo / export / stack-benchmark)
+DEFAULT_VERIFY_PROCESS_CLI_PIPELINE = True
 
 # ============================================
 # ANSI colors for terminal output
@@ -103,6 +109,9 @@ def print_report(report: SessionReport):
     f_color = C.ok if failures == 0 else C.fail
     print(f"    Verified:           {checked}")
     print(f"    Failures:           {f_color(failures)}")
+    cli_pc = d["layers"]["verify"].get("cli_process_checks", 0)
+    if cli_pc:
+        print(f"    {C.dim('CLI (ProcessEvent):')} {cli_pc}")
     print()
 
     # Detail: violations
@@ -142,6 +151,10 @@ def cmd_demo(args):
     print(f"  Scenario: {C.bold(label)}")
     print(f"  Agent:    {C.info(agent_id)}")
     pipe = "eBPF(mock) -> OPA(builtin) -> Z3"
+    if pipeline_verify_process_cli(
+        args, default=DEFAULT_VERIFY_PROCESS_CLI_PIPELINE
+    ):
+        pipe += " + CLI(regex) on ProcessEvent"
     if args.chain:
         pipe += " -> HMAC chain"
     print(f"  Pipeline: {pipe}")
@@ -156,6 +169,9 @@ def cmd_demo(args):
         observe=True,
         policy="nonexistent/",
         verify=True,
+        verify_process_cli=pipeline_verify_process_cli(
+            args, default=DEFAULT_VERIFY_PROCESS_CLI_PIPELINE
+        ),
         chain=args.chain,
         hmac_secret=hmac_secret if args.chain else None,
         use_mock=True,
@@ -246,12 +262,16 @@ def cmd_monitor(args):
         print(f"  Tracing PID: {args.pid}")
     
     print(f"  Policy: {args.policy or 'builtin'}")
+    _mvpc = monitor_verify_process_cli(args)
+    if _mvpc:
+        print(f"  {C.info('CLI verify on ProcessEvent:')} enabled (regex, same as verify --type cli)")
     print(f"  Press Ctrl+C to stop\n")
 
     guard = Guard(
         observe=True,
         policy=args.policy or "nonexistent/",
         verify=True,
+        verify_process_cli=_mvpc,
         use_mock=not args.live,
     )
 
@@ -297,7 +317,15 @@ def cmd_pipeline_benchmark(args):
     results = []
 
     for key, (label, scenario_fn) in scenarios.items():
-        guard = Guard(observe=True, policy="nonexistent/", verify=True, use_mock=True)
+        guard = Guard(
+            observe=True,
+            policy="nonexistent/",
+            verify=True,
+            verify_process_cli=pipeline_verify_process_cli(
+                args, default=DEFAULT_VERIFY_PROCESS_CLI_PIPELINE
+            ),
+            use_mock=True,
+        )
         
         start = time.perf_counter()
         with guard.monitor(f"bench-{key}") as session:
@@ -356,6 +384,9 @@ def cmd_export(args):
         observe=True,
         policy="nonexistent/",
         verify=True,
+        verify_process_cli=pipeline_verify_process_cli(
+            args, default=DEFAULT_VERIFY_PROCESS_CLI_PIPELINE
+        ),
         chain=True,
         hmac_secret=args.secret or "substrate-guard-demo",
         use_mock=True,
@@ -440,6 +471,11 @@ def register_stack_parsers(subparsers: argparse._SubParsersAction) -> None:
         "--secret",
         help="HMAC secret for chain (default: env SUBSTRATE_GUARD_HMAC_SECRET or demo key)",
     )
+    demo_parser.add_argument(
+        "--no-verify-process-cli",
+        action="store_true",
+        help="Skip CLI regex verification on ProcessEvent (default: enabled with verify)",
+    )
 
     eval_parser = subparsers.add_parser("evaluate", help="Evaluate a single event against policies")
     eval_parser.add_argument("--event", "-e", required=True, help="JSON event data")
@@ -453,10 +489,25 @@ def register_stack_parsers(subparsers: argparse._SubParsersAction) -> None:
     mon_parser.add_argument("--policy", "-p", help="Path to .rego policy file/dir")
     mon_parser.add_argument("--live", action="store_true",
                            help="Use real eBPF (requires root + kernel 5.4+)")
+    mon_parser.add_argument(
+        "--verify-process-cli",
+        action="store_true",
+        help="Run CLI regex verification on each ProcessEvent (optional; adds work per exec)",
+    )
+    mon_parser.add_argument(
+        "--no-verify-process-cli",
+        action="store_true",
+        help="Force off even if SUBSTRATE_GUARD_VERIFY_PROCESS_CLI is set",
+    )
 
-    subparsers.add_parser(
+    bench_parser = subparsers.add_parser(
         "stack-benchmark",
         help="Full pipeline benchmark (all mock scenarios; not the Z3-only benchmark)",
+    )
+    bench_parser.add_argument(
+        "--no-verify-process-cli",
+        action="store_true",
+        help="Skip CLI regex verification on ProcessEvent (default: enabled with verify)",
     )
 
     export_parser = subparsers.add_parser("export", help="Export compliance evidence + chain")
@@ -469,6 +520,11 @@ def register_stack_parsers(subparsers: argparse._SubParsersAction) -> None:
     export_parser.add_argument("--output", "-o", help="Output file path")
     export_parser.add_argument("--secret", help="HMAC secret for chain (default: demo key)")
     export_parser.add_argument("--org", help="Organization name for report")
+    export_parser.add_argument(
+        "--no-verify-process-cli",
+        action="store_true",
+        help="Skip CLI regex verification on ProcessEvent (default: enabled with verify)",
+    )
 
 
 # Dispatch for unified CLI (keys must match subparser names above)

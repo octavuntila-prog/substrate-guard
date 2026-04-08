@@ -7,7 +7,8 @@ Usage:
     substrate-guard verify --type cli -c "<command>"
     substrate-guard benchmark [--type code|tool|cli|all]   # Z3 verifier benchmarks
     substrate-guard demo [--scenario safe] [--chain]
-    substrate-guard stack-benchmark                        # full pipeline scenarios
+    substrate-guard monitor -a <id> [--live] [--verify-process-cli] [--no-verify-process-cli]
+    substrate-guard stack-benchmark [--no-verify-process-cli]  # full pipeline scenarios
     substrate-guard attest demo                            # Layer 5 device signing
     substrate-guard offline demo                           # Layer 6 SQLite + sync
     substrate-guard audit [--db-url ...]                   # PostgreSQL pipeline audit

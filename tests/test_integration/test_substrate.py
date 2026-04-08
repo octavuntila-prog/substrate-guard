@@ -226,6 +226,40 @@ class TestSubstrateGuard:
         assert health["observe"]["status"] == "ok"
         assert health["policy"]["status"] in ("ok", "ok-no-policy")
 
+    def test_verify_process_cli_default_off(self, sg):
+        assert sg.guard._verify_process_cli is False
+
+    def test_verify_process_cli_kwarg(self):
+        sg = SubstrateGuard(use_ebpf=False, verify_process_cli=True)
+        assert sg.guard._verify_process_cli is True
+
+    def test_verify_process_cli_from_config_file(self, tmp_path):
+        cfg = tmp_path / "substrate.json"
+        cfg.write_text('{"verify_process_cli": true, "platform": "test.local"}')
+        sg = SubstrateGuard(config_path=str(cfg), use_ebpf=False)
+        assert sg.guard._verify_process_cli is True
+        assert sg.config.platform == "test.local"
+
+    def test_verify_process_cli_kwarg_overrides_config(self, tmp_path):
+        cfg = tmp_path / "substrate.json"
+        cfg.write_text('{"verify_process_cli": true}')
+        sg = SubstrateGuard(config_path=str(cfg), use_ebpf=False, verify_process_cli=False)
+        assert sg.guard._verify_process_cli is False
+
+    def test_env_enables_over_config_false(self, tmp_path, monkeypatch):
+        cfg = tmp_path / "substrate.json"
+        cfg.write_text('{"verify_process_cli": false}')
+        monkeypatch.setenv("SUBSTRATE_GUARD_VERIFY_PROCESS_CLI", "1")
+        sg = SubstrateGuard(config_path=str(cfg), use_ebpf=False)
+        assert sg.guard._verify_process_cli is True
+
+    def test_explicit_kwarg_overrides_env(self, tmp_path, monkeypatch):
+        cfg = tmp_path / "substrate.json"
+        cfg.write_text("{}")
+        monkeypatch.setenv("SUBSTRATE_GUARD_VERIFY_PROCESS_CLI", "1")
+        sg = SubstrateGuard(config_path=str(cfg), use_ebpf=False, verify_process_cli=False)
+        assert sg.guard._verify_process_cli is False
+
 
 # ============================================
 # Mirror Reporter Tests

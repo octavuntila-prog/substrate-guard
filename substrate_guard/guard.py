@@ -27,7 +27,7 @@ from typing import Any, Generator, Optional, Tuple
 from pathlib import Path
 
 from .observe.tracer import AgentTracer
-from .observe.events import Event, EventType, Severity, EventStream
+from .observe.events import Event, EventType, ProcessEvent, Severity, EventStream
 from .policy.engine import PolicyEngine, PolicyDecision
 
 logger = logging.getLogger("substrate_guard")
@@ -112,6 +112,23 @@ def _map_verification_to_guard(
     return False, f"unrecognized verification result: {type(result).__name__}"
 
 
+def _command_line_from_process_event(event: Event) -> Optional[str]:
+    """Reconstruct a shell-like command string from execve metadata for CLI verification."""
+    if not isinstance(event, ProcessEvent):
+        return None
+    if event.args:
+        cmd = " ".join(str(a) for a in event.args).strip()
+    elif event.filename:
+        cmd = str(event.filename).strip()
+    else:
+        return None
+    if not cmd:
+        return None
+    if len(cmd) > 8192:
+        return cmd[:8192] + "…"
+    return cmd
+
+
 def _verification_to_chain_event(vr: "VerificationResult", agent_id: Optional[str]) -> dict:
     """Structured chain entry for auditors: why formal verification passed or failed."""
     return {
@@ -162,6 +179,7 @@ class SessionReport:
     policy_allowed: int
     formal_verifications: int
     formal_failures: int
+    cli_process_verifications: int = 0
     events: list[GuardEvent] = field(default_factory=list)
     cost_estimate_usd: float = 0.0
 
@@ -180,6 +198,7 @@ class SessionReport:
                 "verify": {
                     "checked": self.formal_verifications,
                     "failures": self.formal_failures,
+                    "cli_process_checks": self.cli_process_verifications,
                 },
             },
             "cost_usd": round(self.cost_estimate_usd, 4),
@@ -190,13 +209,16 @@ class SessionReport:
     def summary_line(self) -> str:
         verdict = "✅ SAFE" if (self.policy_violations == 0 and 
                                self.formal_failures == 0) else "❌ VIOLATIONS"
-        return (
+        base = (
             f"{verdict} | agent={self.agent_id} | "
             f"observed={self.events_observed} | "
             f"policy_violations={self.policy_violations} | "
             f"formal_failures={self.formal_failures} | "
             f"{self.duration_s:.1f}s"
         )
+        if self.cli_process_verifications:
+            return f"{base} | cli_exec_checks={self.cli_process_verifications}"
+        return base
 
 
 class Guard:
@@ -212,6 +234,10 @@ class Guard:
         policy: Path to Rego policies or PolicyEngine instance (Layer 2)
         verify: Enable Z3 formal verification (Layer 3)
         use_mock: Force mock mode for eBPF (testing without kernel access)
+        verify_process_cli: If True, :meth:`evaluate_event` runs CLI verification on
+            :class:`~substrate_guard.observe.events.ProcessEvent` by reconstructing the
+            command line from ``args`` / ``filename``. Off by default (can duplicate
+            chain entries and add latency). Requires ``verify=True`` and Z3 available.
     """
 
     def __init__(
@@ -222,6 +248,8 @@ class Guard:
         chain: bool = False,
         hmac_secret: Optional[str] = None,
         use_mock: bool = False,
+        *,
+        verify_process_cli: bool = False,
     ):
         # Layer 1: eBPF Observe
         self._tracer: Optional[AgentTracer] = None
@@ -252,6 +280,9 @@ class Guard:
         if chain:
             from .chain import AuditChain
             self._chain = AuditChain(secret=hmac_secret)
+
+        # Optional: run CLIVerifier on reconstructed exec command (ProcessEvent)
+        self._verify_process_cli = bool(verify_process_cli)
 
         layers = []
         if self._tracer:
@@ -301,22 +332,29 @@ class Guard:
         if self._policy:
             policy_decision = self._policy.evaluate_event(event)
 
-        # Layer 3: Z3 verification (only for code/tool output events)
-        verification = None
-        # Z3 verification is triggered explicitly via verify_artifact()
-        
         ge = GuardEvent(
             event=event,
             policy_decision=policy_decision,
-            verification=verification,
+            verification=None,
         )
 
-        # Layer 4: Tamper-evident chain
+        # Layer 4: Tamper-evident chain (observe + policy first — then formal_verification)
         if self._chain:
-            chain_data = event.to_dict() if hasattr(event, 'to_dict') else {"raw": str(event)}
+            chain_data = event.to_dict() if hasattr(event, "to_dict") else {"raw": str(event)}
             chain_data["_policy_allowed"] = policy_decision.allowed
             chain_data["_policy_reasons"] = policy_decision.reasons
             self._chain.append(chain_data)
+
+        # Layer 3: optional CLI verification for process exec (after observe chain entry)
+        if self._verify_process_cli and self._verify and self._z3_available:
+            cmd = _command_line_from_process_event(event)
+            if cmd:
+                aid = event.agent_id if getattr(event, "agent_id", None) not in (None, "", "unknown") else None
+                ge.verification = self.verify_artifact(
+                    cmd,
+                    artifact_type="cli",
+                    agent_id=aid,
+                )
 
         return ge
 
@@ -506,6 +544,11 @@ class GuardSession:
         policy_violations = len(self.violations)
         formal_checks = [e for e in self._events if e.verification]
         formal_fails = len(self.formal_failures)
+        cli_pc = sum(
+            1
+            for e in self._events
+            if isinstance(e.event, ProcessEvent) and e.verification is not None
+        )
 
         return SessionReport(
             agent_id=self.agent_id,
@@ -515,5 +558,6 @@ class GuardSession:
             policy_allowed=len(self._events) - policy_violations,
             formal_verifications=len(formal_checks),
             formal_failures=formal_fails,
+            cli_process_verifications=cli_pc,
             events=self._events,
         )

@@ -28,6 +28,7 @@ from typing import Optional
 from datetime import datetime
 
 from ..guard import Guard, SessionReport
+from ..runtime_env import resolve_verify_process_cli
 from ..observe.events import (
     Event, EventType, Severity,
     FileEvent, NetworkEvent, ProcessEvent, SyscallEvent,
@@ -45,7 +46,8 @@ class SubstrateConfig:
     clusters: dict = field(default_factory=dict)
     policy: dict = field(default_factory=dict)
     observe: dict = field(default_factory=dict)
-    
+    verify_process_cli: bool = False
+
     @classmethod
     def from_file(cls, path: str | Path) -> "SubstrateConfig":
         data = json.loads(Path(path).read_text())
@@ -54,6 +56,7 @@ class SubstrateConfig:
             clusters=data.get("clusters", {}),
             policy=data.get("policy", {}),
             observe=data.get("observe", {}),
+            verify_process_cli=bool(data.get("verify_process_cli", False)),
         )
     
     @property
@@ -240,6 +243,7 @@ class SubstrateGuard:
     
     Usage:
         sg = SubstrateGuard()
+        # Or: SubstrateGuard(config_path="...", verify_process_cli=True)
         
         # Process SessionTrace spans
         spans = get_recent_spans()  # from your SessionTrace API
@@ -255,18 +259,25 @@ class SubstrateGuard:
         config_path: Optional[str] = None,
         policy_path: Optional[str] = None,
         use_ebpf: bool = True,
+        verify_process_cli: Optional[bool] = None,
     ):
         # Load config
         if config_path and Path(config_path).exists():
             self.config = SubstrateConfig.from_file(config_path)
         else:
             self.config = SubstrateConfig()
-        
+
+        vpc = resolve_verify_process_cli(
+            verify_process_cli,
+            self.config.verify_process_cli,
+        )
+
         # Initialize Guard
         self.guard = Guard(
             observe=use_ebpf,
             policy=policy_path or "nonexistent/",
             verify=True,
+            verify_process_cli=vpc,
             use_mock=not use_ebpf,
         )
         
