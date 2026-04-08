@@ -71,6 +71,10 @@ class AgentTracer:
 
     def _try_init_bpf(self):
         """Attempt to initialize BPF. Fall back to mock on failure."""
+        if os.name == "nt":
+            logger.info("eBPF is not supported on Windows — using mock tracer.")
+            self._mock = True
+            return
         try:
             from bcc import BPF
             

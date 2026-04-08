@@ -1,0 +1,2 @@
+# substrate-guard — install from source (see pyproject.toml for dependency versions)
+-e .

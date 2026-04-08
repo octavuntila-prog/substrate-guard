@@ -1,0 +1,2 @@
+# Development: tests, Bandit, Hypothesis (matches CI)
+-e .[dev]

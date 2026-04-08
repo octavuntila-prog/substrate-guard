@@ -1,7 +1,7 @@
 # Audit complex — substrate-guard (stare actuală)
 
 **Data referință:** 7 aprilie 2026  
-**Versiune pachet:** `13.2.3` (`pyproject.toml`)  
+**Versiune pachet:** `13.2.4` (`pyproject.toml`)  
 **Scop:** inventar tehnic, capabilități, teste, lanț de audit, gap-uri și limitări — fără a înlocui un audit SOC2/ISO extern.
 
 ---
@@ -10,8 +10,8 @@
 
 | Dimensiune | Valoare |
 |------------|---------|
-| **Teste colectate (pytest)** | **357** |
-| **Rulare tipică locală** | **350 passed**, **7 skipped** |
+| **Teste colectate (pytest)** | **360** |
+| **Rulare tipică locală** | **353 passed**, **7 skipped** |
 | **Skip:** | 1× `sentence_transformers` (comply-ml); 6× Postgres CI fără `POSTGRES_CI` |
 | **Grupuri regex CLI** (`DANGEROUS_PATTERNS`) | **40** |
 | **Fișiere Python `substrate_guard/`** | 40 |
@@ -124,7 +124,7 @@ Ordine logică (nume interne):
 
 ## 9. Concluzie audit
 
-**Puncte forte:** acoperire teste largă (350), integrare Guard ↔ verificatori corectată, lanț de audit cu **motiv formal** (`counterexample`) pentru conformitate și investigații interne, CLI extins cu grupuri clare, CI multi-Python + Postgres.
+**Puncte forte:** acoperire teste largă (353), integrare Guard ↔ verificatori corectată, lanț de audit cu **motiv formal** (`counterexample`) pentru conformitate și investigații interne, CLI extins cu grupuri clare, CI multi-Python + Postgres.
 
 **Următori pași posibili (nu sunt defecte):** extindere structurală dincolo de regex pentru shell; integrare automată verify la anumite tipuri de eveniment; mediu CI cu SBERT pentru zero skip.
 

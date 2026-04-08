@@ -12,6 +12,7 @@ Usage:
     substrate-guard attest demo                            # Layer 5 device signing
     substrate-guard offline demo                           # Layer 6 SQLite + sync
     substrate-guard audit [--db-url ...]                   # PostgreSQL pipeline audit
+    substrate-guard doctor                                  # Z3, OPA, bcc, drivers
 """
 
 import argparse
@@ -109,6 +110,13 @@ def cmd_audit(args):
         print("Use --db-url or set credentials in .env / environment.")
         return 1
     return run_audit(db_url, hours=args.hours, output_dir=args.output)
+
+
+def cmd_doctor(args):
+    """Print runtime dependency diagnostics."""
+    from .diagnostics import run_doctor
+
+    return run_doctor(json_output=getattr(args, "json", False))
 
 
 def cmd_benchmark(args):
@@ -254,6 +262,16 @@ def main() -> None:
     register_attest_parser(subparsers)
     register_offline_parser(subparsers)
 
+    doctor_parser = subparsers.add_parser(
+        "doctor",
+        help="Check runtime dependencies (Z3, OPA, bcc, DB drivers)",
+    )
+    doctor_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Reserved for machine-readable output (not yet implemented)",
+    )
+
     args = parser.parse_args()
 
     if args.command is None:
@@ -280,6 +298,8 @@ def main() -> None:
         sys.exit(cmd_attest(args))
     elif args.command == "offline":
         sys.exit(cmd_offline(args))
+    elif args.command == "doctor":
+        sys.exit(cmd_doctor(args))
     elif args.command in STACK_HANDLERS:
         sys.exit(STACK_HANDLERS[args.command](args))
     else:

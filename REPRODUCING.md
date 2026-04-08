@@ -19,7 +19,10 @@ python -m venv .venv
 
 python -m pip install --upgrade pip
 pip install -e ".[dev]"
+# echivalent: pip install -r requirements-dev.txt
 ```
+
+După instalare, verifică mediul: `python -m substrate_guard.cli doctor` (Z3, OPA, bcc, drivere). Detalii pe niveluri (mock vs eBPF real): [docs/FUNCTIONAL_ROADMAP.md](docs/FUNCTIONAL_ROADMAP.md).
 
 ## Dovada automată (principală)
 
