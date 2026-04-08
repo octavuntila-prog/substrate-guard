@@ -32,6 +32,10 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 | Tests | **358** passing (365 collected), 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
 
+### Release v13.2.8 (April 7, 2026) — Bijuteria #5 AST-first CLI
+
+**`substrate_guard/ast_parse/`** — verificări structurale bash (``rm -r -f``, pipe ``curl|bash``, ``chmod 777``, ``mkfs``) înainte de regex; Python ``ast`` pentru ``eval``/``exec``. Integrat în **`verify_cli`**. Dependențe dev: ``tree-sitter``, ``tree-sitter-bash``. [docs/releases/v13.2.8.md](docs/releases/v13.2.8.md).
+
 ### Release v13.2.7 (April 7, 2026) — adversarial fuzz CI + SBERT smoke
 
 Workflows **[adversarial-fuzz](.github/workflows/adversarial-fuzz.yml)** (`SUBSTRATE_FUZZ_MULTIPLIER`, Hypothesis mai dens) + **[comply-ml-smoke](.github/workflows/comply-ml-smoke.yml)** (`sentence-transformers`). `tests/fuzz_helpers.py`, vezi [docs/releases/v13.2.7.md](docs/releases/v13.2.7.md).
@@ -129,7 +133,7 @@ substrate-guard/
 │   └── tracer.py     # 417 LOC — event capture and normalization
 ├── policy/           # L2 — OPA/Rego policy engine
 │   └── engine.py     # 411 LOC — rule evaluation, violation detection
-├── verify/           # L3 — Z3 SMT formal verification
+├── ast_parse/        # L3+ — AST-first CLI checks (Tree-sitter bash; Python ast)
 ├── comply/           # L4 — ZK semantic non-membership proofs
 ├── attest/           # L5 — Ed25519 cryptographic attestation
 ├── offline/          # L6 — SQLite + CRDT offline verification

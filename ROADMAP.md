@@ -42,6 +42,12 @@ Fiecare fază se închide doar când **toate testele** trec și criteriul de dov
 - **Compose:** `docker-compose.yml` (local), `docker-compose.guard.yml` (rețea externă agency), `scripts/config_docker.json`, `.env.example`.
 - **Reproducere:** `REPRODUCING.md` + `scripts/run-ci-local.sh` / `run-ci-local.ps1`.
 
+## Faza 6 — AST-first CLI (Bijuteria #5) (făcut)
+
+- **Cod:** `substrate_guard/ast_parse/` — `tree-sitter` + `tree-sitter-bash` (în `dev`), verificări pe structură pentru bash; `ast` stdlib pentru snippet-uri Python (`eval`/`exec`/…).
+- **Integrare:** `cli_verifier.py` rulează `_structural_cli_violations` înainte de regex+Z3.
+- **Dovadă:** `pytest tests/test_ast_parse.py`.
+
 ---
 
 Regulă: **nu trecem la faza N+1** până Faza N nu are teste verzi și un exemplu rulabil.

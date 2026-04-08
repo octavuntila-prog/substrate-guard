@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "substrate-guard"
-version = "13.2.7"
+version = "13.2.8"
 description = "Formal verification safety layer for AI outputs"
 readme = "README.md"
 license = {text = "MIT"}
@@ -23,6 +23,8 @@ dev = [
     "pytest-asyncio>=0.24",
     "hypothesis>=6.92",
     "bandit>=1.7.0",
+    "tree-sitter>=0.21",
+    "tree-sitter-bash>=0.21",
 ]
 postgres = [
     "psycopg2-binary>=2.9",

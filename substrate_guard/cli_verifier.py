@@ -318,12 +318,30 @@ DANGEROUS_PATTERNS = [
 ]
 
 
+def _structural_cli_violations(command: str) -> list[CLIViolation]:
+    """AST-first checks (bash Tree-sitter, Python ``ast``) when dependencies allow."""
+    try:
+        from substrate_guard.ast_parse.safety_checker import check_shell_command_ast
+
+        return [
+            CLIViolation(
+                pattern_name=sv.rule,
+                description=sv.description,
+                matched_text=sv.matched_text[:400],
+            )
+            for sv in check_shell_command_ast(command)
+        ]
+    except Exception:
+        return []
+
+
 class CLIVerifier:
     """Verify CLI commands against dangerous patterns.
 
-    Approach: Compiles forbidden patterns into a Z3 boolean formula.
-    Each pattern is a Bool variable that is True if the command matches.
-    The command is SAFE iff no pattern matches (AND of all NOT(pattern)).
+    **AST-first (Bijuteria #5):** structural checks run first for shell/Python
+    heuristics (``tree-sitter-bash`` optional). Then regex patterns compile into a
+    Z3 boolean formula: each pattern is a Bool that is True if the command matches.
+    The command is SAFE iff no structural hit and no regex pattern matches.
 
     While the regex matching is concrete (not symbolic), the Z3 encoding
     gives us a formal proof structure: we can express the safety property
@@ -336,7 +354,8 @@ class CLIVerifier:
     def verify(self, command: str) -> CLISafetyResult:
         """Verify a single CLI command."""
         t0 = time.time()
-        violations = []
+        structural = _structural_cli_violations(command)
+        violations = list(structural)
 
         solver = Solver()
 
@@ -373,10 +392,10 @@ class CLIVerifier:
         result = solver.check()
         elapsed = (time.time() - t0) * 1000
 
-        if result == sat:
-            status = CLISafetyStatus.SAFE
-        else:
+        if structural or result != sat:
             status = CLISafetyStatus.UNSAFE
+        else:
+            status = CLISafetyStatus.SAFE
 
         return CLISafetyResult(
             status=status,
