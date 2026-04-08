@@ -32,6 +32,22 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 | Tests | **358** passing (365 collected), 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
 
+### Release v13.2.12 (April 7, 2026) — sqlparse dependency core
+
+**`sqlparse`** este dependență **obligatorie**; scanarea SQL structurală (`DROP` / `TRUNCATE` / …) rulează la orice instalare. [docs/releases/v13.2.12.md](docs/releases/v13.2.12.md).
+
+### Release v13.2.11 (April 7, 2026) — PyYAML dependency core
+
+**`pyyaml`** este dependență **obligatorie** (nu doar `[dev]`), astfel încât scanarea YAML structurală rulează la orice instalare. [docs/releases/v13.2.11.md](docs/releases/v13.2.11.md).
+
+### Release v13.2.10 (April 7, 2026) — JSON / YAML structural
+
+**`json_yaml_patterns`**: JSON (chei ``__proto__`` / ``constructor`` / ``prototype``), YAML cu **safe_load** + detectare ``!!python`` în sursă. Heuristică **`_looks_like_yaml`** în parser. [docs/releases/v13.2.10.md](docs/releases/v13.2.10.md).
+
+### Release v13.2.9 (April 7, 2026) — `structural_scan` + SQL (sqlparse)
+
+**`structural_scan()`** — punct unic; SQL structural (DROP, TRUNCATE, ALTER…DROP) prin **sqlparse**. [docs/releases/v13.2.9.md](docs/releases/v13.2.9.md).
+
 ### Release v13.2.8 (April 7, 2026) — Bijuteria #5 AST-first CLI
 
 **`substrate_guard/ast_parse/`** — verificări structurale bash (``rm -r -f``, pipe ``curl|bash``, ``chmod 777``, ``mkfs``) înainte de regex; Python ``ast`` pentru ``eval``/``exec``. Integrat în **`verify_cli`**. Dependențe dev: ``tree-sitter``, ``tree-sitter-bash``. [docs/releases/v13.2.8.md](docs/releases/v13.2.8.md).

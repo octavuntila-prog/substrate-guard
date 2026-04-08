@@ -44,7 +44,8 @@ Fiecare fază se închide doar când **toate testele** trec și criteriul de dov
 
 ## Faza 6 — AST-first CLI (Bijuteria #5) (făcut)
 
-- **Cod:** `substrate_guard/ast_parse/` — `tree-sitter` + `tree-sitter-bash` (în `dev`), verificări pe structură pentru bash; `ast` stdlib pentru snippet-uri Python (`eval`/`exec`/…).
+- **Cod:** `substrate_guard/ast_parse/` — `tree-sitter` + `tree-sitter-bash` (în `dev`), verificări pe structură pentru bash; `ast` stdlib pentru snippet-uri Python (`eval`/`exec`/…); **`sqlparse`** + **`pyyaml`** (dependențe **core**) pentru SQL / JSON+YAML structural; **`json`** stdlib.
+- **API:** `structural_scan()` — punct unic de intrare; `check_shell_command_ast` = alias.
 - **Integrare:** `cli_verifier.py` rulează `_structural_cli_violations` înainte de regex+Z3.
 - **Dovadă:** `pytest tests/test_ast_parse.py`.
 

@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from substrate_guard.ast_parse.safety_checker import (
     check_shell_command_ast,
+    structural_scan,
     tree_sitter_bash_available,
 )
 
 __all__ = [
     "check_shell_command_ast",
+    "structural_scan",
     "tree_sitter_bash_available",
 ]

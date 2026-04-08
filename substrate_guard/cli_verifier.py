@@ -321,7 +321,7 @@ DANGEROUS_PATTERNS = [
 def _structural_cli_violations(command: str) -> list[CLIViolation]:
     """AST-first checks (bash Tree-sitter, Python ``ast``) when dependencies allow."""
     try:
-        from substrate_guard.ast_parse.safety_checker import check_shell_command_ast
+        from substrate_guard.ast_parse.safety_checker import structural_scan
 
         return [
             CLIViolation(
@@ -329,7 +329,7 @@ def _structural_cli_violations(command: str) -> list[CLIViolation]:
                 description=sv.description,
                 matched_text=sv.matched_text[:400],
             )
-            for sv in check_shell_command_ast(command)
+            for sv in structural_scan(command)
         ]
     except Exception:
         return []
@@ -338,8 +338,9 @@ def _structural_cli_violations(command: str) -> list[CLIViolation]:
 class CLIVerifier:
     """Verify CLI commands against dangerous patterns.
 
-    **AST-first (Bijuteria #5):** structural checks run first for shell/Python
-    heuristics (``tree-sitter-bash`` optional). Then regex patterns compile into a
+    **AST-first (Bijuteria #5):** :func:`structural_scan` runs first — bash
+    (Tree-sitter), Python ``ast``, SQL ``sqlparse``, JSON ``json``, YAML (``pyyaml`` / ``safe_load``).
+    Then regex patterns compile into a
     Z3 boolean formula: each pattern is a Bool that is True if the command matches.
     The command is SAFE iff no structural hit and no regex pattern matches.
 

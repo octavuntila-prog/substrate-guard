@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "substrate-guard"
-version = "13.2.8"
+version = "13.2.12"
 description = "Formal verification safety layer for AI outputs"
 readme = "README.md"
 license = {text = "MIT"}
@@ -15,6 +15,8 @@ dependencies = [
     "sympy>=1.12",
     "numpy>=1.24",
     "cryptography>=46.0.6",
+    "pyyaml>=6.0",
+    "sqlparse>=0.5.0",
 ]
 
 [project.optional-dependencies]

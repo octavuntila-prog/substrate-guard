@@ -110,6 +110,32 @@ def _sudo_unwrap(args: list[str]) -> tuple[str, list[str]]:
     return args[i], args[i + 1 :]
 
 
+def _looks_like_yaml(s: str) -> bool:
+    """Heuristic: stream / mapping document (not JSON, not shell)."""
+    t = s.lstrip()
+    if t.startswith("---") or t.startswith("%YAML"):
+        return True
+    if t.startswith("{") or t.startswith("["):
+        return False
+    for line in s.splitlines()[:24]:
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("- "):
+            line = line[2:].lstrip()
+        if ":" not in line:
+            break
+        head, _, _rest = line.partition(":")
+        head = head.strip()
+        if not head or not re.match(r"^[\w.-]+$", head):
+            break
+        colon = line.find(":")
+        if "://" in line[: colon + 8]:
+            continue
+        return True
+    return False
+
+
 def detect_shell_language(code: str) -> str:
     """Heuristic: is this likely a shell one-liner vs Python / unknown."""
     s = code.strip()
@@ -179,8 +205,23 @@ def detect_shell_language(code: str) -> str:
         return "python"
     if s.startswith(("{", "[")):
         return "json"
+    if _looks_like_yaml(s):
+        return "yaml"
     u = s.upper()
-    if any(u.startswith(k) for k in ("SELECT ", "INSERT ", "UPDATE ", "DELETE ", "DROP ", "CREATE ", "ALTER ")):
+    if any(
+        u.startswith(k)
+        for k in (
+            "SELECT ",
+            "INSERT ",
+            "UPDATE ",
+            "DELETE ",
+            "DROP ",
+            "CREATE ",
+            "ALTER ",
+            "WITH ",
+            "TRUNCATE ",
+        )
+    ):
         return "sql"
     return "unknown"
 
