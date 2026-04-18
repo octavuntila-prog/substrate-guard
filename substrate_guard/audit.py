@@ -224,16 +224,22 @@ def fetch_table_counts(db_url: str) -> dict:
 
 
 def parse_json_field(value) -> dict:
-    """Safely parse a JSON field that might be string, dict, or None."""
+    """Safely parse a JSON field that might be string, dict, or None.
+
+    Contract: always returns a ``dict``. JSON ``null``, scalars, or arrays
+    (legal JSON but malformed as a structured field) collapse to ``{}``
+    so callers can chain ``.get(...)`` without ``AttributeError``.
+    """
     if value is None:
         return {}
     if isinstance(value, dict):
         return value
     if isinstance(value, str):
         try:
-            return json.loads(value)
+            parsed = json.loads(value)
         except (json.JSONDecodeError, TypeError):
             return {}
+        return parsed if isinstance(parsed, dict) else {}
     return {}
 
 
