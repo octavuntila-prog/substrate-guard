@@ -8,9 +8,10 @@ LABEL description="substrate-guard: verification stack (Z3, chain, comply, attes
 
 WORKDIR /app
 
-COPY pyproject.toml README.md /app/
+COPY pyproject.toml README.md bandit.yaml /app/
 COPY substrate_guard/ /app/substrate_guard/
 COPY tests/ /app/tests/
+COPY examples/ /app/examples/
 
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -e ".[dev,postgres]"
