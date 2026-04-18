@@ -61,17 +61,26 @@ def test_fuzz_cliverifier_consistent_with_second_call(s: str):
 
 
 @settings(max_examples=fuzz_max_examples(100), deadline=None)
-@given(st.one_of(st.none(), _short_text, st.dictionaries(st.text(), st.text())))
+@given(
+    st.one_of(
+        st.none(),
+        _short_text,
+        st.dictionaries(st.text(), st.text()),
+        # Explicit corner cases Hypothesis might not hit via free-form text:
+        st.sampled_from(["null", "true", "false", "0", "[]", '"x"', "{}"]),
+    )
+)
 @pytest.mark.fuzz
 def test_fuzz_parse_json_field_total(payload):
+    """Contract: parse_json_field always returns a dict (see audit.parse_json_field).
+
+    JSON null / scalars / arrays — legal JSON but malformed as a *field* —
+    collapse to ``{}`` so callers can chain ``.get(...)`` without branching.
+    """
     out = parse_json_field(payload)
-    # None / dict pass through; str may JSON-decode to scalar (e.g. "0") — see audit.parse_json_field
-    if payload is None:
-        assert out == {}
-    elif isinstance(payload, dict):
-        assert isinstance(out, dict)
-    else:
-        assert isinstance(out, (dict, list, str, int, float, bool))
+    assert isinstance(out, dict)
+    if isinstance(payload, dict):
+        assert out == payload  # dict pass-through is identity
 
 
 @settings(max_examples=fuzz_max_examples(80), deadline=None)
