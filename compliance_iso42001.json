@@ -1,0 +1,66 @@
+{
+  "generator": "substrate-guard / AI Black Box",
+  "version": "1.0",
+  "generated_at": "2026-03-22T14:56:15.972458+00:00",
+  "organization": "Aisophical SRL",
+  "chain_integrity": {
+    "status": "VERIFIED",
+    "chain_length": 0,
+    "head_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "algorithm": "HMAC-SHA256"
+  },
+  "framework": "ISO/IEC 42001:2023",
+  "controls": {
+    "risk_assessment": {
+      "description": "AI risk identification and treatment",
+      "implementation": "Three-layer verification stack identifies risks at kernel (eBPF), policy (OPA), and formal (Z3) levels",
+      "risk_categories_covered": [
+        "unauthorized_file_access",
+        "dangerous_command_execution",
+        "network_exfiltration",
+        "budget_exhaustion",
+        "rate_limit_violation",
+        "workspace_boundary_breach",
+        "pii_exposure"
+      ]
+    },
+    "ai_system_lifecycle": {
+      "description": "Management of AI system throughout its lifecycle",
+      "implementation": "Continuous monitoring via cron (daily 04:00 audit), real-time policy evaluation, formal verification of outputs",
+      "evidence": {
+        "monitoring_frequency": "continuous + daily audit",
+        "total_events_evaluated": 0,
+        "agents_monitored": 0
+      }
+    },
+    "transparency": {
+      "description": "AI system decisions shall be explainable",
+      "implementation": "Every policy decision includes human-readable reasons. Every Z3 verification includes proof or counterexample",
+      "evidence": {
+        "decision_format": "allow/deny + list of reasons",
+        "verification_format": "verified/unsafe + counterexample"
+      }
+    },
+    "audit_trail": {
+      "description": "Tamper-evident record of all AI system actions",
+      "implementation": "HMAC-SHA256 chain \u2014 each event hashed with previous hash",
+      "evidence": {
+        "chain_length": 0,
+        "genesis_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "head_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "unique_agents": 0,
+        "event_types": {},
+        "integrity": "verified"
+      }
+    }
+  },
+  "session": {
+    "agent_id": "export-all",
+    "duration_s": 0.0002002716064453125,
+    "events_observed": 0,
+    "policy_violations": 0,
+    "formal_verifications": 0,
+    "formal_failures": 0,
+    "verdict": "COMPLIANT"
+  }
+}

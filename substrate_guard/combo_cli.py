@@ -1,16 +1,23 @@
-"""Black Box pipeline handlers and argparse helpers for the unified CLI.
+"""substrate-guard CLI — Unified AI safety verification from kernel to proof.
 
-Subcommands are registered from `substrate_guard.cli` via `register_stack_parsers`.
-Use: `substrate-guard demo`, `monitor`, `export`, `stack-benchmark`, etc.
-
-Legacy: `python -m substrate_guard.combo_cli` delegates to the same `cli.main`.
+Commands:
+    substrate-guard monitor --agent <id> [--pid <pid>]
+        Monitor an AI agent through all 3 layers (eBPF → OPA → Z3)
+    
+    substrate-guard evaluate --event <json>
+        Evaluate a single event against policies
+    
+    substrate-guard verify --type <code|tool|cli|hw|distill> <artifact>
+        Run Z3 formal verification on an artifact
+    
+    substrate-guard demo --scenario <safe|malicious|injection|abuse>
+        Run a demo scenario through the full pipeline
 """
 
 from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 import time
 import logging
@@ -60,8 +67,8 @@ class C:
 
 def print_banner():
     print(f"""
-{C.bold("substrate-guard")} - The Complete Verification Stack
-{C.dim("eBPF observes -> OPA decides -> Z3 proves")}
+{C.bold("substrate-guard")} — The Complete Verification Stack
+{C.dim("eBPF observes → OPA decides → Z3 proves")}
 """)
 
 
@@ -71,12 +78,12 @@ def print_report(report: SessionReport):
     verdict = d["verdict"]
     
     if verdict == "SAFE":
-        verdict_str = C.ok("[OK] SAFE")
+        verdict_str = C.ok("✅ SAFE")
     else:
-        verdict_str = C.fail("[!!] VIOLATIONS DETECTED")
+        verdict_str = C.fail("❌ VIOLATIONS DETECTED")
 
     print(f"\n{'='*60}")
-    print(f"  {C.bold('Session Report')} - agent: {C.info(report.agent_id)}")
+    print(f"  {C.bold('Session Report')} — agent: {C.info(report.agent_id)}")
     print(f"{'='*60}")
     print(f"  Verdict:    {verdict_str}")
     print(f"  Duration:   {report.duration_s:.2f}s")
@@ -112,7 +119,7 @@ def print_report(report: SessionReport):
             if not ge.policy_decision.allowed:
                 evt = ge.event
                 for reason in ge.policy_decision.reasons:
-                    print(f"    {C.fail('x')} [{evt.type.value}] {reason}")
+                    print(f"    {C.fail('✗')} [{evt.type.value}] {reason}")
         print()
 
     print(f"{'='*60}\n")
@@ -141,23 +148,13 @@ def cmd_demo(args):
 
     print(f"  Scenario: {C.bold(label)}")
     print(f"  Agent:    {C.info(agent_id)}")
-    pipe = "eBPF(mock) -> OPA(builtin) -> Z3"
-    if args.chain:
-        pipe += " -> HMAC chain"
-    print(f"  Pipeline: {pipe}")
+    print(f"  Pipeline: eBPF(mock) → OPA(builtin) → Z3")
     print()
 
-    hmac_secret = (
-        args.secret
-        or os.environ.get("SUBSTRATE_GUARD_HMAC_SECRET")
-        or "substrate-guard-demo"
-    )
     guard = Guard(
         observe=True,
         policy="nonexistent/",
         verify=True,
-        chain=args.chain,
-        hmac_secret=hmac_secret if args.chain else None,
         use_mock=True,
     )
 
@@ -187,23 +184,15 @@ def cmd_demo(args):
             elif hasattr(evt, 'filename'):
                 detail = f"{evt.filename} {' '.join(str(a) for a in getattr(evt, 'args', []))}"
             
-            print(f"  [{severity}] {evt.type.value:20s} -> {status}  {C.dim(detail)}")
+            print(f"  [{severity}] {evt.type.value:20s} → {status}  {C.dim(detail)}")
             
             if not ge.policy_decision.allowed:
                 for reason in ge.policy_decision.reasons:
-                    print(f"         {C.fail('->')} {reason}")
+                    print(f"         {C.fail('└─')} {reason}")
 
     report = session.report()
     print_report(report)
-
-    if guard._chain:
-        chain_ok, _ = guard._chain.verify()
-        print(
-            f"  Tamper-evident chain: "
-            f"{C.ok('VERIFIED') if chain_ok else C.fail('BROKEN')}  "
-            f"({guard._chain.length} entries, head {guard._chain.head_hash[:16]}...)\n"
-        )
-
+    
     return 0 if report.policy_violations == 0 else 1
 
 
@@ -225,9 +214,9 @@ def cmd_evaluate(args):
     decision = engine.evaluate(event_data)
     
     if decision.allowed:
-        print(f"  {C.ok('[OK] ALLOWED')}")
+        print(f"  {C.ok('✅ ALLOWED')}")
     else:
-        print(f"  {C.fail('[!!] DENIED')}")
+        print(f"  {C.fail('❌ DENIED')}")
         for reason in decision.reasons:
             print(f"    {C.fail('•')} {reason}")
     
@@ -263,11 +252,11 @@ def cmd_monitor(args):
                     ge = guard.evaluate_event(event)
                     session._events.append(ge)
                     
-                    status = C.ok("ALLOW") if ge.policy_decision.allowed else C.fail("DENY")
+                    status = C.ok("�allow") if ge.policy_decision.allowed else C.fail("DENY")
                     print(f"  [{event.type.value:20s}] {status}  agent={event.agent_id}")
             else:
                 # Mock mode — wait for Ctrl+C
-                print(f"  {C.warn('Mock mode')} - no real eBPF. Use --live for real tracing.")
+                print(f"  {C.warn('Mock mode')} — no real eBPF. Use --live for real tracing.")
                 print(f"  Use 'substrate-guard demo' to see the pipeline in action.\n")
                 while True:
                     time.sleep(1)
@@ -280,11 +269,11 @@ def cmd_monitor(args):
     return 0
 
 
-def cmd_pipeline_benchmark(args):
-    """Run full-pipeline benchmark across all mock scenarios (observe -> policy -> Z3)."""
+def cmd_benchmark(args):
+    """Run benchmark across all scenarios and print results."""
     print_banner()
     print(f"  {C.bold('Benchmark: Full Pipeline')}")
-    print(f"  Running all scenarios through eBPF(mock) -> OPA(builtin) -> Z3\n")
+    print(f"  Running all scenarios through eBPF(mock) → OPA(builtin) → Z3\n")
 
     scenarios = {
         "safe_web": ("Safe Web Agent", MockScenario.safe_web_agent),
@@ -425,41 +414,39 @@ def cmd_export(args):
     return 0
 
 
-def register_stack_parsers(subparsers: argparse._SubParsersAction) -> None:
-    """Register Black Box / pipeline commands on the root parser (used by cli.main)."""
-    demo_parser = subparsers.add_parser("demo", help="Run a demo scenario (mock observe -> OPA -> Z3)")
+def main():
+    parser = argparse.ArgumentParser(
+        prog="substrate-guard",
+        description="AI Black Box — eBPF → OPA → Z3 → HMAC Chain",
+    )
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # Demo
+    demo_parser = subparsers.add_parser("demo", help="Run a demo scenario")
     demo_parser.add_argument("--scenario", "-s", default="safe",
                             choices=["safe", "code", "malicious", "injection", "abuse"],
                             help="Scenario to run")
-    demo_parser.add_argument(
-        "--chain",
-        action="store_true",
-        help="Append each event to HMAC-SHA256 tamper-evident chain (Black Box storage)",
-    )
-    demo_parser.add_argument(
-        "--secret",
-        help="HMAC secret for chain (default: env SUBSTRATE_GUARD_HMAC_SECRET or demo key)",
-    )
 
-    eval_parser = subparsers.add_parser("evaluate", help="Evaluate a single event against policies")
+    # Evaluate
+    eval_parser = subparsers.add_parser("evaluate", help="Evaluate a single event")
     eval_parser.add_argument("--event", "-e", required=True, help="JSON event data")
     eval_parser.add_argument("--policy", "-p", help="Path to .rego policy file/dir")
     eval_parser.add_argument("--no-opa", action="store_true",
                             help="Use built-in evaluator instead of OPA binary")
 
-    mon_parser = subparsers.add_parser("monitor", help="Monitor an agent (observe + policy + verify)")
+    # Monitor
+    mon_parser = subparsers.add_parser("monitor", help="Monitor an agent")
     mon_parser.add_argument("--agent", "-a", required=True, help="Agent ID")
     mon_parser.add_argument("--pid", type=int, help="PID to trace")
     mon_parser.add_argument("--policy", "-p", help="Path to .rego policy file/dir")
     mon_parser.add_argument("--live", action="store_true",
                            help="Use real eBPF (requires root + kernel 5.4+)")
 
-    subparsers.add_parser(
-        "stack-benchmark",
-        help="Full pipeline benchmark (all mock scenarios; not the Z3-only benchmark)",
-    )
+    # Benchmark
+    subparsers.add_parser("benchmark", help="Run benchmark across all scenarios")
 
-    export_parser = subparsers.add_parser("export", help="Export compliance evidence + chain")
+    # Export compliance reports
+    export_parser = subparsers.add_parser("export", help="Export compliance evidence")
     export_parser.add_argument("--framework", "-f", required=True,
                               choices=["SOC2", "ISO27001", "ISO42001", "SUMMARY", "CHAIN"],
                               help="Compliance framework to export")
@@ -470,22 +457,21 @@ def register_stack_parsers(subparsers: argparse._SubParsersAction) -> None:
     export_parser.add_argument("--secret", help="HMAC secret for chain (default: demo key)")
     export_parser.add_argument("--org", help="Organization name for report")
 
+    args = parser.parse_args()
 
-# Dispatch for unified CLI (keys must match subparser names above)
-STACK_HANDLERS = {
-    "demo": cmd_demo,
-    "evaluate": cmd_evaluate,
-    "monitor": cmd_monitor,
-    "export": cmd_export,
-    "stack-benchmark": cmd_pipeline_benchmark,
-}
-
-
-def main() -> None:
-    """Back-compat: `python -m substrate_guard.combo_cli` -> unified entry point."""
-    from substrate_guard.cli import main as unified_main
-
-    unified_main()
+    if args.command == "demo":
+        sys.exit(cmd_demo(args))
+    elif args.command == "evaluate":
+        sys.exit(cmd_evaluate(args))
+    elif args.command == "monitor":
+        sys.exit(cmd_monitor(args))
+    elif args.command == "benchmark":
+        sys.exit(cmd_benchmark(args))
+    elif args.command == "export":
+        sys.exit(cmd_export(args))
+    else:
+        parser.print_help()
+        sys.exit(0)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,48 @@
 {
-  "platform": "docker",
-  "clusters": {},
-  "policy": {},
-  "observe": {}
+    "ecosystem": "SUBSTRATE",
+    "platform": "untilaoctavian.com",
+    "server": {
+        "hostname": "ai-research-agency",
+        "arch": "aarch64",
+        "ram_mb": 3700,
+        "vcpus": 2,
+        "deployment": "docker"
+    },
+    "clusters": {
+        "backend": {
+            "agents": 125,
+            "role": "production",
+            "container": "ai-research-agency-backend",
+            "services": ["SessionTrace", "MarketJudge", "AgentObs", "Guardian"]
+        }
+    },
+    "policy": {
+        "workspace": "/workspace/",
+        "budget_per_agent_usd": 5.0,
+        "rate_limit_per_minute": 100,
+        "allowed_domains": [
+            "api.openai.com",
+            "api.anthropic.com",
+            "aisophical.com",
+            "untilaoctavian.com",
+            "github.com",
+            "pypi.org"
+        ]
+    },
+    "observe": {
+        "mode": "mock",
+        "log_path": "/var/log/substrate-guard/",
+        "retain_days": 7
+    },
+    "resources": {
+        "max_memory_mb": 400,
+        "max_cpu_percent": 25,
+        "z3_timeout_ms": 5000
+    },
+    "vendor_paths": {
+        "sessiontrace": "/opt/ai-research-agency/backend/vendor/sessiontrace",
+        "marketjudge": "/opt/ai-research-agency/backend/vendor/marketjudge",
+        "agentobs": "/opt/ai-research-agency/backend/vendor/agentobs",
+        "guardian": "/opt/ai-research-agency/backend/meta_agents/guardian"
+    }
 }

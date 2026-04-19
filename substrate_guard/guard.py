@@ -18,12 +18,11 @@ Usage:
 
 from __future__ import annotations
 
-import json
-import logging
 import time
+import logging
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Generator, Optional, Tuple
+from typing import Optional, Generator
 from pathlib import Path
 
 from .observe.tracer import AgentTracer
@@ -31,98 +30,6 @@ from .observe.events import Event, EventType, Severity, EventStream
 from .policy.engine import PolicyEngine, PolicyDecision
 
 logger = logging.getLogger("substrate_guard")
-
-
-def _format_guard_counterexample(artifact_type: str, result: object) -> Optional[str]:
-    """Format verifier-specific failure details for :class:`VerificationResult.counterexample`."""
-    if artifact_type == "code":
-        from .code_verifier import VerificationResult as CodeVerificationResult
-
-        if isinstance(result, CodeVerificationResult):
-            parts: list[str] = []
-            if result.error:
-                parts.append(str(result.error))
-            if result.counterexample:
-                cx = result.counterexample
-                parts.append(f"inputs={cx.inputs}")
-                if cx.description:
-                    parts.append(str(cx.description))
-            parts.extend(str(w) for w in result.warnings)
-            if parts:
-                return "; ".join(parts)
-            return f"status={result.status.value}"
-
-    if artifact_type == "hw":
-        err = getattr(result, "error", None)
-        if err:
-            return str(err)
-        cex = getattr(result, "counterexample", None)
-        if cex is not None:
-            try:
-                return json.dumps(cex, sort_keys=True)
-            except (TypeError, ValueError):
-                return str(cex)
-
-    return None
-
-
-def _map_verification_to_guard(
-    artifact_type: str,
-    result: object,
-) -> Tuple[bool, Optional[str]]:
-    """Map verifier-specific return values to Guard's ``verified`` flag and counterexample.
-
-    Verifiers return dataclasses (``CLISafetyResult``, ``ToolSafetyResult``, …), not dicts
-    with ``{"verified": ...}``. The old ``result.get("verified")`` path was always falsy.
-    """
-    if isinstance(result, dict):
-        return bool(result.get("verified")), result.get("counterexample")
-
-    if artifact_type == "cli":
-        from .cli_verifier import CLISafetyResult
-
-        if isinstance(result, CLISafetyResult):
-            if result.safe:
-                return True, None
-            parts = [
-                f"{v.pattern_name}: {v.description} [{v.matched_text}]"
-                for v in result.violations
-            ]
-            return False, ("; ".join(parts) if parts else "unsafe_cli_command")
-
-    if artifact_type == "tool":
-        safe = getattr(result, "safe", None)
-        if safe is not None:
-            return bool(safe), (None if safe else str(result))
-
-    if artifact_type in ("code", "hw"):
-        verified = getattr(result, "verified", None)
-        if verified is not None:
-            v = bool(verified)
-            if v:
-                return True, None
-            ce = _format_guard_counterexample(artifact_type, result)
-            return False, ce
-
-    if artifact_type == "distill":
-        all_valid = getattr(result, "all_valid", None)
-        if all_valid is not None:
-            return bool(all_valid), (None if all_valid else str(result))
-
-    return False, f"unrecognized verification result: {type(result).__name__}"
-
-
-def _verification_to_chain_event(vr: "VerificationResult", agent_id: Optional[str]) -> dict:
-    """Structured chain entry for auditors: why formal verification passed or failed."""
-    return {
-        "type": "formal_verification",
-        "agent_id": agent_id or "unknown",
-        "verifier_type": vr.verifier_type,
-        "verified": vr.verified,
-        "artifact_preview": vr.artifact,
-        "counterexample": vr.counterexample,
-        "proof_time_ms": vr.proof_time_ms,
-    }
 
 
 @dataclass
@@ -263,7 +170,7 @@ class Guard:
             layers.append("verify(Z3)")
         if self._chain:
             layers.append("chain(HMAC)")
-        logger.info(f"Guard initialized: [{' -> '.join(layers)}]")
+        logger.info(f"Guard initialized: [{' → '.join(layers)}]")
 
     @contextmanager
     def monitor(self, agent_id: str, pid: Optional[int] = None):
@@ -320,125 +227,77 @@ class Guard:
 
         return ge
 
-    def _append_verification_to_chain(self, vr: VerificationResult, agent_id: Optional[str]) -> None:
-        """Record formal verification outcome (including counterexample) in the HMAC audit chain."""
-        if not self._chain:
-            return
-        self._chain.append(_verification_to_chain_event(vr, agent_id))
-
     def verify_artifact(
         self,
         artifact: str,
         artifact_type: str = "code",
-        spec: Any = None,
-        *,
-        agent_id: Optional[str] = None,
+        spec: Optional[dict] = None,
     ) -> VerificationResult:
         """Run Z3 formal verification on an AI-generated artifact.
         
         Args:
             artifact: Code string, tool definition, CLI command, etc.
             artifact_type: One of "code", "tool", "cli", "hw", "distill"
-            spec: For ``code``, a dict or :class:`~substrate_guard.code_verifier.Spec`.
-                  For ``hw``, a dict or :class:`~substrate_guard.hw_verifier.HWSpec`.
-                  Omitted keys use verifier defaults.
-            agent_id: Optional agent scope; included in chain export when ``chain=True``.
-                Each formal verification appends a ``formal_verification`` entry with
-                ``verified``, ``counterexample``, and ``artifact_preview`` for auditors.
+            spec: Specification dict (pre/postconditions for code, etc.)
         """
-        def _out(vr: VerificationResult) -> VerificationResult:
-            self._append_verification_to_chain(vr, agent_id)
-            return vr
-
         if not self._z3_available:
-            return _out(
-                VerificationResult(
-                    verified=False,
-                    verifier_type=artifact_type,
-                    artifact=artifact[:100],
-                    counterexample="Z3 not available",
-                )
+            return VerificationResult(
+                verified=False,
+                verifier_type=artifact_type,
+                artifact=artifact[:100],
+                counterexample="Z3 not available",
             )
 
         start = time.perf_counter()
         
         try:
             if artifact_type == "code":
-                from .code_verifier import CodeVerifier, Spec, spec_from_mapping
-
+                from .code_verifier import CodeVerifier
                 verifier = CodeVerifier()
-                code_spec: Spec = (
-                    spec if isinstance(spec, Spec) else spec_from_mapping(spec if isinstance(spec, dict) else None)
-                )
-                result = verifier.verify(artifact, code_spec)
+                result = verifier.verify(artifact, spec or {})
             elif artifact_type == "tool":
-                from .tool_verifier import tool_definition_from_payload, verify_tool
-
-                try:
-                    tool_def = tool_definition_from_payload(artifact)
-                except (json.JSONDecodeError, KeyError, TypeError, ValueError) as e:
-                    elapsed = (time.perf_counter() - start) * 1000
-                    return _out(
-                        VerificationResult(
-                            verified=False,
-                            verifier_type="tool",
-                            artifact=artifact[:100] if isinstance(artifact, str) else str(artifact)[:100],
-                            counterexample=f"Invalid tool payload: {e}",
-                            proof_time_ms=elapsed,
-                        )
-                    )
-                result = verify_tool(tool_def)
+                from .tool_verifier import ToolVerifier
+                verifier = ToolVerifier()
+                result = verifier.verify_tool(artifact if isinstance(artifact, dict) 
+                                              else {"name": "unknown", "parameters": {}})
             elif artifact_type == "cli":
                 from .cli_verifier import CLIVerifier
                 verifier = CLIVerifier()
                 result = verifier.verify(artifact)
             elif artifact_type == "hw":
-                from .hw_verifier import HWSpec, HardwareVerifier, hw_spec_from_mapping
-
+                from .hw_verifier import HardwareVerifier
                 verifier = HardwareVerifier()
-                hw_spec: HWSpec = (
-                    spec if isinstance(spec, HWSpec) else hw_spec_from_mapping(spec if isinstance(spec, dict) else None)
-                )
-                result = verifier.verify(artifact, hw_spec)
+                result = verifier.verify(artifact, spec or {})
             elif artifact_type == "distill":
-                from .distill_verifier import DistillationVerifier
-
-                verifier = DistillationVerifier()
+                from .distill_verifier import DistillVerifier
+                verifier = DistillVerifier()
                 result = verifier.verify(artifact)
             else:
-                return _out(
-                    VerificationResult(
-                        verified=False,
-                        verifier_type=artifact_type,
-                        artifact=artifact[:100],
-                        counterexample=f"Unknown verifier type: {artifact_type}",
-                    )
+                return VerificationResult(
+                    verified=False,
+                    verifier_type=artifact_type,
+                    artifact=artifact[:100],
+                    counterexample=f"Unknown verifier type: {artifact_type}",
                 )
 
             elapsed = (time.perf_counter() - start) * 1000
-
-            verified, counterexample = _map_verification_to_guard(artifact_type, result)
-
-            return _out(
-                VerificationResult(
-                    verified=verified,
-                    verifier_type=artifact_type,
-                    artifact=artifact[:100] if isinstance(artifact, str) else str(artifact)[:100],
-                    counterexample=counterexample,
-                    proof_time_ms=elapsed,
-                )
+            
+            return VerificationResult(
+                verified=result.get("verified", False),
+                verifier_type=artifact_type,
+                artifact=artifact[:100] if isinstance(artifact, str) else str(artifact)[:100],
+                counterexample=result.get("counterexample"),
+                proof_time_ms=elapsed,
             )
 
         except Exception as e:
             elapsed = (time.perf_counter() - start) * 1000
-            return _out(
-                VerificationResult(
-                    verified=False,
-                    verifier_type=artifact_type,
-                    artifact=artifact[:100] if isinstance(artifact, str) else str(artifact)[:100],
-                    counterexample=f"Verification error: {e}",
-                    proof_time_ms=elapsed,
-                )
+            return VerificationResult(
+                verified=False,
+                verifier_type=artifact_type,
+                artifact=artifact[:100] if isinstance(artifact, str) else str(artifact)[:100],
+                counterexample=f"Verification error: {e}",
+                proof_time_ms=elapsed,
             )
 
 
@@ -485,9 +344,9 @@ class GuardSession:
         return ge
 
     def verify(self, artifact: str, artifact_type: str = "code",
-               spec: Any = None) -> VerificationResult:
+               spec: Optional[dict] = None) -> VerificationResult:
         """Run Z3 verification on an artifact within this session."""
-        return self._guard.verify_artifact(artifact, artifact_type, spec, agent_id=self.agent_id)
+        return self._guard.verify_artifact(artifact, artifact_type, spec)
 
     @property
     def violations(self) -> list[GuardEvent]:

@@ -1,0 +1,34 @@
+{
+  "generator": "substrate-guard / AI Black Box",
+  "version": "1.0",
+  "generated_at": "2026-04-18T10:17:17.310495+00:00",
+  "organization": "Aisophical SRL",
+  "chain_integrity": {
+    "status": "VERIFIED",
+    "chain_length": 16,
+    "head_hash": "dd772d99598733aafd3138395c72b074c536d141ef4e677e6a681b7cb82614d2",
+    "algorithm": "HMAC-SHA256"
+  },
+  "compliance_status": {
+    "SOC_2_Type_II": "EVIDENCE_AVAILABLE",
+    "ISO_27001_2022": "EVIDENCE_AVAILABLE",
+    "ISO_42001_2023": "EVIDENCE_AVAILABLE",
+    "EU_AI_Act": "PARTIAL \u2014 audit trail + explainability ready"
+  },
+  "verification_stack": {
+    "Layer_1_eBPF": "Active (kernel observation)",
+    "Layer_2_OPA": "Active (7 policy rules)",
+    "Layer_3_Z3": "Active (135 test cases, 100%)",
+    "Audit_Chain": "INTACT (16 entries)"
+  },
+  "session": {
+    "agent_id": "export-all",
+    "duration_s": 0.0017647743225097656,
+    "events_observed": 16,
+    "policy_violations": 7,
+    "formal_verifications": 0,
+    "formal_failures": 0,
+    "verdict": "NON-COMPLIANT"
+  },
+  "differentiator": "Others record what AI does. We prove it was correct."
+}

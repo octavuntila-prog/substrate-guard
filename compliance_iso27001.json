@@ -1,0 +1,68 @@
+{
+  "generator": "substrate-guard / AI Black Box",
+  "version": "1.0",
+  "generated_at": "2026-03-22T14:56:15.337030+00:00",
+  "organization": "Aisophical SRL",
+  "chain_integrity": {
+    "status": "VERIFIED",
+    "chain_length": 0,
+    "head_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "algorithm": "HMAC-SHA256"
+  },
+  "framework": "ISO 27001:2022",
+  "annex_a_controls": {
+    "A.8.15_logging": {
+      "description": "Event logs recording user activities, exceptions, faults and information security events shall be produced, stored, protected and analysed",
+      "implementation": "Every AI agent action is captured as a structured event, hashed into an HMAC-SHA256 chain, and stored with full provenance",
+      "evidence": {
+        "events_logged": 0,
+        "chain_algorithm": "HMAC-SHA256",
+        "chain_integrity": "VERIFIED",
+        "retention": "Configurable (default 30 days)"
+      }
+    },
+    "A.8.16_monitoring": {
+      "description": "Networks, systems and applications shall be monitored for anomalous behaviour",
+      "implementation": "Three-layer monitoring: eBPF kernel observation, OPA policy evaluation, Z3 formal verification",
+      "evidence": {
+        "layers": {
+          "L1_observe": "eBPF tracepoints (execve, openat, connect, SSL_read/write)",
+          "L2_decide": "OPA/Rego policy engine, 7 built-in rules, <5ms/decision",
+          "L3_prove": "Z3 SMT solver, 135 test cases, 100% accuracy"
+        }
+      }
+    },
+    "A.5.23_cloud_security": {
+      "description": "Processes for acquisition, use, management and exit from cloud services shall be established",
+      "implementation": "Agent workspace boundary enforcement \u2014 file writes restricted to /workspace/ and /tmp/, system paths blocked, network connections to suspicious ports blocked",
+      "evidence": {
+        "workspace_enforcement": true,
+        "blocked_paths": [
+          "/etc/",
+          "/root/",
+          "/boot/",
+          "/dev/",
+          "/proc/",
+          "/sys/"
+        ],
+        "blocked_ports": [
+          4444,
+          5555,
+          6666,
+          8888,
+          31337,
+          12345
+        ]
+      }
+    }
+  },
+  "session": {
+    "agent_id": "export-all",
+    "duration_s": 0.00021719932556152344,
+    "events_observed": 0,
+    "policy_violations": 0,
+    "formal_verifications": 0,
+    "formal_failures": 0,
+    "verdict": "COMPLIANT"
+  }
+}

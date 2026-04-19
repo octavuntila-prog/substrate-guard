@@ -68,19 +68,6 @@ def parse_env_file(env_path: str) -> dict:
     return env
 
 
-def resolve_db_url(db_url: Optional[str], env_path: Optional[str]) -> Optional[str]:
-    """Resolve connection URL: explicit arg, then .env file, then ``os.environ`` (Docker-friendly)."""
-    if db_url:
-        return db_url
-    env: dict = {}
-    if env_path:
-        env = parse_env_file(env_path)
-    resolved = build_db_url(env)
-    if resolved:
-        return resolved
-    return build_db_url(dict(os.environ))
-
-
 def build_db_url(env: dict) -> Optional[str]:
     """Build PostgreSQL URL from .env variables.
     
@@ -433,14 +420,18 @@ def main():
 
     args = parser.parse_args()
 
-    db_url = resolve_db_url(args.db_url, args.env)
+    # Resolve DB URL
+    db_url = args.db_url
     if not db_url:
-        print(f"{C.RED}Error:{C.RESET} No database URL found.")
-        print(f"Tried .env at: {args.env}, then process environment (POSTGRES_* / DATABASE_URL).")
-        print(f"Use --db-url or set credentials in .env / environment.")
-        print(f"\nExample:")
-        print(f"  python3 -m substrate_guard.audit --db-url postgresql://user:pass@postgres:5432/dbname")
-        return 1
+        env = parse_env_file(args.env)
+        db_url = build_db_url(env)
+        if not db_url:
+            print(f"{C.RED}Error:{C.RESET} No database URL found.")
+            print(f"Tried .env at: {args.env}")
+            print(f"Use --db-url or --env to specify connection.")
+            print(f"\nExample:")
+            print(f"  python3 -m substrate_guard.audit --db-url postgresql://user:pass@postgres:5432/dbname")
+            return 1
 
     return run_audit(db_url, hours=args.hours, output_dir=args.output)
 

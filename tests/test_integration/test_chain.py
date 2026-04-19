@@ -251,46 +251,6 @@ class TestGuardChainIntegration:
             FileEvent(type=EventType.FILE_WRITE, path="/workspace/a.py", agent_id="a1")
         )
 
-    def test_chain_records_formal_verification_counterexample_for_audit(self):
-        """Blocked commands must leave counterexample in HMAC chain export, not only verified=false."""
-        guard = Guard(
-            observe=False, policy=None, verify=True,
-            chain=True, hmac_secret=SECRET, use_mock=True,
-        )
-        r = guard.verify_artifact("rm -rf /", artifact_type="cli", agent_id="audit-bot")
-        assert r.verified is False
-        assert guard._chain.length == 1
-        entry = guard._chain.entries[0]
-        assert entry.event_type == "formal_verification"
-        assert entry.agent_id == "audit-bot"
-        ed = entry.event_data
-        assert ed["type"] == "formal_verification"
-        assert ed["verified"] is False
-        assert ed["counterexample"]
-        assert "recursive_delete" in ed["counterexample"] or "rm" in ed["counterexample"]
-
-        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
-            path = f.name
-        try:
-            guard._chain.export(path)
-            data = json.loads(open(path).read())
-            exported = data["entries"][0]["event_data"]
-            assert exported["counterexample"] == ed["counterexample"]
-            assert exported["verifier_type"] == "cli"
-        finally:
-            os.unlink(path)
-
-    def test_session_verify_passes_agent_id_to_chain(self):
-        guard = Guard(
-            observe=False, policy=None, verify=True,
-            chain=True, hmac_secret=SECRET, use_mock=True,
-        )
-        with guard.monitor("sess-agent-7") as session:
-            session.verify("echo ok", artifact_type="cli")
-        assert guard._chain.entries[0].event_data["agent_id"] == "sess-agent-7"
-        assert guard._chain.entries[0].event_data["verified"] is True
-        assert guard._chain.entries[0].event_data["counterexample"] is None
-
 
 # ============================================
 # Compliance export tests

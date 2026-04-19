@@ -1,0 +1,90 @@
+{
+  "generator": "substrate-guard / AI Black Box",
+  "version": "1.0",
+  "generated_at": "2026-03-22T14:56:14.696671+00:00",
+  "organization": "Aisophical SRL",
+  "chain_integrity": {
+    "status": "VERIFIED",
+    "chain_length": 0,
+    "head_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "algorithm": "HMAC-SHA256"
+  },
+  "framework": "SOC 2 Type II",
+  "trust_service_criteria": {
+    "CC6.1_logical_access": {
+      "description": "The entity implements logical access security over protected information assets",
+      "control": "OPA/Rego policy engine evaluates every agent action against 7 built-in rules",
+      "evidence": {
+        "policy_rules": [
+          "dangerous_paths",
+          "dangerous_commands",
+          "network_exfiltration",
+          "budget_enforcement",
+          "rate_limiting",
+          "workspace_boundary",
+          "pii_detection"
+        ],
+        "total_evaluations": 0,
+        "violations_detected": 0
+      }
+    },
+    "CC7.2_system_monitoring": {
+      "description": "The entity monitors system components for anomalies",
+      "control": "eBPF kernel-level observation captures syscalls, file I/O, network connections for all agent processes",
+      "evidence": {
+        "observation_layer": "eBPF (Linux kernel tracepoints + uprobes)",
+        "event_types": [
+          "syscall",
+          "file_open",
+          "file_write",
+          "file_read",
+          "network_connect",
+          "process_exec",
+          "tls_read",
+          "tls_write"
+        ],
+        "events_captured": 0
+      }
+    },
+    "CC8.1_change_management": {
+      "description": "The entity authorizes, designs, develops, configures, documents, tests, approves, and implements changes",
+      "control": "Z3 SMT formal verification proves mathematical correctness of AI-generated code, tool APIs, CLI commands, hardware assembly, and distilled models",
+      "evidence": {
+        "verification_engine": "Z3 SMT Solver",
+        "domains_covered": [
+          "code",
+          "tool_api",
+          "cli",
+          "hardware_riscv",
+          "distillation"
+        ],
+        "test_cases": 135,
+        "accuracy": "100%",
+        "false_positives": 0,
+        "false_negatives": 0
+      }
+    },
+    "CC4.1_monitoring_controls": {
+      "description": "The entity monitors the effectiveness of controls",
+      "control": "HMAC-SHA256 tamper-evident audit chain ensures no event can be modified, deleted, or inserted without detection",
+      "evidence": {
+        "chain_length": 0,
+        "genesis_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "head_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "unique_agents": 0,
+        "event_types": {},
+        "integrity": "verified"
+      }
+    }
+  },
+  "session": {
+    "agent_id": "export-all",
+    "duration_s": 0.00022721290588378906,
+    "events_observed": 0,
+    "policy_violations": 0,
+    "formal_verifications": 0,
+    "formal_failures": 0,
+    "verdict": "COMPLIANT"
+  },
+  "chain_entries_sample": []
+}
