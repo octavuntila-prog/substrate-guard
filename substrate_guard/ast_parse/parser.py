@@ -10,14 +10,32 @@ from typing import Any
 # Lazy parser cache: language id -> Parser
 _parsers: dict[str, Any] = {}
 
+# Lazy import-state cache for tree-sitter + tree-sitter-bash.
+# None = not yet checked; True = available; False = unavailable (warning already emitted).
+# Keeping this as a module-level scalar matches the _parsers idiom above
+# and avoids pulling functools.lru_cache for a single-shot check.
+_bash_import_checked: bool | None = None
+
 
 def tree_sitter_bash_available() -> bool:
+    global _bash_import_checked
+    if _bash_import_checked is not None:
+        return _bash_import_checked
     try:
         importlib.import_module("tree_sitter_bash")
         importlib.import_module("tree_sitter")
+        _bash_import_checked = True
     except ImportError:
-        return False
-    return True
+        import warnings
+        warnings.warn(
+            "tree-sitter / tree-sitter-bash unavailable — bash AST scanning disabled. "
+            "Install with: pip install tree-sitter tree-sitter-bash "
+            "(or upgrade substrate-guard to >=13.2.14 which bundles these automatically).",
+            ImportWarning,
+            stacklevel=2,
+        )
+        _bash_import_checked = False
+    return _bash_import_checked
 
 
 def _bash_parser():
