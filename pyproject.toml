@@ -17,6 +17,13 @@ dependencies = [
     "cryptography>=46.0.6",
     "pyyaml>=6.0",
     "sqlparse>=0.5.0",
+    # Upper bound on tree-sitter and tree-sitter-bash is intentional.
+    # tree-sitter-bash's own requires_dist is `tree-sitter~=0.24` under its
+    # optional [core] extra, but we ship without that extra and pin both
+    # packages explicitly here. When a new major-minor (0.26+) is released,
+    # test compatibility empirically before bumping the cap.
+    "tree-sitter>=0.21,<0.26",
+    "tree-sitter-bash>=0.21,<0.26",
 ]
 
 [project.optional-dependencies]
@@ -25,8 +32,6 @@ dev = [
     "pytest-asyncio>=0.24",
     "hypothesis>=6.92",
     "bandit>=1.7.0",
-    "tree-sitter>=0.21",
-    "tree-sitter-bash>=0.21",
 ]
 postgres = [
     "psycopg2-binary>=2.9",
