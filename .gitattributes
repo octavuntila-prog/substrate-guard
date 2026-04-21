@@ -1,0 +1,17 @@
+# Enforce LF line endings for shell and Python scripts.
+# Prevents CRLF issues when editing on Windows — shell on Linux prod
+# fails with obscure errors if scripts have CR characters.
+*.sh text eol=lf
+*.py text eol=lf
+
+# Config files also force LF (cron/systemd on Linux require it)
+*.service text eol=lf
+*.timer text eol=lf
+
+# Binary files — never touched by text normalization
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.so binary
+*.whl binary

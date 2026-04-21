@@ -28,6 +28,8 @@ import sys
 import time
 import logging
 from datetime import datetime, timedelta
+
+from substrate_guard import __version__ as substrate_guard_version
 from pathlib import Path
 from typing import Optional
 
@@ -370,6 +372,7 @@ def run_audit(db_url: str, hours: Optional[int] = None, output_dir: str = "/var/
 
     summary = {
         "timestamp": datetime.utcnow().isoformat(),
+        "substrate_guard_version": substrate_guard_version,
         "db_records": {
             "pipeline_traces": len(traces),
             "agent_runs": len(runs),

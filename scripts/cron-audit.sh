@@ -47,8 +47,10 @@ mkdir -p "$LOG_DIR"
         echo "VIOLATIONS DETECTED — sending alert"
         # Use existing Telegram bot (same as watchdog.sh and disk-monitor.sh)
         if [ -f "$APP_DIR/.env" ]; then
-            export $(grep -E '^(TELEGRAM_BOT_TOKEN|TELEGRAM_CHAT_ID)=' "$APP_DIR/.env" | xargs)
-            if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${TELEGRAM_CHAT_ID:-}" ]; then
+            export $(grep -E '^(TELEGRAM_BOT_TOKEN|TELEGRAM_CHAT_ID|TELEGRAM_ADMIN_ID)=' "$APP_DIR/.env" | xargs)
+            # Use TELEGRAM_CHAT_ID if present, otherwise fall back to TELEGRAM_ADMIN_ID
+            TELEGRAM_TARGET="${TELEGRAM_CHAT_ID:-${TELEGRAM_ADMIN_ID:-}}"
+            if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "$TELEGRAM_TARGET" ]; then
                 LATEST_REPORT=$(ls -t "$LOG_DIR"/audit_*.json 2>/dev/null | head -1)
                 if [ -n "$LATEST_REPORT" ]; then
                     VIOLATIONS=$(python3 -c "import json; d=json.load(open('$LATEST_REPORT')); print(d['evaluation']['violations'])")
@@ -58,7 +60,7 @@ mkdir -p "$LOG_DIR"
                     MSG="⚠️ substrate-guard: Violations detected but no report file found"
                 fi
                 curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-                    -d "chat_id=${TELEGRAM_CHAT_ID}" \
+                    -d "chat_id=${TELEGRAM_TARGET}" \
                     -d "text=${MSG}" > /dev/null 2>&1 || true
             fi
         fi
