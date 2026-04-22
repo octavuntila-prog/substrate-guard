@@ -115,6 +115,63 @@ def build_db_url(env: dict) -> Optional[str]:
     return None
 
 
+def resolve_policy_mode(args) -> tuple[str, str]:
+    """Resolve policy mode from CLI > env > default.
+
+    Returns:
+        Tuple of (mode, source) where source is one of 'cli', 'env', 'default'.
+
+    Raises:
+        ValueError: if CLI --policy flag has invalid value.
+    """
+    # CLI flag takes precedence
+    if getattr(args, 'policy', None):
+        if args.policy not in VALID_POLICY_MODES:
+            raise ValueError(
+                f"Invalid --policy: {args.policy!r}. "
+                f"Expected one of {VALID_POLICY_MODES}"
+            )
+        return args.policy, 'cli'
+
+    # Env var second
+    env_value = os.environ.get(POLICY_ENV_VAR)
+    if env_value:
+        if env_value in VALID_POLICY_MODES:
+            return env_value, 'env'
+        else:
+            logger.warning(
+                f"Invalid {POLICY_ENV_VAR}={env_value!r}. "
+                f"Expected one of {VALID_POLICY_MODES}. Falling back to default."
+            )
+
+    # Hardcoded default
+    return 'builtin', 'default'
+
+
+def resolve_policy_path(mode: str) -> str:
+    """Resolve policy path from mode.
+
+    Args:
+        mode: one of 'rego' or 'builtin'.
+
+    Returns:
+        BUILTIN_POLICY_PATH sentinel for 'builtin' mode, or absolute path
+        to shipped Rego policies directory for 'rego' mode.
+
+    Raises:
+        ValueError: if mode is not a valid policy mode.
+    """
+    if mode == 'builtin':
+        return BUILTIN_POLICY_PATH
+    elif mode == 'rego':
+        return str(Path(__file__).parent / 'policy' / 'policies')
+    else:
+        raise ValueError(
+            f"Unknown policy mode: {mode!r}. "
+            f"Expected one of {VALID_POLICY_MODES}"
+        )
+
+
 def query_db(db_url: str, query: str, params: tuple = ()) -> list[dict]:
     """Execute a query and return results as list of dicts."""
     try:
