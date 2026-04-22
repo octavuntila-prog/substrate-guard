@@ -513,8 +513,28 @@ def main():
                        help="Path to .env file with DB credentials")
     parser.add_argument("--hours", type=int, default=None,
                        help="Only audit records from last N hours (default: all)")
+    parser.add_argument(
+        "--from",
+        dest="from_date",
+        type=str,
+        default=None,
+        help="Inclusive start date (YYYY-MM-DD) for event window",
+    )
+    parser.add_argument(
+        "--to",
+        dest="to_date",
+        type=str,
+        default=None,
+        help="Inclusive end date (YYYY-MM-DD) for event window",
+    )
     parser.add_argument("--output", default="/var/log/substrate-guard",
                        help="Output directory for JSON report")
+    parser.add_argument(
+        "--policy",
+        choices=sorted(VALID_POLICY_MODES),
+        default=None,
+        help="Policy engine (default: builtin; env: SUBSTRATE_GUARD_POLICY)",
+    )
 
     args = parser.parse_args()
 
