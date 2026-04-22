@@ -308,7 +308,15 @@ def parse_json_field(value) -> dict:
     return {}
 
 
-def run_audit(db_url: str, hours: Optional[int] = None, output_dir: str = "/var/log/substrate-guard"):
+def run_audit(
+    db_url: str,
+    hours: Optional[int] = None,
+    output_dir: str = "/var/log/substrate-guard",
+    *,
+    policy_path: str,
+    policy_mode: str,
+    policy_source: str,
+):
     """Main audit function."""
     start_time = time.time()
 
@@ -361,7 +369,7 @@ def run_audit(db_url: str, hours: Optional[int] = None, output_dir: str = "/var/
     # ── Step 4: Evaluate Through Pipeline ──
     print(f"{C.CYAN}[4/5]{C.RESET} Running Guard pipeline (observe → policy → verify)...")
 
-    guard = Guard(observe=True, policy="nonexistent/", verify=True, use_mock=True)
+    guard = Guard(observe=True, policy=policy_path, verify=True, use_mock=True)
     
     violations = []
     allowed = 0
@@ -436,6 +444,8 @@ def run_audit(db_url: str, hours: Optional[int] = None, output_dir: str = "/var/
     summary = {
         "timestamp": datetime.utcnow().isoformat(),
         "substrate_guard_version": substrate_guard_version,
+        "policy_engine": policy_mode,
+        "policy_engine_source": policy_source,
         "db_records": {
             "pipeline_traces": len(traces),
             "agent_runs": len(runs),
@@ -547,7 +557,22 @@ def main():
         print(f"  python3 -m substrate_guard.audit --db-url postgresql://user:pass@postgres:5432/dbname")
         return 1
 
-    return run_audit(db_url, hours=args.hours, output_dir=args.output)
+    policy_mode, policy_source = resolve_policy_mode(args)
+    policy_path = resolve_policy_path(policy_mode)
+
+    logger.info(
+        f"Policy engine: {policy_mode} "
+        f"(source: {policy_source}, path: {policy_path})"
+    )
+
+    return run_audit(
+        db_url,
+        hours=args.hours,
+        output_dir=args.output,
+        policy_path=policy_path,
+        policy_mode=policy_mode,
+        policy_source=policy_source,
+    )
 
 
 if __name__ == "__main__":
