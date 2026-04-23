@@ -4,7 +4,9 @@ import json
 import pytest
 from substrate_guard.audit import (
     parse_env_file, build_db_url, parse_json_field, _event_detail,
+    run_audit, resolve_policy_path,
 )
+from substrate_guard.constants import BUILTIN_POLICY_PATH
 from substrate_guard.integrations.vendor_bridge import PipelineTraceAdapter, AgentRunAdapter
 from substrate_guard.observe.events import EventType
 
@@ -232,3 +234,162 @@ class TestAuditPipeline:
         assert elapsed < 10000
         per_event = elapsed / 1000
         print(f"\n  Large-scale audit: 1000 events in {elapsed:.0f}ms ({per_event:.2f}ms/event)")
+
+
+# ============================================
+# TestPolicyEngineWiring (M1.2 Task 6) — wiring + JSON schema regression
+# ============================================
+
+V13216_REQUIRED_KEYS = frozenset({
+    'categories', 'db_records', 'evaluation', 'events_generated',
+    'layers', 'server', 'substrate_guard_version', 'timestamp',
+    'total_cost_usd', 'unique_agents', 'violations_detail',
+})
+
+M12_NEW_KEYS = frozenset({'policy_engine', 'policy_engine_source'})
+
+
+@pytest.fixture
+def mock_audit_db(monkeypatch):
+    """Stub DB-level functions so run_audit can run without Postgres.
+
+    Zero-row fixtures (empty traces + runs) — isolates test from DB state
+    and keeps tests deterministic. For non-trivial event coverage, use
+    real Postgres via test_postgres_ci.py instead.
+    """
+    from substrate_guard import audit as audit_mod
+    monkeypatch.setattr(
+        audit_mod, 'fetch_table_counts',
+        lambda url: {'pipeline_traces': 0, 'agent_runs': 0},
+    )
+    monkeypatch.setattr(
+        audit_mod, 'fetch_pipeline_traces',
+        lambda url, hours=None: [],
+    )
+    monkeypatch.setattr(
+        audit_mod, 'fetch_agent_runs',
+        lambda url, hours=None: [],
+    )
+
+
+def _load_summary(tmp_path):
+    """Helper: read the single JSON report written by run_audit to tmp_path."""
+    reports = list(tmp_path.glob("audit_*.json"))
+    assert len(reports) == 1, (
+        f"expected 1 audit_*.json in {tmp_path}, got {len(reports)}"
+    )
+    return json.loads(reports[0].read_text())
+
+
+class TestPolicyEngineWiring:
+    """Tests for M1.2 Task 6 Guard-wiring + summary JSON schema regression."""
+
+    def test_default_builtin_in_summary(self, tmp_path, mock_audit_db):
+        """Default invocation (source='default') → summary labels builtin/default."""
+        code = run_audit(
+            "postgresql://stub",
+            hours=None,
+            output_dir=str(tmp_path),
+            policy_path=BUILTIN_POLICY_PATH,
+            policy_mode='builtin',
+            policy_source='default',
+        )
+        assert code == 0
+        summary = _load_summary(tmp_path)
+        assert summary['policy_engine'] == 'builtin'
+        assert summary['policy_engine_source'] == 'default'
+
+    def test_cli_policy_in_summary(self, tmp_path, mock_audit_db):
+        """policy_source='cli' propagates as label (as if --policy passed)."""
+        run_audit(
+            "postgresql://stub",
+            hours=None,
+            output_dir=str(tmp_path),
+            policy_path=BUILTIN_POLICY_PATH,
+            policy_mode='builtin',
+            policy_source='cli',
+        )
+        summary = _load_summary(tmp_path)
+        assert summary['policy_engine_source'] == 'cli'
+
+    def test_env_policy_in_summary(self, tmp_path, mock_audit_db):
+        """policy_source='env' propagates as label (SUBSTRATE_GUARD_POLICY-like)."""
+        run_audit(
+            "postgresql://stub",
+            hours=None,
+            output_dir=str(tmp_path),
+            policy_path=BUILTIN_POLICY_PATH,
+            policy_mode='builtin',
+            policy_source='env',
+        )
+        summary = _load_summary(tmp_path)
+        assert summary['policy_engine_source'] == 'env'
+
+    def test_rego_mode_in_summary(self, tmp_path, mock_audit_db):
+        """Verify policy_mode='rego' propagates to summary label.
+
+        Note: Does NOT verify OPA is actually executing rego policies.
+        When OPA binary is unavailable (local dev without OPA installed),
+        PolicyEngine silently falls back to Python built-in dispatch. We
+        verify summary label reflects requested mode, not effective
+        dispatch. Actual Rego execution is covered by M1.3 retrospective
+        audit with OPA installed.
+        """
+        rego_path = resolve_policy_path('rego')
+        run_audit(
+            "postgresql://stub",
+            hours=None,
+            output_dir=str(tmp_path),
+            policy_path=rego_path,
+            policy_mode='rego',
+            policy_source='cli',
+        )
+        summary = _load_summary(tmp_path)
+        assert summary['policy_engine'] == 'rego'
+
+    def test_schema_v13216_fields_preserved(self, tmp_path, mock_audit_db):
+        """Regression: all 11 v13.2.16 top-level fields remain in v13.3.0 schema."""
+        run_audit(
+            "postgresql://stub",
+            hours=None,
+            output_dir=str(tmp_path),
+            policy_path=BUILTIN_POLICY_PATH,
+            policy_mode='builtin',
+            policy_source='default',
+        )
+        summary = _load_summary(tmp_path)
+        missing = V13216_REQUIRED_KEYS - summary.keys()
+        assert not missing, f"v13.2.16 fields missing from v13.3.0: {missing}"
+
+    def test_schema_has_new_fields(self, tmp_path, mock_audit_db):
+        """M1.2 adds exactly 2 new top-level fields."""
+        run_audit(
+            "postgresql://stub",
+            hours=None,
+            output_dir=str(tmp_path),
+            policy_path=BUILTIN_POLICY_PATH,
+            policy_mode='builtin',
+            policy_source='default',
+        )
+        summary = _load_summary(tmp_path)
+        missing = M12_NEW_KEYS - summary.keys()
+        assert not missing, f"M1.2 new fields missing: {missing}"
+
+    def test_schema_no_unexpected_fields(self, tmp_path, mock_audit_db):
+        """Scope guard: no surprise fields beyond v13.2.16 + M1.2.
+
+        If this fails, a new field was added. Update M12_NEW_KEYS (or
+        introduce M13_NEW_KEYS for future milestone) intentionally.
+        """
+        run_audit(
+            "postgresql://stub",
+            hours=None,
+            output_dir=str(tmp_path),
+            policy_path=BUILTIN_POLICY_PATH,
+            policy_mode='builtin',
+            policy_source='default',
+        )
+        summary = _load_summary(tmp_path)
+        expected = V13216_REQUIRED_KEYS | M12_NEW_KEYS
+        extra = summary.keys() - expected
+        assert not extra, f"Unexpected fields in summary: {extra}"
