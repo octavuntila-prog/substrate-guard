@@ -252,9 +252,14 @@ python -m substrate_guard.cli demo --scenario safe
 
 # PostgreSQL audit (needs DB URL / schema — see DEPLOY.md / audit --help)
 python -m substrate_guard.cli audit --db-url postgresql://...
+
+# Policy engine (default: built-in Python rules; optional Rego via OPA)
+python -m substrate_guard.cli audit --policy builtin --db-url postgresql://...
+# Or enable via env (persists across invocations):
+# SUBSTRATE_GUARD_POLICY=rego python -m substrate_guard.cli audit --db-url postgresql://...
 ```
 
-What is **fully functional without Linux eBPF** vs. what needs a **real kernel / OPA / DB** is documented in [docs/FUNCTIONAL_ROADMAP.md](docs/FUNCTIONAL_ROADMAP.md). **Ordered runbook (eBPF → Postgres → orchestrator example):** [docs/RUNBOOK_ORDERED.md](docs/RUNBOOK_ORDERED.md).
+What is **fully functional without Linux eBPF** vs. what needs a **real kernel / OPA / DB** is documented in [docs/FUNCTIONAL_ROADMAP.md](docs/FUNCTIONAL_ROADMAP.md). **Ordered runbook (eBPF → Postgres → orchestrator example):** [docs/RUNBOOK_ORDERED.md](docs/RUNBOOK_ORDERED.md). For Rego policy engine setup (optional): [docs/rego-setup.md](docs/rego-setup.md).
 
 ## Known Limitations
 
