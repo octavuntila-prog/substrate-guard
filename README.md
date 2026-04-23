@@ -32,6 +32,10 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 | Tests | **358** passing (365 collected), 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
 
+### Release v13.3.0 (April 24, 2026) — configurable policy engine
+
+**`--policy {builtin,rego}`** flag + **`SUBSTRATE_GUARD_POLICY`** env var control policy engine selection; audit JSON reports include `policy_engine` + `policy_engine_source` metadata. [docs/releases/v13.3.0.md](docs/releases/v13.3.0.md).
+
 ### Release v13.2.12 (April 7, 2026) — sqlparse dependency core
 
 **`sqlparse`** este dependență **obligatorie**; scanarea SQL structurală (`DROP` / `TRUNCATE` / …) rulează la orice instalare. [docs/releases/v13.2.12.md](docs/releases/v13.2.12.md).
