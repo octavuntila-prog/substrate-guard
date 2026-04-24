@@ -53,8 +53,16 @@ def test_fetch_pipeline_and_runs_empty_ok():
 
 def test_run_audit_zero_rows(tmp_path):
     from substrate_guard.audit import run_audit
+    from substrate_guard.constants import BUILTIN_POLICY_PATH
 
-    code = run_audit(_db_url(), hours=None, output_dir=str(tmp_path))
+    code = run_audit(
+        _db_url(),
+        hours=None,
+        output_dir=str(tmp_path),
+        policy_path=BUILTIN_POLICY_PATH,
+        policy_mode='builtin',
+        policy_source='default',
+    )
     assert code == 0
     assert list(tmp_path.glob("audit_*.json"))
 
@@ -88,7 +96,16 @@ def test_run_audit_with_one_trace(tmp_path):
         conn.close()
 
     try:
-        code = run_audit(db_url, hours=None, output_dir=str(tmp_path))
+        from substrate_guard.constants import BUILTIN_POLICY_PATH
+
+        code = run_audit(
+            db_url,
+            hours=None,
+            output_dir=str(tmp_path),
+            policy_path=BUILTIN_POLICY_PATH,
+            policy_mode='builtin',
+            policy_source='default',
+        )
         assert code == 0
     finally:
         conn = psycopg2.connect(db_url)

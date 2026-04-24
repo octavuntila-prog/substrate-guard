@@ -34,6 +34,12 @@ mkdir -p "$LOG_DIR"
         DB_URL=$(echo "$DB_URL" | sed "s|@postgres:|@${PG_IP}:|")
     fi
     
+    # Policy engine: defaults to built-in Python rules.
+    # To activate Rego enforcement (requires OPA binary installed):
+    #   export SUBSTRATE_GUARD_POLICY=rego
+    # Or override per-run:
+    #   python3 -m substrate_guard.audit --policy rego [...]
+
     # Run audit for last 24 hours
     cd /opt/substrate-guard
     PYTHONPATH=/opt/substrate-guard python3 -m substrate_guard.audit \

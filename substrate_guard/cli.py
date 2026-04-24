@@ -17,9 +17,14 @@ Usage:
 
 import argparse
 import json
+import logging
 import subprocess
 import sys
 from pathlib import Path
+
+from substrate_guard.constants import VALID_POLICY_MODES
+
+logger = logging.getLogger("substrate_guard.cli")
 
 
 def cmd_verify_code(args):
@@ -101,7 +106,12 @@ def cmd_verify_cli(args):
 
 
 def cmd_audit(args):
-    from substrate_guard.audit import resolve_db_url, run_audit
+    from substrate_guard.audit import (
+        resolve_db_url,
+        resolve_policy_mode,
+        resolve_policy_path,
+        run_audit,
+    )
 
     db_url = resolve_db_url(args.db_url, args.env)
     if not db_url:
@@ -109,7 +119,23 @@ def cmd_audit(args):
         print(f"Tried .env at: {args.env}, then process environment (POSTGRES_* / DATABASE_URL).")
         print("Use --db-url or set credentials in .env / environment.")
         return 1
-    return run_audit(db_url, hours=args.hours, output_dir=args.output)
+
+    policy_mode, policy_source = resolve_policy_mode(args)
+    policy_path = resolve_policy_path(policy_mode)
+
+    logger.info(
+        f"Policy engine: {policy_mode} "
+        f"(source: {policy_source}, path: {policy_path})"
+    )
+
+    return run_audit(
+        db_url,
+        hours=args.hours,
+        output_dir=args.output,
+        policy_path=policy_path,
+        policy_mode=policy_mode,
+        policy_source=policy_source,
+    )
 
 
 def cmd_doctor(args):
@@ -254,9 +280,29 @@ def main() -> None:
         help="Only audit records from the last N hours (default: all)",
     )
     audit_parser.add_argument(
+        "--from",
+        dest="from_date",
+        type=str,
+        default=None,
+        help="Inclusive start date (YYYY-MM-DD) for event window",
+    )
+    audit_parser.add_argument(
+        "--to",
+        dest="to_date",
+        type=str,
+        default=None,
+        help="Inclusive end date (YYYY-MM-DD) for event window",
+    )
+    audit_parser.add_argument(
         "--output",
         default="/var/log/substrate-guard",
         help="Directory for JSON audit report",
+    )
+    audit_parser.add_argument(
+        "--policy",
+        choices=sorted(VALID_POLICY_MODES),
+        default=None,
+        help="Policy engine (default: builtin; env: SUBSTRATE_GUARD_POLICY)",
     )
     register_comply_parser(subparsers)
     register_attest_parser(subparsers)

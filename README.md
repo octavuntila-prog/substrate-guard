@@ -32,6 +32,10 @@ Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous mul
 | Tests | **358** passing (365 collected), 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
 
+### Release v13.3.0 (April 24, 2026) — configurable policy engine
+
+**`--policy {builtin,rego}`** flag + **`SUBSTRATE_GUARD_POLICY`** env var control policy engine selection; audit JSON reports include `policy_engine` + `policy_engine_source` metadata. [docs/releases/v13.3.0.md](docs/releases/v13.3.0.md).
+
 ### Release v13.2.12 (April 7, 2026) — sqlparse dependency core
 
 **`sqlparse`** este dependență **obligatorie**; scanarea SQL structurală (`DROP` / `TRUNCATE` / …) rulează la orice instalare. [docs/releases/v13.2.12.md](docs/releases/v13.2.12.md).
@@ -252,9 +256,14 @@ python -m substrate_guard.cli demo --scenario safe
 
 # PostgreSQL audit (needs DB URL / schema — see DEPLOY.md / audit --help)
 python -m substrate_guard.cli audit --db-url postgresql://...
+
+# Policy engine (default: built-in Python rules; optional Rego via OPA)
+python -m substrate_guard.cli audit --policy builtin --db-url postgresql://...
+# Or enable via env (persists across invocations):
+# SUBSTRATE_GUARD_POLICY=rego python -m substrate_guard.cli audit --db-url postgresql://...
 ```
 
-What is **fully functional without Linux eBPF** vs. what needs a **real kernel / OPA / DB** is documented in [docs/FUNCTIONAL_ROADMAP.md](docs/FUNCTIONAL_ROADMAP.md). **Ordered runbook (eBPF → Postgres → orchestrator example):** [docs/RUNBOOK_ORDERED.md](docs/RUNBOOK_ORDERED.md).
+What is **fully functional without Linux eBPF** vs. what needs a **real kernel / OPA / DB** is documented in [docs/FUNCTIONAL_ROADMAP.md](docs/FUNCTIONAL_ROADMAP.md). **Ordered runbook (eBPF → Postgres → orchestrator example):** [docs/RUNBOOK_ORDERED.md](docs/RUNBOOK_ORDERED.md). For Rego policy engine setup (optional): [docs/rego-setup.md](docs/rego-setup.md).
 
 ## Known Limitations
 

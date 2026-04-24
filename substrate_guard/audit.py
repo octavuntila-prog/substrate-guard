@@ -30,6 +30,12 @@ import logging
 from datetime import datetime, timedelta
 
 from substrate_guard import __version__ as substrate_guard_version
+from substrate_guard.constants import (
+    BUILTIN_POLICY_PATH,
+    DEFAULT_REGO_POLICIES_SUBDIR,
+    VALID_POLICY_MODES,
+    POLICY_ENV_VAR,
+)
 from pathlib import Path
 from typing import Optional
 
@@ -107,6 +113,63 @@ def build_db_url(env: dict) -> Optional[str]:
     if user and db:
         return f"postgresql://{user}:{password}@{host}:{port}/{db}"
     return None
+
+
+def resolve_policy_mode(args) -> tuple[str, str]:
+    """Resolve policy mode from CLI > env > default.
+
+    Returns:
+        Tuple of (mode, source) where source is one of 'cli', 'env', 'default'.
+
+    Raises:
+        ValueError: if CLI --policy flag has invalid value.
+    """
+    # CLI flag takes precedence
+    if getattr(args, 'policy', None):
+        if args.policy not in VALID_POLICY_MODES:
+            raise ValueError(
+                f"Invalid --policy: {args.policy!r}. "
+                f"Expected one of {VALID_POLICY_MODES}"
+            )
+        return args.policy, 'cli'
+
+    # Env var second
+    env_value = os.environ.get(POLICY_ENV_VAR)
+    if env_value:
+        if env_value in VALID_POLICY_MODES:
+            return env_value, 'env'
+        else:
+            logger.warning(
+                f"Invalid {POLICY_ENV_VAR}={env_value!r}. "
+                f"Expected one of {VALID_POLICY_MODES}. Falling back to default."
+            )
+
+    # Hardcoded default
+    return 'builtin', 'default'
+
+
+def resolve_policy_path(mode: str) -> str:
+    """Resolve policy path from mode.
+
+    Args:
+        mode: one of 'rego' or 'builtin'.
+
+    Returns:
+        BUILTIN_POLICY_PATH sentinel for 'builtin' mode, or absolute path
+        to shipped Rego policies directory for 'rego' mode.
+
+    Raises:
+        ValueError: if mode is not a valid policy mode.
+    """
+    if mode == 'builtin':
+        return BUILTIN_POLICY_PATH
+    elif mode == 'rego':
+        return str(Path(__file__).parent / 'policy' / 'policies')
+    else:
+        raise ValueError(
+            f"Unknown policy mode: {mode!r}. "
+            f"Expected one of {VALID_POLICY_MODES}"
+        )
 
 
 def query_db(db_url: str, query: str, params: tuple = ()) -> list[dict]:
@@ -245,7 +308,15 @@ def parse_json_field(value) -> dict:
     return {}
 
 
-def run_audit(db_url: str, hours: Optional[int] = None, output_dir: str = "/var/log/substrate-guard"):
+def run_audit(
+    db_url: str,
+    hours: Optional[int] = None,
+    output_dir: str = "/var/log/substrate-guard",
+    *,
+    policy_path: str,
+    policy_mode: str,
+    policy_source: str,
+):
     """Main audit function."""
     start_time = time.time()
 
@@ -298,7 +369,7 @@ def run_audit(db_url: str, hours: Optional[int] = None, output_dir: str = "/var/
     # ── Step 4: Evaluate Through Pipeline ──
     print(f"{C.CYAN}[4/5]{C.RESET} Running Guard pipeline (observe → policy → verify)...")
 
-    guard = Guard(observe=True, policy="nonexistent/", verify=True, use_mock=True)
+    guard = Guard(observe=True, policy=policy_path, verify=True, use_mock=True)
     
     violations = []
     allowed = 0
@@ -373,6 +444,8 @@ def run_audit(db_url: str, hours: Optional[int] = None, output_dir: str = "/var/
     summary = {
         "timestamp": datetime.utcnow().isoformat(),
         "substrate_guard_version": substrate_guard_version,
+        "policy_engine": policy_mode,
+        "policy_engine_source": policy_source,
         "db_records": {
             "pipeline_traces": len(traces),
             "agent_runs": len(runs),
@@ -450,8 +523,28 @@ def main():
                        help="Path to .env file with DB credentials")
     parser.add_argument("--hours", type=int, default=None,
                        help="Only audit records from last N hours (default: all)")
+    parser.add_argument(
+        "--from",
+        dest="from_date",
+        type=str,
+        default=None,
+        help="Inclusive start date (YYYY-MM-DD) for event window",
+    )
+    parser.add_argument(
+        "--to",
+        dest="to_date",
+        type=str,
+        default=None,
+        help="Inclusive end date (YYYY-MM-DD) for event window",
+    )
     parser.add_argument("--output", default="/var/log/substrate-guard",
                        help="Output directory for JSON report")
+    parser.add_argument(
+        "--policy",
+        choices=sorted(VALID_POLICY_MODES),
+        default=None,
+        help="Policy engine (default: builtin; env: SUBSTRATE_GUARD_POLICY)",
+    )
 
     args = parser.parse_args()
 
@@ -464,7 +557,22 @@ def main():
         print(f"  python3 -m substrate_guard.audit --db-url postgresql://user:pass@postgres:5432/dbname")
         return 1
 
-    return run_audit(db_url, hours=args.hours, output_dir=args.output)
+    policy_mode, policy_source = resolve_policy_mode(args)
+    policy_path = resolve_policy_path(policy_mode)
+
+    logger.info(
+        f"Policy engine: {policy_mode} "
+        f"(source: {policy_source}, path: {policy_path})"
+    )
+
+    return run_audit(
+        db_url,
+        hours=args.hours,
+        output_dir=args.output,
+        policy_path=policy_path,
+        policy_mode=policy_mode,
+        policy_source=policy_source,
+    )
 
 
 if __name__ == "__main__":
