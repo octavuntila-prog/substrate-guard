@@ -27,7 +27,7 @@ import os
 import sys
 import time
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from substrate_guard import __version__ as substrate_guard_version
 from substrate_guard.constants import (
@@ -58,6 +58,20 @@ class C:
     YELLOW = "\033[33m"
     CYAN = "\033[36m"
     DIM = "\033[2m"
+
+
+def _utcnow_naive() -> datetime:
+    """UTC now as naive datetime.
+
+    Replacement for ``_utcnow_naive()``, which is deprecated in Python 3.12+
+    and scheduled for removal. Returns a naive datetime (no tzinfo) to
+    preserve exact JSON schema compatibility with v13.2.x and v13.3.0 audit
+    reports — ``isoformat()`` output does NOT include the ``+00:00`` suffix.
+
+    For new code that needs timezone-aware datetimes, use
+    ``datetime.now(timezone.utc)`` directly instead of this helper.
+    """
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def parse_env_file(env_path: str) -> dict:
@@ -259,7 +273,7 @@ def fetch_pipeline_traces(db_url: str, hours: Optional[int] = None, limit: int =
     completed_at, confidence
     """
     if hours:
-        since = datetime.utcnow() - timedelta(hours=hours)
+        since = _utcnow_naive() - timedelta(hours=hours)
         return query_db(db_url, _SQL_PIPELINE_WITH_HOURS, (since, limit))
     return query_db(db_url, _SQL_PIPELINE_NO_HOURS, (limit,))
 
@@ -271,7 +285,7 @@ def fetch_agent_runs(db_url: str, hours: Optional[int] = None, limit: int = 5000
     confidence, error, input_summary, output_summary, trace_id, created_at
     """
     if hours:
-        since = datetime.utcnow() - timedelta(hours=hours)
+        since = _utcnow_naive() - timedelta(hours=hours)
         return query_db(db_url, _SQL_AGENT_RUNS_WITH_HOURS, (since, limit))
     return query_db(db_url, _SQL_AGENT_RUNS_NO_HOURS, (limit,))
 
@@ -442,7 +456,7 @@ def run_audit(
     total_cost = sum(float(t.get("cost_usd", 0) or 0) for t in traces)
 
     summary = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": _utcnow_naive().isoformat(),
         "substrate_guard_version": substrate_guard_version,
         "policy_engine": policy_mode,
         "policy_engine_source": policy_source,
@@ -487,7 +501,7 @@ def run_audit(
 
     # Save JSON report
     os.makedirs(output_dir, exist_ok=True)
-    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    ts = _utcnow_naive().strftime("%Y%m%d_%H%M%S")
     report_path = f"{output_dir}/audit_{ts}.json"
     try:
         Path(report_path).write_text(json.dumps(summary, indent=2, default=str))
