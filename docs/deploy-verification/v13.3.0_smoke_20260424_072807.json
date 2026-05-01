@@ -1,0 +1,46 @@
+{
+  "timestamp": "2026-04-24T07:28:07.604839",
+  "substrate_guard_version": "13.3.0",
+  "policy_engine": "builtin",
+  "policy_engine_source": "default",
+  "db_records": {
+    "pipeline_traces": 0,
+    "agent_runs": 13,
+    "total": 13
+  },
+  "events_generated": 13,
+  "unique_agents": 1,
+  "categories": [
+    "App Store Scanner",
+    "Crunchbase Scanner",
+    "Dev.to Scanner",
+    "Financial Signal Scanner",
+    "GitHub Trending Scanner",
+    "Google Trends Scanner",
+    "HackerNews Scanner",
+    "Job Posting Analyzer",
+    "Podcast Scanner",
+    "Product Hunt Scanner",
+    "QA System Auditor",
+    "RSS/Blogs Scanner",
+    "YouTube Scanner"
+  ],
+  "total_cost_usd": 0,
+  "evaluation": {
+    "allowed": 13,
+    "violations": 0,
+    "violation_rate": 0.0,
+    "total_ms": 501.0,
+    "per_event_ms": 38.54
+  },
+  "violations_detail": [],
+  "layers": {
+    "observe": "mock",
+    "policy": "builtin (7 rules)",
+    "verify": "z3"
+  },
+  "server": {
+    "arch": "aarch64",
+    "hostname": "ai-research-agency"
+  }
+}
