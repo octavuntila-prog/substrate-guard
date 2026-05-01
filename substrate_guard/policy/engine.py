@@ -27,6 +27,8 @@ from pathlib import Path
 from typing import Optional
 from fnmatch import fnmatch
 
+from substrate_guard.constants import BUILTIN_POLICY_PATH
+
 logger = logging.getLogger("substrate_guard.policy")
 
 
@@ -93,9 +95,18 @@ class PolicyEngine:
         elif self._policy_path.is_dir():
             self._policies = sorted(self._policy_path.glob("**/*.rego"))
         else:
-            # Policy path doesn't exist yet — will use built-in rules only
-            logger.warning(f"Policy path {self._policy_path} not found. "
-                          "Using built-in rules only.")
+            # Two cases distinguished:
+            #   1. Sentinel BUILTIN_POLICY_PATH — by-design fallback to Python rules (INFO)
+            #   2. Real path provided but missing — genuine misconfiguration (WARNING)
+            if str(self._policy_path) == BUILTIN_POLICY_PATH:
+                logger.info(
+                    "No Rego policy configured. Using built-in Python rules."
+                )
+            else:
+                logger.warning(
+                    f"Policy path {self._policy_path} not found. "
+                    "Falling back to built-in Python rules."
+                )
         
         logger.info(f"Loaded {len(self._policies)} policy file(s)")
 
