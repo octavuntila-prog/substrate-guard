@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-05-01T09:04:09.250919",
+  "substrate_guard_version": "13.3.1",
+  "policy_engine": "builtin",
+  "policy_engine_source": "default",
+  "db_records": {
+    "pipeline_traces": 0,
+    "agent_runs": 0,
+    "total": 0
+  },
+  "events_generated": 0,
+  "unique_agents": 0,
+  "categories": [],
+  "total_cost_usd": 0,
+  "evaluation": {
+    "allowed": 0,
+    "violations": 0,
+    "violation_rate": 0.0,
+    "total_ms": 500.9,
+    "per_event_ms": 500.9
+  },
+  "violations_detail": [],
+  "layers": {
+    "observe": "mock",
+    "policy": "builtin (7 rules)",
+    "verify": "z3"
+  },
+  "server": {
+    "arch": "aarch64",
+    "hostname": "ai-research-agency"
+  }
+}
