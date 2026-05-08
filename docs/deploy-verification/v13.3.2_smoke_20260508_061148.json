@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-05-08T06:11:48.972308",
+  "substrate_guard_version": "13.3.2",
+  "policy_engine": "builtin",
+  "policy_engine_source": "default",
+  "db_records": {
+    "pipeline_traces": 15,
+    "agent_runs": 15,
+    "total": 30
+  },
+  "events_generated": 30,
+  "unique_agents": 1,
+  "categories": [
+    "AI System Inventorist",
+    "AI System Inventory",
+    "Annex IV Documentation",
+    "Annex IV Documentor",
+    "Compliance Report Compilation",
+    "Compliance Report Compiler",
+    "Conformity Assessment",
+    "Conformity Assessor",
+    "DPIA Generation",
+    "DPIA Generator",
+    "EU Database Registrar",
+    "EU Database Registration",
+    "Policy Generation",
+    "Policy Writer",
+    "ROPA Generation",
+    "ROPA Generator",
+    "Risk Classification",
+    "Risk Classifier"
+  ],
+  "total_cost_usd": 3.8487,
+  "evaluation": {
+    "allowed": 30,
+    "violations": 0,
+    "violation_rate": 0.0,
+    "total_ms": 501.0,
+    "per_event_ms": 16.7
+  },
+  "violations_detail": [],
+  "layers": {
+    "observe": "mock",
+    "policy": "builtin (7 rules)",
+    "verify": "z3"
+  },
+  "server": {
+    "arch": "aarch64",
+    "hostname": "ai-research-agency"
+  }
+}
