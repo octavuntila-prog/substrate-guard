@@ -11,6 +11,32 @@ from substrate_guard.integrations.vendor_bridge import PipelineTraceAdapter, Age
 from substrate_guard.observe.events import EventType
 
 
+# Test-only deterministic mock secret (32+ chars for forward-compat with any
+# future length validation). NOT for production use — production deployments
+# read SUBSTRATE_GUARD_HMAC_SECRET from /etc/substrate-guard/hmac.key per
+# v13.4.0 ops procedure.
+_MOCK_HMAC_SECRET = "test-mock-hmac-key-deterministic-not-for-production"
+
+
+@pytest.fixture(autouse=True)
+def _mock_hmac_secret_env(monkeypatch):
+    """Auto-applied fixture: ensure HMAC env vars set for run_audit() tests.
+
+    audit.py (post-v13.4.0) reads ``SUBSTRATE_GUARD_HMAC_SECRET``.
+    chain.AuditChain reads ``GUARD_HMAC_SECRET`` as fallback when no secret
+    is passed via parameter chain.
+
+    Both set so any code path through AuditChain construction succeeds
+    (avoids ChainConfigError fail-loud per v13.4.0 Decision 1).
+
+    Module-scoped (autouse=True at module level via fixture in this file
+    only). test_chain.py's fail-loud tests are NOT affected because that
+    file lives separately and won't pick up this fixture.
+    """
+    monkeypatch.setenv("SUBSTRATE_GUARD_HMAC_SECRET", _MOCK_HMAC_SECRET)
+    monkeypatch.setenv("GUARD_HMAC_SECRET", _MOCK_HMAC_SECRET)
+
+
 # ============================================
 # .env parsing + asyncpg URL strip
 # ============================================

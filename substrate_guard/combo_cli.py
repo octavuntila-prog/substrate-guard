@@ -25,6 +25,7 @@ from .observe.events import (
 )
 from .observe.tracer import AgentTracer, MockScenario
 from .policy.engine import PolicyEngine
+from .constants import BUILTIN_POLICY_PATH
 
 
 logging.basicConfig(
@@ -167,7 +168,7 @@ def cmd_demo(args):
     )
     guard = Guard(
         observe=True,
-        policy="nonexistent/",
+        policy=BUILTIN_POLICY_PATH,
         verify=True,
         verify_process_cli=pipeline_verify_process_cli(
             args, default=DEFAULT_VERIFY_PROCESS_CLI_PIPELINE
@@ -234,7 +235,7 @@ def cmd_evaluate(args):
         return 1
 
     engine = PolicyEngine(
-        policy_path=args.policy or "nonexistent/",
+        policy_path=args.policy or BUILTIN_POLICY_PATH,
         use_opa_binary=not args.no_opa,
     )
     
@@ -269,7 +270,7 @@ def cmd_monitor(args):
 
     guard = Guard(
         observe=True,
-        policy=args.policy or "nonexistent/",
+        policy=args.policy or BUILTIN_POLICY_PATH,
         verify=True,
         verify_process_cli=_mvpc,
         use_mock=not args.live,
@@ -319,7 +320,7 @@ def cmd_pipeline_benchmark(args):
     for key, (label, scenario_fn) in scenarios.items():
         guard = Guard(
             observe=True,
-            policy="nonexistent/",
+            policy=BUILTIN_POLICY_PATH,
             verify=True,
             verify_process_cli=pipeline_verify_process_cli(
                 args, default=DEFAULT_VERIFY_PROCESS_CLI_PIPELINE
@@ -382,7 +383,7 @@ def cmd_export(args):
 
     guard = Guard(
         observe=True,
-        policy="nonexistent/",
+        policy=BUILTIN_POLICY_PATH,
         verify=True,
         verify_process_cli=pipeline_verify_process_cli(
             args, default=DEFAULT_VERIFY_PROCESS_CLI_PIPELINE
