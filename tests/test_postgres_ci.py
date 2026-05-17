@@ -15,6 +15,24 @@ pytestmark = [
 ]
 
 
+_MOCK_HMAC_SECRET = "test-mock-hmac-key-deterministic-not-for-production"
+
+
+@pytest.fixture(autouse=True)
+def _mock_hmac_secret_env(monkeypatch):
+    """Auto-applied: HMAC env vars for run_audit() tests in this module.
+
+    Mirrors tests/test_integration/test_audit.py fixture (v13.4.0 Step 5.pre).
+    test_run_audit_* here run ONLY when POSTGRES_CI=1 (CI postgres-ci job) —
+    invisible to local pytest (always skipped), live in CI. Without this,
+    run_audit() -> Guard(chain=True, hmac_secret=None) -> ChainConfigError
+    fail-loud (Decision 1). The Step 5.pre fixture was scoped to test_audit.py
+    only; this closes the test_postgres_ci.py gap (CI-surfaced, N=14 pattern).
+    """
+    monkeypatch.setenv("SUBSTRATE_GUARD_HMAC_SECRET", _MOCK_HMAC_SECRET)
+    monkeypatch.setenv("GUARD_HMAC_SECRET", _MOCK_HMAC_SECRET)
+
+
 def _db_url():
     from substrate_guard.audit import resolve_db_url
 

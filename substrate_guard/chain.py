@@ -53,6 +53,19 @@ class ChainEntry:
         return asdict(self)
 
 
+class ChainConfigError(ValueError):
+    """Raised when AuditChain is constructed without HMAC secret and without
+    explicit ``allow_random_fallback=True`` opt-in.
+
+    Per M0.3 / v13.4.0 design: production deployments must always provide a
+    stable HMAC secret (via ``secret=`` parameter or ``GUARD_HMAC_SECRET``
+    environment variable). Random-key fallback is testing/demo only and must
+    be opted into explicitly to prevent silent loss of cross-run chain
+    verifiability.
+    """
+    pass
+
+
 class AuditChain:
     """HMAC-SHA256 tamper-evident audit chain.
     
@@ -65,20 +78,43 @@ class AuditChain:
     Modifying, deleting, or inserting any event breaks the chain.
     
     Args:
-        secret: HMAC secret key. If None, reads from GUARD_HMAC_SECRET env
-                or generates a random one (logged as warning).
+        secret: HMAC secret key. If None, reads from ``GUARD_HMAC_SECRET``
+                environment variable. If still None, raises
+                ``ChainConfigError`` unless ``allow_random_fallback=True``.
+        allow_random_fallback: If True, generates a random secret when none
+                provided (chain not verifiable across runs — random key lost
+                at process exit). For testing/demo only — production must
+                always provide a stable secret. Default: False (fail-loud).
+
+    Raises:
+        ChainConfigError: If no secret available (neither parameter nor env)
+                and ``allow_random_fallback=False`` (default).
     """
 
-    def __init__(self, secret: Optional[str] = None):
-        self._secret = (secret or os.environ.get("GUARD_HMAC_SECRET", "")).encode()
-        if not self._secret:
-            self._secret = os.urandom(32)
+    def __init__(
+        self,
+        secret: Optional[str] = None,
+        allow_random_fallback: bool = False,
+    ):
+        resolved_secret = secret or os.environ.get("GUARD_HMAC_SECRET", "")
+
+        if not resolved_secret:
+            if not allow_random_fallback:
+                raise ChainConfigError(
+                    "AuditChain requires HMAC secret. Pass secret=, set "
+                    "GUARD_HMAC_SECRET env, or pass allow_random_fallback=True "
+                    "(testing only — chain not verifiable across runs)."
+                )
+            resolved_secret_bytes = os.urandom(32)
             import logging
             logging.getLogger("substrate_guard.chain").warning(
-                "No HMAC secret provided — generated random key. "
-                "Set GUARD_HMAC_SECRET env or pass secret= for persistence."
+                "Using random HMAC secret — chain not verifiable across runs. "
+                "Set GUARD_HMAC_SECRET env or pass secret= for production."
             )
-        
+        else:
+            resolved_secret_bytes = resolved_secret.encode()
+
+        self._secret = resolved_secret_bytes
         self._entries: list[ChainEntry] = []
         self._head_hash: str = GENESIS_HASH
 

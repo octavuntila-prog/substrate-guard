@@ -33,7 +33,26 @@ mkdir -p "$LOG_DIR"
         PG_IP="${PG_IP:-localhost}"
         DB_URL=$(echo "$DB_URL" | sed "s|@postgres:|@${PG_IP}:|")
     fi
-    
+
+    # HMAC secret for tamper-evident chain (v13.4.0 — Decision 1: fail-loud).
+    # Production deployments MUST have /etc/substrate-guard/hmac.key configured
+    # with a stable secret (chmod 600). Random fallback would lose cross-run
+    # chain verifiability, so we abort here if missing or insecure.
+    HMAC_KEY_FILE="/etc/substrate-guard/hmac.key"
+    if [ ! -f "$HMAC_KEY_FILE" ]; then
+        echo "FATAL: HMAC key file missing at $HMAC_KEY_FILE"
+        echo "       Set up via: openssl rand -hex 32 > $HMAC_KEY_FILE && chmod 600 $HMAC_KEY_FILE"
+        echo "       See docs/releases/v13.4.0.md for ops procedure."
+        exit 1
+    fi
+    PERMS=$(stat -c %a "$HMAC_KEY_FILE" 2>/dev/null)
+    if [ "$PERMS" != "600" ] && [ "$PERMS" != "400" ]; then
+        echo "FATAL: HMAC key file has insecure permissions ($PERMS), must be 600 or 400"
+        echo "       Fix via: chmod 600 $HMAC_KEY_FILE"
+        exit 1
+    fi
+    export SUBSTRATE_GUARD_HMAC_SECRET=$(cat "$HMAC_KEY_FILE")
+
     # Policy engine: defaults to built-in Python rules.
     # To activate Rego enforcement (requires OPA binary installed):
     #   export SUBSTRATE_GUARD_POLICY=rego

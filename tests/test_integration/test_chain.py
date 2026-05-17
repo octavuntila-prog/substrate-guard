@@ -5,7 +5,7 @@ import os
 import pytest
 import tempfile
 
-from substrate_guard.chain import AuditChain, ChainEntry, GENESIS_HASH
+from substrate_guard.chain import AuditChain, ChainConfigError, ChainEntry, GENESIS_HASH
 from substrate_guard.compliance import ComplianceExporter
 from substrate_guard.guard import Guard, SessionReport
 from substrate_guard.observe.events import (
@@ -363,3 +363,62 @@ class TestComplianceExport:
             assert "differentiator" in data
         finally:
             os.unlink(path)
+
+
+# ============================================
+# Fail-loud configuration tests (v13.4.0 — Decision 1)
+# ============================================
+
+class TestChainConfigFailLoud:
+    """AuditChain requires HMAC secret per v13.4.0 Decision 1 (locked).
+
+    Random-key fallback is testing/demo only and must be opted into via
+    ``allow_random_fallback=True``. These tests verify the fail-loud behavior
+    introduced in v13.4.0 (replacing the silent random-fallback behavior of
+    v13.3.x and earlier).
+    """
+
+    def test_no_secret_no_env_raises(self, monkeypatch):
+        """No secret param, no env var, no opt-in → ChainConfigError."""
+        monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+        with pytest.raises(ChainConfigError):
+            AuditChain()
+
+    def test_empty_secret_raises(self, monkeypatch):
+        """Empty string secret should fail-loud (not bypass check).
+
+        Verifies that ``secret=""`` doesn't sneak past the truthy check
+        because ``"" or env_value`` short-circuits to env_value, and if
+        env is also empty/unset the resolved value is empty → ChainConfigError.
+        """
+        monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+        with pytest.raises(ChainConfigError):
+            AuditChain(secret="")
+
+    def test_env_fallback_works(self, monkeypatch):
+        """``GUARD_HMAC_SECRET`` env var → ``AuditChain()`` succeeds without param.
+
+        This is the production cron path when audit.py passes ``hmac_secret=None``
+        because ``SUBSTRATE_GUARD_HMAC_SECRET`` is unset but ``GUARD_HMAC_SECRET``
+        is set (legacy fallback layer).
+        """
+        monkeypatch.setenv("GUARD_HMAC_SECRET", "env-fallback-secret-test-key-001")
+        chain = AuditChain()
+        assert chain.length == 0
+        chain.append({"type": "test", "agent_id": "a1"})
+        assert chain.length == 1
+        ok, _ = chain.verify()
+        assert ok is True
+
+    def test_random_fallback_opt_in(self, monkeypatch):
+        """``allow_random_fallback=True`` → constructs with random key + WARNING log.
+
+        Random secret means chain works for THIS process but not verifiable
+        across processes (key lost at exit). For testing/demo only.
+        """
+        monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+        chain = AuditChain(allow_random_fallback=True)
+        chain.append({"type": "test", "agent_id": "a1"})
+        assert chain.length == 1
+        ok, _ = chain.verify()
+        assert ok is True

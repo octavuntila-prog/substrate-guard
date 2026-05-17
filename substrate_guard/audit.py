@@ -383,7 +383,15 @@ def run_audit(
     # ── Step 4: Evaluate Through Pipeline ──
     print(f"{C.CYAN}[4/5]{C.RESET} Running Guard pipeline (observe → policy → verify)...")
 
-    guard = Guard(observe=True, policy=policy_path, verify=True, use_mock=True)
+    hmac_secret = os.environ.get("SUBSTRATE_GUARD_HMAC_SECRET")
+    guard = Guard(
+        observe=True,
+        policy=policy_path,
+        verify=True,
+        use_mock=True,
+        chain=True,
+        hmac_secret=hmac_secret,
+    )
     
     violations = []
     allowed = 0
@@ -508,6 +516,44 @@ def run_audit(
         print(f"  {C.GREEN}Report saved:{C.RESET} {report_path}")
     except Exception as e:
         print(f"  {C.YELLOW}Could not save report: {e}{C.RESET}")
+
+    # Per-run chain export (v13.4.0 — Decision 2: per-run, NOT master chain).
+    # Defensive depth: ``_chain is None`` covers paths where chain=True wasn't
+    # passed to Guard (e.g., future code paths not exercising audit.py:386).
+    # ``length > 0`` skips empty-chain runs (zero events processed).
+    if guard._chain is not None and guard._chain.length > 0:
+        chain_path = f"{output_dir}/chain_{ts}.jsonl"
+        try:
+            guard._chain.export(chain_path)
+            print(f"  {C.GREEN}Chain saved:{C.RESET} {chain_path}")
+        except Exception as e:
+            print(f"  {C.YELLOW}Could not save chain: {e}{C.RESET}")
+            logger.warning(f"Chain export failed: {e}", exc_info=True)
+    elif guard._chain is not None:
+        # Chain exists but empty — zero events processed in this run.
+        # Observability: explicit log so M0.7 baseline window debugging
+        # distinguishes "chain not wired" from "chain wired, no events".
+        print(f"  {C.DIM}Chain not exported (zero events){C.RESET}")
+
+    # Compliance summary export (v13.4.0 Addition 3 — post-#37 unblock).
+    # Generates compliance summary JSON. Full SOC2 / ISO 27001 / ISO 42001
+    # exports remain manual via combo_cli — they require SessionReport
+    # context not present in cron's batch-DB pipeline. Production cron
+    # writes summary only; full standards exports are an ops procedure.
+    if guard._chain is not None and guard._chain.length > 0:
+        try:
+            from substrate_guard.compliance import ComplianceExporter
+            exporter = ComplianceExporter(chain=guard._chain)
+
+            compliance_dir = Path(output_dir) / "compliance"
+            compliance_dir.mkdir(parents=True, exist_ok=True)
+
+            compliance_path = compliance_dir / f"summary_{ts}.json"
+            exporter.export_summary(str(compliance_path))
+            print(f"  {C.GREEN}Compliance summary saved:{C.RESET} {compliance_path}")
+        except Exception as e:
+            print(f"  {C.YELLOW}Compliance export failed:{C.RESET} {e}")
+            logger.warning(f"Compliance export failed: {e}", exc_info=True)
 
     total_elapsed = time.time() - start_time
     print(f"\n  {C.DIM}Total time: {total_elapsed:.1f}s{C.RESET}\n")
