@@ -1,0 +1,44 @@
+{
+  "version": "1.0",
+  "format": "substrate-guard-audit-chain",
+  "created_at": 1779082430.887264,
+  "entries_count": 1,
+  "genesis_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "head_hash": "d8dd86a3e149add6d063d22ab9e7f4e7a8f68743b41f76e521c73af5e60a346d",
+  "chain_signature": "d255057602dfdb82ef3efe67564081e53e09dc3fee65314673c9ffbc228f45e0",
+  "entries": [
+    {
+      "index": 0,
+      "timestamp": 1779082430.3868022,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1779082430.3861606,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 1371,
+          "confidence": 0.856,
+          "run_id": "4030",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:QA System Auditor",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "d8dd86a3e149add6d063d22ab9e7f4e7a8f68743b41f76e521c73af5e60a346d"
+    }
+  ]
+}
