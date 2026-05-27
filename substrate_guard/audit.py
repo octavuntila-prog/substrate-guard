@@ -522,7 +522,7 @@ def run_audit(
     # passed to Guard (e.g., future code paths not exercising audit.py:386).
     # ``length > 0`` skips empty-chain runs (zero events processed).
     if guard._chain is not None and guard._chain.length > 0:
-        chain_path = f"{output_dir}/chain_{ts}.jsonl"
+        chain_path = f"{output_dir}/chain_{ts}.json"
         try:
             guard._chain.export(chain_path)
             print(f"  {C.GREEN}Chain saved:{C.RESET} {chain_path}")

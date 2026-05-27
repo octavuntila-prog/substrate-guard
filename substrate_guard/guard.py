@@ -289,7 +289,11 @@ class Guard:
             mode = "mock" if self._tracer.is_mock else "eBPF"
             layers.append(f"observe({mode})")
         if self._policy:
-            layers.append("policy(OPA)")
+            # Engine label dynamic: BUILTIN_POLICY_PATH sentinel → empty
+            # _policies list → "builtin"; loaded .rego files → "OPA".
+            # Mirrors line 289 observe(mock/eBPF) dynamic pattern (#46).
+            engine = "OPA" if self._policy._policies else "builtin"
+            layers.append(f"policy({engine})")
         if self._z3_available:
             layers.append("verify(Z3)")
         if self._chain:
