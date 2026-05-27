@@ -17,19 +17,19 @@ One command: `substrate-guard` (also `ai-blackbox`). Z3 workflows use `verify` /
 
 substrate-guard is a 6-layer verification architecture that observes, decides, proves, and audits every action taken by autonomous AI agents — in real time, with cryptographic evidence.
 
-Deployed in production on [SUBSTRATE](https://aisophical.com), an autonomous multi-agent ecosystem running continuously on 7 servers across 3 generations since February 19, 2026.
+Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current version v13.4.0 (released May 18, 2026). The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
 
-## Production Results (verified April 6, 2026)
+## Production Results (verified May 27, 2026)
 
 | Metric | Value |
 |--------|-------|
-| Events monitored | 18,353 (3,704 Research + 14,649 CPX52) |
+| Events processed | Mock observe + demo scenarios + cron audit (Research server) |
 | Violations detected | 79 (0.54%) |
 | Latency | 0.14ms/event |
-| HMAC-SHA256 chain | VERIFIED (14,649 entries, intact) |
-| Cron audits | 45 reports, 16 consecutive days, zero missed |
+| HMAC-SHA256 chain | Wired in v13.4.0 (cron path); per-run chain export, cryptographic verify_export |
+| Cron audits | M0.7 baseline window: 7/7 verified (May 19–25, 2026) |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
-| Tests | **358** passing (365 collected), 7 skipped optional (SBERT + Postgres CI); 100% accuracy on 5 benchmark scenarios |
+| Tests | **398** passing (**405** collected), 7 skipped optional (1 SBERT + 6 Postgres CI); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
 
 ### Release v13.3.0 (April 24, 2026) — configurable policy engine
@@ -113,7 +113,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 ┌─────────────────────────────────────────────────────────────┐
 │                    substrate-guard                           │
 │                                                             │
-│  L1  eBPF         OBSERVE   Kernel-level, zero overhead     │  ← Deployed
+│  L1  eBPF         OBSERVE   Mock tracer (kernel hooks: #38b)│  ← Mock
 │  L2  OPA/Rego     DECIDE    Declarative policy enforcement  │  ← Deployed
 │  L3  Z3 SMT       PROVE     Formal mathematical proofs      │  ← Deployed
 │  L4  ZK-SNM       COMPLY    Zero-knowledge compliance       │  ← Prototyped
@@ -125,12 +125,12 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**L1-L3**: Deployed in production, processing live events from autonomous AI ecosystems.
+**L1**: Mock tracer; real eBPF kernel hooks designed but not production-wired (#38b deferred). **L2-L3**: Deployed in production (Research server, v13.4.0 cron audit pipeline).
 **L4-L6**: Prototyped with tests. Code exists, validated, not yet in production pipeline.
 
 ## How It Works
 
-**Observe (L1):** eBPF hooks capture every agent action at the kernel level — syscalls, network, file access — with zero runtime overhead.
+**Observe (L1):** Mock tracer in current production deployment. eBPF kernel hooks are designed but not wired to the autonomous cron path (#38b deferred). Real kernel instrumentation has been tested locally during development.
 
 **Decide (L2):** OPA/Rego policies evaluate each action against declarative rules. 80 policy tests cover authorization, rate limiting, data access, and behavioral constraints.
 
@@ -138,7 +138,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 
 **Chain:** Every event is recorded in an HMAC-SHA256 tamper-evident chain. Each entry references the hash of the previous entry. Any modification breaks the chain — detectable instantly. Formal verification outcomes (`verify_artifact` / `session.verify`) append **`formal_verification`** entries with **`counterexample`** when a command or artifact is rejected, so audit exports retain *why* a check failed, not only that it failed.
 
-**Audit:** Daily automated audits (cron 04:00 UTC) verify chain integrity, count violations, measure latency, and export compliance reports.
+**Audit:** Daily automated cron audit (04:00 UTC on Research server, currently v13.4.0) verifies chain integrity, counts violations, measures latency, and exports compliance reports. M0.7 baseline window: 7/7 verified (May 19–25, 2026).
 
 ## Codebase
 
@@ -163,7 +163,7 @@ substrate-guard/
 ├── integrations/     # 404 LOC — SUBSTRATE ecosystem connectors
 ├── chain.py          # HMAC-SHA256 tamper-evident chain
 ├── compliance.py     # SOC2 / ISO 27001 / ISO 42001 exports
-└── tests/            # 365 tests collected, ~3,410 LOC (incl. adversarial + fuzz + agent CLI suite)
+└── tests/            # 405 tests collected, 5,032 LOC (incl. adversarial + fuzz + agent CLI suite)
     ├── test_policy.py     # 541 LOC — L2 policy decisions
     ├── test_substrate.py  # 438 LOC — integration tests
     ├── test_comply.py     # 347 LOC — L4 ZK compliance
@@ -176,26 +176,15 @@ substrate-guard/
     └── test_observe.py    # 195 LOC — L1 observation
 ```
 
-**This repo: ~9,456 LOC** (6,046 production + ~3,410 tests; rounded).
+**This repo: 14,346 LOC** (9,314 source in `substrate_guard/` + 5,032 tests; per `wc -l`, 2026-05-27).
 
-### Full Production Stack
+### Deployment Scope
 
-The complete system deployed on SUBSTRATE includes additional components not in this repository:
+This repository (substrate-guard) is deployed on the **Research server** (89.167.66.225) — 9,314 LOC source + 5,032 LOC tests (per `wc -l`, 2026-05-27).
 
-| Component | LOC | Location | Function |
-|-----------|-----|----------|----------|
-| substrate-v2 core | 4,690 | CPX52 server | 9 ecosystem engines (base.py 541, persistence 213, runner 70, 9 ecosystems 1,815) |
-| Guard daemon | 583 | CPX52 (in v9-oracle) | Production guard chain, hourly audits |
-| Mirror | 322 | CPX52 (in v9-oracle) | Anomaly detection, 30-min reflection cycles |
-| Synthesizer | 290 | CPX52 (in v9-oracle) | Cross-ecosystem synthesis |
-| Kalshi Collector | 271 | CPX52 (in v9-oracle) | Prediction market signal collection |
-| Market Judge | 235 | CPX52 (in v9-oracle) | Diversity monitoring, monoculture alerts |
-| Blog Judge Gate | 213 | CPX52 (in v9-oracle) | Content filtering, duplicate detection |
-| Blog Judge | 210 | CPX52 (in v9-oracle) | Pattern matching, quality assessment |
+The broader SUBSTRATE ecosystem includes a separate production stack on the **CPX52 server** (substrate-v2 core + ecosystem judges + V2.0 single-file guard daemon) — see [Related Projects](#related-projects) below. That stack is outside this repository's scope.
 
-**Total production stack: 16,019 LOC** across 2 servers (9,205 Research + 6,814 CPX52). Zero tests on production.
-
-**Tests: 365** collected (**358** passed in a typical local run; 7 skipped) — all on Research server. Zero tests on CPX52 production (daemon services tested through integration, not unit tests).
+**Tests: 405** collected (**398** passed in a local run on 2026-05-27; 7 skipped optional: 1 SBERT, 6 Postgres CI). See [Related Projects](#related-projects) for the separate CPX52 V2.0 stack scope.
 
 ## Benchmark Results
 
@@ -269,17 +258,20 @@ What is **fully functional without Linux eBPF** vs. what needs a **real kernel /
 
 - **L4-L6 are prototyped, not production-deployed.** Tests pass, code exists, but these layers are not yet in the live pipeline. We say "3 deployed + 3 prototyped," not "6 deployed."
 - **q-score not externally validated.** The quality scoring system used in SUBSTRATE has not undergone inter-rater reliability testing. Proposed in our ALIFE 2026 submission.
-- **Tests only on Research server.** CPX52 production daemons (Mirror, Blog Judge, Market Judge, Guard) have zero unit tests — they are validated through integration and daily audit, not test suites.
+- **Test suite scope.** This repository's tests run on the Research server only. The separate CPX52 V2.0 stack is validated through integration and daily audit, not unit tests — see [Related Projects](#related-projects).
 - **Single maintainer.** All code written and maintained by one person. No external contributors yet.
 
 ## Production Deployment
 
-substrate-guard runs in production on two servers:
+substrate-guard (this repository) runs on the **Research server** (89.167.66.225) — v13.4.0 deployed May 18, 2026. Daily automated cron audit at 04:00 UTC. M0.7 baseline window: 7/7 verified (May 19–25, 2026); zero missed cycles since v13.4.0 deployment.
 
-- **Research** (89.167.66.225) — Full test suite, benchmark, development
-- **CPX52** (89.167.109.168) — Production guard chain, 14,649 entries, 16 days continuous cron audit
+### Related Projects
 
-Daily automated audit at 04:00 UTC. Results sent via Telegram alerts. Zero missed days since March 22, 2026.
+The broader SUBSTRATE ecosystem includes a **separate production deployment on the CPX52 server** (89.167.109.168) — substrate-v2 core (ecosystem engines + judges) and a V2.0 single-file guard daemon (independent codebase, separate operational metrics).
+
+CPX52 V2.0 audit refresh (2026-05-27 09:43 UTC): 22,376 chain entries (3,276 strong + 19,100 weak frozen post-cutover), 63 days continuous cron audit (genesis 2026-03-25), 100% verification rate over the last 7 days (356/356 cycles).
+
+See [aisophical.com](https://aisophical.com) for SUBSTRATE ecosystem overview.
 
 ## Context: SUBSTRATE
 
