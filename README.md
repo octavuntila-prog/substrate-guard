@@ -211,7 +211,7 @@ All exports include HMAC chain hash, timestamp, event counts, and violation deta
 
 ## Publications
 
-7 published, 2 under peer review (as of April 6, 2026):
+7 published, 2 under peer review (as of audit 2026-04-06):
 
 | # | Title | Venue | DOI / ID |
 |---|-------|-------|----------|
@@ -280,7 +280,7 @@ substrate-guard was built to verify [SUBSTRATE](https://aisophical.com) — an a
 - 7 servers, 100+ agents, 3 generations
 - 45+ days continuous operation
 - 137 original concepts generated autonomously
-- 8,200+ artifacts across all ecosystems (CPX52: 6,102 + IUBIRE V3: 2,531 + S3: 280 MVPs — audited April 6, 2026)
+- 8,200+ artifacts across all ecosystems (CPX52: 6,102 + IUBIRE V3: 2,531 + S3: 280 MVPs — as of audit 2026-04-06)
 - Multi-generational reproduction confirmed (Gen2 → Gen3)
 
 SUBSTRATE is not an orchestration framework. It is an ecosystem. substrate-guard is how we prove it behaves correctly.
