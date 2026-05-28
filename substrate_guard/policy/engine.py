@@ -94,6 +94,11 @@ class PolicyEngine:
             self._policies = [self._policy_path]
         elif self._policy_path.is_dir():
             self._policies = sorted(self._policy_path.glob("**/*.rego"))
+            if not self._policies:
+                logger.warning(
+                    f"Policy directory {self._policy_path} contains no .rego files. "
+                    "Falling back to built-in Python rules."
+                )
         else:
             # Two cases distinguished:
             #   1. Sentinel BUILTIN_POLICY_PATH — by-design fallback to Python rules (INFO)
