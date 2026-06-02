@@ -92,7 +92,7 @@ class ComplianceExporter:
             "trust_service_criteria": {
                 "CC6.1_logical_access": {
                     "description": "The entity implements logical access security over protected information assets",
-                    "control": "OPA/Rego policy engine evaluates every agent action against 7 built-in rules",
+                    "control": "Built-in Python policy engine evaluates every agent action against 7 rules (Rego/OPA available via --policy rego, not production default)",
                     "evidence": {
                         "policy_rules": [
                             "dangerous_paths", "dangerous_commands", "network_exfiltration",
@@ -104,9 +104,9 @@ class ComplianceExporter:
                 },
                 "CC7.2_system_monitoring": {
                     "description": "The entity monitors system components for anomalies",
-                    "control": "eBPF kernel-level observation captures syscalls, file I/O, network connections for all agent processes",
+                    "control": "Observation layer (eBPF: execve/openat/connect/TLS) implemented; production cron ingests platform-DB records via adapters (mock tracer) — live eBPF not wired (#38b)",
                     "evidence": {
-                        "observation_layer": "eBPF (Linux kernel tracepoints + uprobes)",
+                        "observation_layer": "DB-batch ingestion (mock tracer); eBPF tracepoints+uprobes implemented, not production-wired (#38b)",
                         "event_types": ["syscall", "file_open", "file_write", "file_read",
                                        "network_connect", "process_exec", "tls_read", "tls_write"],
                         "events_captured": self._report.events_observed if self._report else self._chain.length,
@@ -118,7 +118,7 @@ class ComplianceExporter:
                     "evidence": {
                         "verification_engine": "Z3 SMT Solver",
                         "domains_covered": ["code", "tool_api", "cli", "hardware_riscv", "distillation"],
-                        "test_cases": 135,
+                        "benchmark_scenarios": 5,
                         "accuracy": "100%",
                         "false_positives": 0,
                         "false_negatives": 0,
@@ -166,9 +166,9 @@ class ComplianceExporter:
                     "implementation": "Three-layer monitoring: eBPF kernel observation, OPA policy evaluation, Z3 formal verification",
                     "evidence": {
                         "layers": {
-                            "L1_observe": "eBPF tracepoints (execve, openat, connect, SSL_read/write)",
-                            "L2_decide": "OPA/Rego policy engine, 7 built-in rules, <5ms/decision",
-                            "L3_prove": "Z3 SMT solver, 135 test cases, 100% accuracy",
+                            "L1_observe": "DB-batch ingestion (mock tracer); eBPF implemented, not wired (#38b)",
+                            "L2_decide": "Built-in Python engine, 7 rules (Rego/OPA available, not default)",
+                            "L3_prove": "Z3 SMT solver; 5 adversarial benchmark scenarios, 100%; not exercised per-event in batch audit",
                         },
                     },
                 },
@@ -199,7 +199,7 @@ class ComplianceExporter:
             "controls": {
                 "risk_assessment": {
                     "description": "AI risk identification and treatment",
-                    "implementation": "Three-layer verification stack identifies risks at kernel (eBPF), policy (OPA), and formal (Z3) levels",
+                    "implementation": "Three-layer stack identifies risks at observe (eBPF impl., mock in cron — #38b), policy (built-in Python), and formal (Z3) levels",
                     "risk_categories_covered": [
                         "unauthorized_file_access",
                         "dangerous_command_execution",
@@ -251,9 +251,9 @@ class ComplianceExporter:
                 "EU_AI_Act": "PARTIAL — audit trail + explainability ready",
             },
             "verification_stack": {
-                "Layer_1_eBPF": "Active (kernel observation)",
-                "Layer_2_OPA": "Active (7 policy rules)",
-                "Layer_3_Z3": "Active (135 test cases, 100%)",
+                "Layer_1_observe": "Mock tracer (DB-batch ingestion via adapters); eBPF kernel hooks implemented, NOT wired in production cron (#38b)",
+                "Layer_2_policy": "Active — built-in Python engine, 7 rules (Rego/OPA available via --policy rego, not cron default)",
+                "Layer_3_verify": "Z3 available — formal artifact verification via CLI/benchmark (5 adversarial scenarios, 100%); NOT exercised per-event in batch audit",
                 "Audit_Chain": f"{'INTACT' if chain_ok else 'BROKEN'} ({self._chain.length} entries)",
             },
             **self._session_data(),

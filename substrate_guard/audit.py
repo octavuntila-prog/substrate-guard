@@ -2,7 +2,7 @@
 
 Connects to the ai-research-agency PostgreSQL (postgres:16-alpine) on the
 internal Docker network, pulls pipeline_traces (1,483) and agent_runs (1,132),
-and runs every record through the eBPF→OPA→Z3 pipeline.
+and runs every record through the Guard pipeline (built-in policy + HMAC chain; observe mock, Z3 idle in batch).
 
 Usage (from host):
     python3 -m substrate_guard.audit --db-url postgresql://user:pass@localhost:5432/dbname
@@ -335,7 +335,7 @@ def run_audit(
     start_time = time.time()
 
     print(f"\n{C.BOLD}substrate-guard — Real DB Audit{C.RESET}")
-    print(f"{C.DIM}eBPF observes → OPA decides → Z3 proves{C.RESET}\n")
+    print(f"{C.DIM}DB records → built-in policy → HMAC chain{C.RESET}\n")
 
     # ── Step 1: DB Connection ──
     print(f"{C.CYAN}[1/5]{C.RESET} Connecting to PostgreSQL...")
@@ -486,9 +486,9 @@ def run_audit(
         },
         "violations_detail": violations[:50],  # first 50 for paper
         "layers": {
-            "observe": "mock",
-            "policy": "builtin (7 rules)",
-            "verify": "z3" if guard._z3_available else "unavailable",
+            "observe": "eBPF" if (guard._tracer and not guard._tracer.is_mock) else "mock",
+            "policy": policy_mode,
+            "verify": "z3 (available, not exercised per-event in batch)" if guard._z3_available else "unavailable",
         },
         "server": {
             "arch": "aarch64",
