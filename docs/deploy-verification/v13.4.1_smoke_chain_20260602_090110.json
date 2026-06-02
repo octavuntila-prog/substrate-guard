@@ -1,0 +1,4862 @@
+{
+  "version": "1.0",
+  "format": "substrate-guard-audit-chain",
+  "created_at": 1780390870.7500353,
+  "entries_count": 147,
+  "genesis_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "head_hash": "3018d6f87aad0bb8e558c2152631fb7311d941557e4142e89169a2df985bd554",
+  "chain_signature": "ec9409878dc5c20a1b6e86e752977f0bac0ddc295aee9ef4614da155e1f7b3d9",
+  "entries": [
+    {
+      "index": 0,
+      "timestamp": 1780390870.2490427,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.248413,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 21424,
+          "confidence": 0.68,
+          "run_id": "4917",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "f81b966af8cf37b49832849aaf88303e167200bbdfe725ca7dcb965da62689a1"
+    },
+    {
+      "index": 1,
+      "timestamp": 1780390870.2492304,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.249143,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6709,
+          "confidence": 0.766,
+          "run_id": "4916",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f81b966af8cf37b49832849aaf88303e167200bbdfe725ca7dcb965da62689a1",
+      "hash": "9ea1c58c8d486ab24f3f963759189c24653ff73ee6302b2ec1197ae865ea19b9"
+    },
+    {
+      "index": 2,
+      "timestamp": 1780390870.2493184,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.249263,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 31440,
+          "confidence": 0.74,
+          "run_id": "4915",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9ea1c58c8d486ab24f3f963759189c24653ff73ee6302b2ec1197ae865ea19b9",
+      "hash": "a3be904b1b0ff7653b0be58e63c70c7ef36b355bdfedae6f2d85ea353327b609"
+    },
+    {
+      "index": 3,
+      "timestamp": 1780390870.2494087,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2493436,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6481,
+          "confidence": 0.766,
+          "run_id": "4914",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "a3be904b1b0ff7653b0be58e63c70c7ef36b355bdfedae6f2d85ea353327b609",
+      "hash": "97d117eae61495225574dcf83299f7ada21435c0005277cea56569ca778474aa"
+    },
+    {
+      "index": 4,
+      "timestamp": 1780390870.2494905,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2494369,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 29608,
+          "confidence": 0.67,
+          "run_id": "4913",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "97d117eae61495225574dcf83299f7ada21435c0005277cea56569ca778474aa",
+      "hash": "9f8b7a156640780178f0e57cf543893d6f3cb4810dd9e1474e6ba4909a3af4bf"
+    },
+    {
+      "index": 5,
+      "timestamp": 1780390870.2495604,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2495136,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 5866,
+          "confidence": 0.75,
+          "run_id": "4912",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9f8b7a156640780178f0e57cf543893d6f3cb4810dd9e1474e6ba4909a3af4bf",
+      "hash": "7a22ae0182486392d3ec4ddc02f1fd7806c565aa3d5170070bf8cb62e972f1f7"
+    },
+    {
+      "index": 6,
+      "timestamp": 1780390870.2496593,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2495828,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 28172,
+          "confidence": 0.646,
+          "run_id": "4911",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "7a22ae0182486392d3ec4ddc02f1fd7806c565aa3d5170070bf8cb62e972f1f7",
+      "hash": "ff8336d2c8a30d72d5bf169124f9a3faa2199204745f3641f4dbe1847787d8f0"
+    },
+    {
+      "index": 7,
+      "timestamp": 1780390870.24973,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2496836,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6079,
+          "confidence": 0.716,
+          "run_id": "4910",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "ff8336d2c8a30d72d5bf169124f9a3faa2199204745f3641f4dbe1847787d8f0",
+      "hash": "9aa93a1efc253b44db7a3b6d41e88b27f124389d71e604c94bed998efc3b72a0"
+    },
+    {
+      "index": 8,
+      "timestamp": 1780390870.2497954,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2497504,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 25039,
+          "confidence": 0.724,
+          "run_id": "4909",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9aa93a1efc253b44db7a3b6d41e88b27f124389d71e604c94bed998efc3b72a0",
+      "hash": "b117b67a6ce6bdffc666869e029dedc420c888723b469f41834650e78ac77588"
+    },
+    {
+      "index": 9,
+      "timestamp": 1780390870.249865,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2498152,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 4949,
+          "confidence": 0.8,
+          "run_id": "4908",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "b117b67a6ce6bdffc666869e029dedc420c888723b469f41834650e78ac77588",
+      "hash": "256e67fb51a5082dc30137c842c0a31d5a76f1d689d416c57bbd0390e3a1bf12"
+    },
+    {
+      "index": 10,
+      "timestamp": 1780390870.2499459,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2498863,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 88670,
+          "confidence": 0.65,
+          "run_id": "4907",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Personal Context Filter",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "256e67fb51a5082dc30137c842c0a31d5a76f1d689d416c57bbd0390e3a1bf12",
+      "hash": "8fe6fbb1ae234f36c78f27358668ea4b1541ff8691a72536cb357dba57074863"
+    },
+    {
+      "index": 11,
+      "timestamp": 1780390870.2500122,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2499678,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 371474,
+          "confidence": 0.766,
+          "run_id": "4906",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Idea Scorer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "8fe6fbb1ae234f36c78f27358668ea4b1541ff8691a72536cb357dba57074863",
+      "hash": "8936a0f69a08dd5e43b42e78d35c57557e3a49c776090ff4fe70ffaee3256a99"
+    },
+    {
+      "index": 12,
+      "timestamp": 1780390870.2500756,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2500331,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 84938,
+          "confidence": 0.45,
+          "run_id": "4905",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Trend Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "8936a0f69a08dd5e43b42e78d35c57557e3a49c776090ff4fe70ffaee3256a99",
+      "hash": "752972b4e7f19815fa04876fd00cd4578a6be95feab86f084dee6d40261fbfd7"
+    },
+    {
+      "index": 13,
+      "timestamp": 1780390870.2501457,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2500954,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 255683,
+          "confidence": 0.45,
+          "run_id": "4904",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:LinkedIn Jobs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "752972b4e7f19815fa04876fd00cd4578a6be95feab86f084dee6d40261fbfd7",
+      "hash": "88c2628773dac17c911c9240479394483eb1aad08825a884cfdd1bcebc68cf2e"
+    },
+    {
+      "index": 14,
+      "timestamp": 1780390870.25021,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2501674,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 85487,
+          "confidence": 0.41,
+          "run_id": "4903",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Twitter/X Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "88c2628773dac17c911c9240479394483eb1aad08825a884cfdd1bcebc68cf2e",
+      "hash": "e4173aaa1544721256622f6e342c72ccc7878bb6c568cc28deb18b1fbe4e5d94"
+    },
+    {
+      "index": 15,
+      "timestamp": 1780390870.250278,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.250229,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 76611,
+          "confidence": 0.44,
+          "run_id": "4902",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Competitor Tracker",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "e4173aaa1544721256622f6e342c72ccc7878bb6c568cc28deb18b1fbe4e5d94",
+      "hash": "2f461453579387860a15c55a6c65005280347d38164567dd2e62f9962fa3aadc"
+    },
+    {
+      "index": 16,
+      "timestamp": 1780390870.25034,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.250298,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 56524,
+          "confidence": 0.38,
+          "run_id": "4901",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Product Hunt Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "2f461453579387860a15c55a6c65005280347d38164567dd2e62f9962fa3aadc",
+      "hash": "7965143d8cea73b848f2dcb88912d224ccf824723c78d409172d630d53f0def3"
+    },
+    {
+      "index": 17,
+      "timestamp": 1780390870.2504003,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2503593,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 50089,
+          "confidence": 0.484,
+          "run_id": "4900",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:YouTube Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "7965143d8cea73b848f2dcb88912d224ccf824723c78d409172d630d53f0def3",
+      "hash": "b78e3d5dd9c5a0422cdc65418e99943382440ad03a44cb2dcbe55253b9698471"
+    },
+    {
+      "index": 18,
+      "timestamp": 1780390870.250461,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2504196,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 50002,
+          "confidence": 0.38,
+          "run_id": "4899",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Job Posting Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "b78e3d5dd9c5a0422cdc65418e99943382440ad03a44cb2dcbe55253b9698471",
+      "hash": "b3b259df467e09ec5a61476bcdb7a596b1d48729f7092c205010b7f0655a856d"
+    },
+    {
+      "index": 19,
+      "timestamp": 1780390870.250521,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2504807,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 44927,
+          "confidence": 0.38,
+          "run_id": "4898",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Crunchbase Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "b3b259df467e09ec5a61476bcdb7a596b1d48729f7092c205010b7f0655a856d",
+      "hash": "b3f26003cf85bf62e3ee0477107e9fca9b0dcaf31ab4eeccdd9d98bdcae3e622"
+    },
+    {
+      "index": 20,
+      "timestamp": 1780390870.2505796,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.25054,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 40270,
+          "confidence": 0.416,
+          "run_id": "4897",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:App Store Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "b3f26003cf85bf62e3ee0477107e9fca9b0dcaf31ab4eeccdd9d98bdcae3e622",
+      "hash": "56f0647931c4e9de43e06004a997d302be011b8df821095a269b53185107a551"
+    },
+    {
+      "index": 21,
+      "timestamp": 1780390870.2508132,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2506166,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 40961,
+          "confidence": 0.23,
+          "run_id": "4896",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:RSS/Blogs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "56f0647931c4e9de43e06004a997d302be011b8df821095a269b53185107a551",
+      "hash": "f156c4abd1880582670de26d61a82e2e8154dc07112b2b7b66f30e34496ee680"
+    },
+    {
+      "index": 22,
+      "timestamp": 1780390870.2509415,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2508452,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 31627,
+          "confidence": 0.36,
+          "run_id": "4895",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Financial Signal Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f156c4abd1880582670de26d61a82e2e8154dc07112b2b7b66f30e34496ee680",
+      "hash": "63a11a28f8096903a535a70dc23124193784e7bcd3792f9c1f136fca430edce2"
+    },
+    {
+      "index": 23,
+      "timestamp": 1780390870.251018,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2509668,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 28665,
+          "confidence": 0.434,
+          "run_id": "4894",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:GitHub Trending Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "63a11a28f8096903a535a70dc23124193784e7bcd3792f9c1f136fca430edce2",
+      "hash": "329c0edccd4cbefbc3fe3e834f3f1c3eee7de71b517df155de6c00fabb4ed3ce"
+    },
+    {
+      "index": 24,
+      "timestamp": 1780390870.2510817,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2510388,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 25726,
+          "confidence": 0.32,
+          "run_id": "4893",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Google Trends Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "329c0edccd4cbefbc3fe3e834f3f1c3eee7de71b517df155de6c00fabb4ed3ce",
+      "hash": "49223a3f231b0c7910b73d383e6a66c95869c46ce3b81e5d48ab814bc54703d8"
+    },
+    {
+      "index": 25,
+      "timestamp": 1780390870.2511415,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.251101,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 24568,
+          "confidence": 0.52,
+          "run_id": "4892",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Dev.to Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "49223a3f231b0c7910b73d383e6a66c95869c46ce3b81e5d48ab814bc54703d8",
+      "hash": "06d47cfccfa283d9cfb29c726793ed48e369e790fdf96bd770de2cddea4dacd2"
+    },
+    {
+      "index": 26,
+      "timestamp": 1780390870.2512026,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2511606,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 24105,
+          "confidence": 0.3,
+          "run_id": "4891",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:HackerNews Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "06d47cfccfa283d9cfb29c726793ed48e369e790fdf96bd770de2cddea4dacd2",
+      "hash": "c6b268081169f85299f8cb58a48d0447b27a854dde25ae9e3e66613ba5cb9255"
+    },
+    {
+      "index": 27,
+      "timestamp": 1780390870.2512627,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2512221,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 20895,
+          "confidence": 0.314,
+          "run_id": "4890",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Podcast Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "c6b268081169f85299f8cb58a48d0447b27a854dde25ae9e3e66613ba5cb9255",
+      "hash": "6751bda128bb7739637424e0d50e2dd9c4cae79131f478628d221c2e05ee9bc8"
+    },
+    {
+      "index": 28,
+      "timestamp": 1780390870.251329,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2512815,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 14407,
+          "confidence": 0.87,
+          "run_id": "4889",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:QA System Auditor",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "6751bda128bb7739637424e0d50e2dd9c4cae79131f478628d221c2e05ee9bc8",
+      "hash": "09fa966036e0aed39c04bfa72afae558d7dde6574b4c3945b76b5de0e593e376"
+    },
+    {
+      "index": 29,
+      "timestamp": 1780390870.2513876,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2513483,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 1260,
+          "confidence": 0.87,
+          "run_id": "4888",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:QA System Auditor",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "09fa966036e0aed39c04bfa72afae558d7dde6574b4c3945b76b5de0e593e376",
+      "hash": "cebdf6f5863d023c42d4bab8cc3a156e7035b5a7a5d6732e3411fd41471ceb8f"
+    },
+    {
+      "index": 30,
+      "timestamp": 1780390870.2514524,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2514098,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 45229,
+          "confidence": 0.8,
+          "run_id": "4887",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Trend Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "cebdf6f5863d023c42d4bab8cc3a156e7035b5a7a5d6732e3411fd41471ceb8f",
+      "hash": "7f07d30c5aa4d48a26e69ee447ddebc89f9d072a25143d3e7739e58a25904cdb"
+    },
+    {
+      "index": 31,
+      "timestamp": 1780390870.2515106,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2514708,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 34591,
+          "confidence": 0.386,
+          "run_id": "4886",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:YouTube Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "7f07d30c5aa4d48a26e69ee447ddebc89f9d072a25143d3e7739e58a25904cdb",
+      "hash": "959b5f806dfb9bbe0f0d79fd139b02ff640c10a5aca3055223a393cab51fa00e"
+    },
+    {
+      "index": 32,
+      "timestamp": 1780390870.2515745,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2515292,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 78338,
+          "confidence": 0.49,
+          "run_id": "4885",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Financial Signal Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "959b5f806dfb9bbe0f0d79fd139b02ff640c10a5aca3055223a393cab51fa00e",
+      "hash": "61e9d84403187d8cc8e2a287a7e70398781e092649849a1a10a88963a69430e5"
+    },
+    {
+      "index": 33,
+      "timestamp": 1780390870.2516654,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2515948,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 31567,
+          "confidence": 0.41,
+          "run_id": "4884",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Crunchbase Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "61e9d84403187d8cc8e2a287a7e70398781e092649849a1a10a88963a69430e5",
+      "hash": "f1962ca47521604b0419de1327cdad4669e8bf06874c897556577e8c6bbe1364"
+    },
+    {
+      "index": 34,
+      "timestamp": 1780390870.251729,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2516868,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 121356,
+          "confidence": 0.46,
+          "run_id": "4883",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:LinkedIn Jobs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f1962ca47521604b0419de1327cdad4669e8bf06874c897556577e8c6bbe1364",
+      "hash": "b15f34ba00a9531b25785374bd70b165a40215bf85fe52be62721ff3c4ff5d05"
+    },
+    {
+      "index": 35,
+      "timestamp": 1780390870.2517936,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2517524,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 50237,
+          "confidence": 0.434,
+          "run_id": "4882",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Product Hunt Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "b15f34ba00a9531b25785374bd70b165a40215bf85fe52be62721ff3c4ff5d05",
+      "hash": "838104dbfcb13e6441db5deedb560276a402d2ef614c857b22b593808fc1e830"
+    },
+    {
+      "index": 36,
+      "timestamp": 1780390870.2518513,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2518125,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 46116,
+          "confidence": 0.666,
+          "run_id": "4881",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Trend Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "838104dbfcb13e6441db5deedb560276a402d2ef614c857b22b593808fc1e830",
+      "hash": "0b92edda7127e4d67a2dc5b4963c171e0a52dbf0d21d71401e35d30d8520a516"
+    },
+    {
+      "index": 37,
+      "timestamp": 1780390870.2519512,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2518694,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 23390,
+          "confidence": 0.68,
+          "run_id": "4880",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0b92edda7127e4d67a2dc5b4963c171e0a52dbf0d21d71401e35d30d8520a516",
+      "hash": "ae3ec1887805d3c0f5aedc22660c25443b4cc7a77647ccf4b83cea1824ac3a74"
+    },
+    {
+      "index": 38,
+      "timestamp": 1780390870.252032,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2519774,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6367,
+          "confidence": 0.8,
+          "run_id": "4879",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "ae3ec1887805d3c0f5aedc22660c25443b4cc7a77647ccf4b83cea1824ac3a74",
+      "hash": "f1cf5da3a5fe574081c46c1809e4ffb322325c864fe032c69b22acc901ffd39c"
+    },
+    {
+      "index": 39,
+      "timestamp": 1780390870.2520986,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2520535,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 24651,
+          "confidence": 0.754,
+          "run_id": "4878",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f1cf5da3a5fe574081c46c1809e4ffb322325c864fe032c69b22acc901ffd39c",
+      "hash": "0a4cf14db00ecbe2117b8a56ad1fa0f498e0c51ea8556e7666b60660a526279a"
+    },
+    {
+      "index": 40,
+      "timestamp": 1780390870.2521603,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2521183,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6,
+          "confidence": 0.784,
+          "run_id": "4877",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0a4cf14db00ecbe2117b8a56ad1fa0f498e0c51ea8556e7666b60660a526279a",
+      "hash": "f4984a52faabd9d01bd13fe39f2d367eb3c583c55d592d06cceab9233e8a0061"
+    },
+    {
+      "index": 41,
+      "timestamp": 1780390870.2522194,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2521796,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 29134,
+          "confidence": 0.496,
+          "run_id": "4876",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f4984a52faabd9d01bd13fe39f2d367eb3c583c55d592d06cceab9233e8a0061",
+      "hash": "866b3f6803a773c15e46ab94e2c249df7fa6f17517264f5669592c79f737c05a"
+    },
+    {
+      "index": 42,
+      "timestamp": 1780390870.2522762,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2522373,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6630,
+          "confidence": 0.766,
+          "run_id": "4875",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "866b3f6803a773c15e46ab94e2c249df7fa6f17517264f5669592c79f737c05a",
+      "hash": "177d54f5cb341e3e71f2acc91f0d29f9c429320fa38467f0445918b6a0d107ca"
+    },
+    {
+      "index": 43,
+      "timestamp": 1780390870.252338,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2522953,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 23510,
+          "confidence": 0.63,
+          "run_id": "4874",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "177d54f5cb341e3e71f2acc91f0d29f9c429320fa38467f0445918b6a0d107ca",
+      "hash": "da8a5695971c1c8b3ab75aece9eb8ce88215a53f5b91b2513253cf578e72a4ce"
+    },
+    {
+      "index": 44,
+      "timestamp": 1780390870.2523952,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.252356,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 2,
+          "confidence": 0.75,
+          "run_id": "4873",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "da8a5695971c1c8b3ab75aece9eb8ce88215a53f5b91b2513253cf578e72a4ce",
+      "hash": "d8fa37637358a64888ce8811a34ec55ab84fc688b09483324ae35fb6805f09a8"
+    },
+    {
+      "index": 45,
+      "timestamp": 1780390870.2524533,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2524145,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 8,
+          "confidence": 0.67,
+          "run_id": "4872",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d8fa37637358a64888ce8811a34ec55ab84fc688b09483324ae35fb6805f09a8",
+      "hash": "3df2cc1e1aa60df9532a80e5fdfa89328fa4683f3c5727752ab64e50533dae77"
+    },
+    {
+      "index": 46,
+      "timestamp": 1780390870.2525148,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2524722,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 62,
+          "confidence": 0.766,
+          "run_id": "4871",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "3df2cc1e1aa60df9532a80e5fdfa89328fa4683f3c5727752ab64e50533dae77",
+      "hash": "d2834f4e600c49850cbabc32c9899551bbc75586ccf64be271d497f308469d57"
+    },
+    {
+      "index": 47,
+      "timestamp": 1780390870.2525773,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2525334,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 78138,
+          "confidence": 0.65,
+          "run_id": "4870",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Personal Context Filter",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d2834f4e600c49850cbabc32c9899551bbc75586ccf64be271d497f308469d57",
+      "hash": "f171418adffdf6c5a337d152913e3df8eca66b5f5f0dbe23025b15baef101dfe"
+    },
+    {
+      "index": 48,
+      "timestamp": 1780390870.2526608,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2525969,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 441068,
+          "confidence": 0.8,
+          "run_id": "4869",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Idea Scorer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f171418adffdf6c5a337d152913e3df8eca66b5f5f0dbe23025b15baef101dfe",
+      "hash": "0bb5fd4d5710f6b16f9a0d93450d9073e5df01bf37256b7e203225ce112c46f3"
+    },
+    {
+      "index": 49,
+      "timestamp": 1780390870.2527208,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2526815,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 123400,
+          "confidence": 0.47,
+          "run_id": "4868",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Trend Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0bb5fd4d5710f6b16f9a0d93450d9073e5df01bf37256b7e203225ce112c46f3",
+      "hash": "fd93583b90121e00f1f3ef00d5acba51ce72bc68b99fb0cc27ab34339cac796d"
+    },
+    {
+      "index": 50,
+      "timestamp": 1780390870.2527795,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2527397,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 271728,
+          "confidence": 0.38,
+          "run_id": "4867",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:LinkedIn Jobs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "fd93583b90121e00f1f3ef00d5acba51ce72bc68b99fb0cc27ab34339cac796d",
+      "hash": "1b6fb50bc878a93f9b293517495cf0cc947e734ede019a3f276d2ba2d76905b1"
+    },
+    {
+      "index": 51,
+      "timestamp": 1780390870.2528374,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2527978,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 99500,
+          "confidence": 0.4,
+          "run_id": "4866",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Job Posting Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "1b6fb50bc878a93f9b293517495cf0cc947e734ede019a3f276d2ba2d76905b1",
+      "hash": "e74d5e86e2ef1ed000cab1e49f2eefaf7dc81dde430328c3763caabae85cb8d6"
+    },
+    {
+      "index": 52,
+      "timestamp": 1780390870.252896,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2528558,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 76632,
+          "confidence": 0.424,
+          "run_id": "4865",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Twitter/X Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "e74d5e86e2ef1ed000cab1e49f2eefaf7dc81dde430328c3763caabae85cb8d6",
+      "hash": "009e229a25e4402d686605f5bf29f171c5c4f6b75e9a5284f3b307c620a6baee"
+    },
+    {
+      "index": 53,
+      "timestamp": 1780390870.2529862,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2529316,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 52109,
+          "confidence": 0.386,
+          "run_id": "4864",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:App Store Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "009e229a25e4402d686605f5bf29f171c5c4f6b75e9a5284f3b307c620a6baee",
+      "hash": "c432ca6d84ec18c1bb724918ee3ef8909b23043b430f88e97d89461ba618f385"
+    },
+    {
+      "index": 54,
+      "timestamp": 1780390870.2530503,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2530088,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 38690,
+          "confidence": 0.38,
+          "run_id": "4863",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:YouTube Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "c432ca6d84ec18c1bb724918ee3ef8909b23043b430f88e97d89461ba618f385",
+      "hash": "0b443552e65e96316b61d12afdb12371e136adc8c356d63e746bb96351a6956c"
+    },
+    {
+      "index": 55,
+      "timestamp": 1780390870.2531083,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2530692,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 38687,
+          "confidence": 0.386,
+          "run_id": "4862",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Crunchbase Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0b443552e65e96316b61d12afdb12371e136adc8c356d63e746bb96351a6956c",
+      "hash": "22da25de27c39f81fc51131180e2edcc11a75b870e5804900e35f60479d9f0d0"
+    },
+    {
+      "index": 56,
+      "timestamp": 1780390870.2531643,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.253127,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 35460,
+          "confidence": 0.314,
+          "run_id": "4861",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:HackerNews Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "22da25de27c39f81fc51131180e2edcc11a75b870e5804900e35f60479d9f0d0",
+      "hash": "73d76996a9e7aa67876f656f8c70a191e6a6d6729cd933d197f0392bfa9e9d95"
+    },
+    {
+      "index": 57,
+      "timestamp": 1780390870.2532656,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2531817,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 29559,
+          "confidence": 0.404,
+          "run_id": "4860",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:GitHub Trending Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "73d76996a9e7aa67876f656f8c70a191e6a6d6729cd933d197f0392bfa9e9d95",
+      "hash": "01874a331d6439a7f53d43a6a69b0e36d3260712f04cce2f2bf633b0491316a9"
+    },
+    {
+      "index": 58,
+      "timestamp": 1780390870.253327,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2532868,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 28289,
+          "confidence": 0.39,
+          "run_id": "4859",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Financial Signal Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "01874a331d6439a7f53d43a6a69b0e36d3260712f04cce2f2bf633b0491316a9",
+      "hash": "42a2af0da9550f1b4a11ac65393c3e9bcb5013773ab769cd6587c4c68031b840"
+    },
+    {
+      "index": 59,
+      "timestamp": 1780390870.2533927,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2533534,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 20700,
+          "confidence": 0.36,
+          "run_id": "4858",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Dev.to Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "42a2af0da9550f1b4a11ac65393c3e9bcb5013773ab769cd6587c4c68031b840",
+      "hash": "b7e25b9aaa8477dc1eec7d240ee48608a1104d4f0dd3142710d554ed16157aac"
+    },
+    {
+      "index": 60,
+      "timestamp": 1780390870.2534587,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2534106,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 19836,
+          "confidence": 0.354,
+          "run_id": "4857",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Podcast Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "b7e25b9aaa8477dc1eec7d240ee48608a1104d4f0dd3142710d554ed16157aac",
+      "hash": "d723c9fe3fbdfc0d09116301aea98e4771b4923232c7999d5c18b5ec66bfaa91"
+    },
+    {
+      "index": 61,
+      "timestamp": 1780390870.253518,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2534773,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 20165,
+          "confidence": 0.466,
+          "run_id": "4856",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:RSS/Blogs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d723c9fe3fbdfc0d09116301aea98e4771b4923232c7999d5c18b5ec66bfaa91",
+      "hash": "5a66c3b6bdaeaacaf5a739fb1aa8a3bc878ef2c9ec264934ef556ec9d20fe999"
+    },
+    {
+      "index": 62,
+      "timestamp": 1780390870.2535727,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2535355,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 18203,
+          "confidence": 0.304,
+          "run_id": "4855",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Google Trends Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "5a66c3b6bdaeaacaf5a739fb1aa8a3bc878ef2c9ec264934ef556ec9d20fe999",
+      "hash": "fa1cfd6c7054d22e1165f15159904eecadfc76502813be5d6adb4822c5e617d4"
+    },
+    {
+      "index": 63,
+      "timestamp": 1780390870.2536576,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.25359,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 12436,
+          "confidence": 0.534,
+          "run_id": "4854",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Product Hunt Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "fa1cfd6c7054d22e1165f15159904eecadfc76502813be5d6adb4822c5e617d4",
+      "hash": "cfbcf00e762bfe744dc84a8c7764d8dcda81f9b27ab31aba850b6c4086f5c18f"
+    },
+    {
+      "index": 64,
+      "timestamp": 1780390870.2537184,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2536778,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 18,
+          "confidence": 0.0,
+          "run_id": "4853",
+          "trace_id": null,
+          "error": "LLM call refused: daily_limit cap reached ($4.19 of $4.25). Adjust via Redis `settings:overrides.budget.*` or wait for period reset."
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "error"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "cfbcf00e762bfe744dc84a8c7764d8dcda81f9b27ab31aba850b6c4086f5c18f",
+      "hash": "27abdc31204f1125cdce2a01a92ab5b2e2332f0d74ce61e9034ddd54e8cea2ba"
+    },
+    {
+      "index": 65,
+      "timestamp": 1780390870.253792,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2537386,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 16,
+          "confidence": 0.0,
+          "run_id": "4852",
+          "trace_id": null,
+          "error": "LLM call refused: daily_limit cap reached ($4.19 of $4.25). Adjust via Redis `settings:overrides.budget.*` or wait for period reset."
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "error"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "27abdc31204f1125cdce2a01a92ab5b2e2332f0d74ce61e9034ddd54e8cea2ba",
+      "hash": "41e3d503b2729a8e63bbc5512b510ed30750f85b707d94dd6f6dc3e5bdb8306e"
+    },
+    {
+      "index": 66,
+      "timestamp": 1780390870.253856,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2538126,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 20,
+          "confidence": 0.0,
+          "run_id": "4851",
+          "trace_id": null,
+          "error": "LLM call refused: daily_limit cap reached ($4.19 of $4.25). Adjust via Redis `settings:overrides.budget.*` or wait for period reset."
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "error"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "41e3d503b2729a8e63bbc5512b510ed30750f85b707d94dd6f6dc3e5bdb8306e",
+      "hash": "91f34e09549d57c9f5c8fa6372f820a501ec5252c783652b05db7bd646af934a"
+    },
+    {
+      "index": 67,
+      "timestamp": 1780390870.253928,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.253876,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 14,
+          "confidence": 0.0,
+          "run_id": "4850",
+          "trace_id": null,
+          "error": "LLM call refused: daily_limit cap reached ($4.19 of $4.25). Adjust via Redis `settings:overrides.budget.*` or wait for period reset."
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "error"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "91f34e09549d57c9f5c8fa6372f820a501ec5252c783652b05db7bd646af934a",
+      "hash": "0bef01408cbc560bd012a5ab7138e67197597dd0be367b84ad4a8b696df7fd0b"
+    },
+    {
+      "index": 68,
+      "timestamp": 1780390870.2539861,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2539477,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 17,
+          "confidence": 0.0,
+          "run_id": "4849",
+          "trace_id": null,
+          "error": "LLM call refused: daily_limit cap reached ($4.19 of $4.25). Adjust via Redis `settings:overrides.budget.*` or wait for period reset."
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "error"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0bef01408cbc560bd012a5ab7138e67197597dd0be367b84ad4a8b696df7fd0b",
+      "hash": "05b8e316ed47ed8d48a69f7ba2801570c91d0f193dc55949970b0783a5a5b6b3"
+    },
+    {
+      "index": 69,
+      "timestamp": 1780390870.2540483,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2540042,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6569,
+          "confidence": 0.75,
+          "run_id": "4848",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "05b8e316ed47ed8d48a69f7ba2801570c91d0f193dc55949970b0783a5a5b6b3",
+      "hash": "c06a83b41038a13af548789a9a07a4b0f1037fda503ed0bf64d6ecac26b017f3"
+    },
+    {
+      "index": 70,
+      "timestamp": 1780390870.254105,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2540674,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 28627,
+          "confidence": 0.67,
+          "run_id": "4847",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "c06a83b41038a13af548789a9a07a4b0f1037fda503ed0bf64d6ecac26b017f3",
+      "hash": "291f04c912243424a1924eddd7b70cec371f604e020edd52fc99350fdfb73034"
+    },
+    {
+      "index": 71,
+      "timestamp": 1780390870.2541604,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2541227,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 5782,
+          "confidence": 0.766,
+          "run_id": "4846",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "291f04c912243424a1924eddd7b70cec371f604e020edd52fc99350fdfb73034",
+      "hash": "d195ccde8dbc9bc2f9f583f2d015b09cc5da6fad371f10dbb3a6c4bf7bf32413"
+    },
+    {
+      "index": 72,
+      "timestamp": 1780390870.2542162,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2541788,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 24092,
+          "confidence": 0.716,
+          "run_id": "4845",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d195ccde8dbc9bc2f9f583f2d015b09cc5da6fad371f10dbb3a6c4bf7bf32413",
+      "hash": "edabca3fbedeab01ab0d2202fecefacfd218ab55ea6c6febb273396dd3bcacab"
+    },
+    {
+      "index": 73,
+      "timestamp": 1780390870.2543,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2542465,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6434,
+          "confidence": 0.784,
+          "run_id": "4844",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "edabca3fbedeab01ab0d2202fecefacfd218ab55ea6c6febb273396dd3bcacab",
+      "hash": "6f67bf674a84a87130024f98b8ee79e649dff2a94c92236bf9c42a9a3ab3a78d"
+    },
+    {
+      "index": 74,
+      "timestamp": 1780390870.2543657,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2543235,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 82336,
+          "confidence": 0.65,
+          "run_id": "4843",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Personal Context Filter",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "6f67bf674a84a87130024f98b8ee79e649dff2a94c92236bf9c42a9a3ab3a78d",
+      "hash": "0b9acf9a3fb6db002b64c350c4d06db301c7fa9e2aecc65922a4118c469b38b6"
+    },
+    {
+      "index": 75,
+      "timestamp": 1780390870.2544239,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2543848,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 370489,
+          "confidence": 0.75,
+          "run_id": "4842",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Idea Scorer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0b9acf9a3fb6db002b64c350c4d06db301c7fa9e2aecc65922a4118c469b38b6",
+      "hash": "f1d30b014208c64f36f040bd2387543733e0b60fc506e7c4a5cc3aae874f6fd7"
+    },
+    {
+      "index": 76,
+      "timestamp": 1780390870.2544842,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.254442,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 93806,
+          "confidence": 0.74,
+          "run_id": "4841",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Trend Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f1d30b014208c64f36f040bd2387543733e0b60fc506e7c4a5cc3aae874f6fd7",
+      "hash": "d641948e8b12f391eef8970ec8ebfce94c7b805e9ce2d0494dfa971b736afc75"
+    },
+    {
+      "index": 77,
+      "timestamp": 1780390870.2545502,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2545037,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 297740,
+          "confidence": 0.45,
+          "run_id": "4840",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:LinkedIn Jobs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d641948e8b12f391eef8970ec8ebfce94c7b805e9ce2d0494dfa971b736afc75",
+      "hash": "c3cd1bab84eee172a351e08e8cc71f6eb4a926d8c9269762461bc355e91bc23f"
+    },
+    {
+      "index": 78,
+      "timestamp": 1780390870.254627,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2545695,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 110247,
+          "confidence": 0.57,
+          "run_id": "4839",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Twitter/X Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "c3cd1bab84eee172a351e08e8cc71f6eb4a926d8c9269762461bc355e91bc23f",
+      "hash": "73cf86f4c29cea9e80636e6625d7915af83b6b930c5030b8bc168bf6a03e17ae"
+    },
+    {
+      "index": 79,
+      "timestamp": 1780390870.2547445,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.254647,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 55375,
+          "confidence": 0.424,
+          "run_id": "4838",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Job Posting Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "73cf86f4c29cea9e80636e6625d7915af83b6b930c5030b8bc168bf6a03e17ae",
+      "hash": "eaa5b7b05d0607a3c469b1034c1f3bbdb6666fb61d4f89ba63d20c1f65f83d98"
+    },
+    {
+      "index": 80,
+      "timestamp": 1780390870.2548096,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2547667,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 52781,
+          "confidence": 0.424,
+          "run_id": "4837",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Product Hunt Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "eaa5b7b05d0607a3c469b1034c1f3bbdb6666fb61d4f89ba63d20c1f65f83d98",
+      "hash": "50dac55a9cbbb8d61f80cff9b114e4d2accea90e47de8214cfcbaccc6eb85771"
+    },
+    {
+      "index": 81,
+      "timestamp": 1780390870.2548711,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2548285,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 42730,
+          "confidence": 0.38,
+          "run_id": "4836",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Crunchbase Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "50dac55a9cbbb8d61f80cff9b114e4d2accea90e47de8214cfcbaccc6eb85771",
+      "hash": "c3426cd60cb9082e890fd1ec7754f38d7cfb4e5f3d14e8a0f3c26bc8ebefa1b2"
+    },
+    {
+      "index": 82,
+      "timestamp": 1780390870.2549438,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2548892,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 42472,
+          "confidence": 0.466,
+          "run_id": "4835",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:YouTube Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "c3426cd60cb9082e890fd1ec7754f38d7cfb4e5f3d14e8a0f3c26bc8ebefa1b2",
+      "hash": "71e931f0795cc6ab99b1dc004c028fe2daeeac54107efe8cae62f7b615fe5eb6"
+    },
+    {
+      "index": 83,
+      "timestamp": 1780390870.255009,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.254963,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 37909,
+          "confidence": 0.38,
+          "run_id": "4834",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:App Store Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "71e931f0795cc6ab99b1dc004c028fe2daeeac54107efe8cae62f7b615fe5eb6",
+      "hash": "7a0c07f2584a4bf0cb4a26cee374b966e840b5e0f3c3e3698fba98d361f507ad"
+    },
+    {
+      "index": 84,
+      "timestamp": 1780390870.2550666,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2550273,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 34983,
+          "confidence": 0.434,
+          "run_id": "4833",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Financial Signal Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "7a0c07f2584a4bf0cb4a26cee374b966e840b5e0f3c3e3698fba98d361f507ad",
+      "hash": "6010ecb847d3093f9cf78177331449d24086dad466b6eac19f1e1f82b7bb1c5f"
+    },
+    {
+      "index": 85,
+      "timestamp": 1780390870.255133,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.255089,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 34102,
+          "confidence": 0.584,
+          "run_id": "4832",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:HackerNews Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "6010ecb847d3093f9cf78177331449d24086dad466b6eac19f1e1f82b7bb1c5f",
+      "hash": "c9192522962e9b86c1a9e4e02c332dcbca6a0302ba2518310faa0eae5098b268"
+    },
+    {
+      "index": 86,
+      "timestamp": 1780390870.2551913,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2551532,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 30276,
+          "confidence": 0.52,
+          "run_id": "4831",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:RSS/Blogs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "c9192522962e9b86c1a9e4e02c332dcbca6a0302ba2518310faa0eae5098b268",
+      "hash": "8a51a5c756bb89f813085fe5dc186bf99a7f20d19047ce45d3b73127d48bf5f4"
+    },
+    {
+      "index": 87,
+      "timestamp": 1780390870.2552495,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2552114,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 29807,
+          "confidence": 0.42,
+          "run_id": "4830",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:GitHub Trending Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "8a51a5c756bb89f813085fe5dc186bf99a7f20d19047ce45d3b73127d48bf5f4",
+      "hash": "795353f5afe367d37baad1f28627d61ed43c88565fae2a52a96a4011e4f6e729"
+    },
+    {
+      "index": 88,
+      "timestamp": 1780390870.255304,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2552674,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 26009,
+          "confidence": 0.38,
+          "run_id": "4829",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Dev.to Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "795353f5afe367d37baad1f28627d61ed43c88565fae2a52a96a4011e4f6e729",
+      "hash": "c7a88a6f405ca2c86b2b0deb91e71ddae16202854e719cc666ae3c99a1fb6d82"
+    },
+    {
+      "index": 89,
+      "timestamp": 1780390870.2553582,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2553213,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 24730,
+          "confidence": 0.31,
+          "run_id": "4828",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Google Trends Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "c7a88a6f405ca2c86b2b0deb91e71ddae16202854e719cc666ae3c99a1fb6d82",
+      "hash": "a1aedbf9bdc356a5557842c7167348b1cbd64e5f339a8269cff2e67cb1e5cbf4"
+    },
+    {
+      "index": 90,
+      "timestamp": 1780390870.2554128,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2553756,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 13574,
+          "confidence": 0.33,
+          "run_id": "4827",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Podcast Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "a1aedbf9bdc356a5557842c7167348b1cbd64e5f339a8269cff2e67cb1e5cbf4",
+      "hash": "0708c517a83ee70b106dc3d6764b68521ff1063fe54e0933b13c0f49a6ae0c7f"
+    },
+    {
+      "index": 91,
+      "timestamp": 1780390870.2554653,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2554297,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 25166,
+          "confidence": 0.68,
+          "run_id": "4826",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0708c517a83ee70b106dc3d6764b68521ff1063fe54e0933b13c0f49a6ae0c7f",
+      "hash": "905ad3c02608c99e61d02835887e907382b1e7f70f45937c70a15b3eb3b161bb"
+    },
+    {
+      "index": 92,
+      "timestamp": 1780390870.255527,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2554824,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 12,
+          "confidence": 0.824,
+          "run_id": "4825",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "905ad3c02608c99e61d02835887e907382b1e7f70f45937c70a15b3eb3b161bb",
+      "hash": "30725da9bacabf96fc7728e090bf26beac9bc52301abbcc4b68eb5d8b8f32681"
+    },
+    {
+      "index": 93,
+      "timestamp": 1780390870.2555854,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2555459,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 25754,
+          "confidence": 0.73,
+          "run_id": "4824",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "30725da9bacabf96fc7728e090bf26beac9bc52301abbcc4b68eb5d8b8f32681",
+      "hash": "6e22e47398c4150dace415ba591c2c24db060305509f5af4a268fa00b2cc1dc6"
+    },
+    {
+      "index": 94,
+      "timestamp": 1780390870.255677,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2556329,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 2,
+          "confidence": 0.724,
+          "run_id": "4823",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "6e22e47398c4150dace415ba591c2c24db060305509f5af4a268fa00b2cc1dc6",
+      "hash": "0f9d712a85eaa8efc23b8d0e3fb0b4d09d873066e0f65ec16a154f0a8ebfa6d5"
+    },
+    {
+      "index": 95,
+      "timestamp": 1780390870.2557337,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.255696,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 36128,
+          "confidence": 0.476,
+          "run_id": "4822",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0f9d712a85eaa8efc23b8d0e3fb0b4d09d873066e0f65ec16a154f0a8ebfa6d5",
+      "hash": "052020cccc8a16b9c4784bf667082ff9799d856f549ebc442d399c9166633438"
+    },
+    {
+      "index": 96,
+      "timestamp": 1780390870.2557878,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.255751,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 13,
+          "confidence": 0.766,
+          "run_id": "4821",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "052020cccc8a16b9c4784bf667082ff9799d856f549ebc442d399c9166633438",
+      "hash": "9a4223298d9c46f217e03fdfac036d8df42e17da6720ffff2907c5b9756ccf12"
+    },
+    {
+      "index": 97,
+      "timestamp": 1780390870.255841,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.255805,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 30856,
+          "confidence": 0.816,
+          "run_id": "4820",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9a4223298d9c46f217e03fdfac036d8df42e17da6720ffff2907c5b9756ccf12",
+      "hash": "7a245786f4743cda10573f3f7078fa11c032c329b79a64103ae56a4cd3b04f1d"
+    },
+    {
+      "index": 98,
+      "timestamp": 1780390870.2559023,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.255858,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 2,
+          "confidence": 0.75,
+          "run_id": "4819",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "7a245786f4743cda10573f3f7078fa11c032c329b79a64103ae56a4cd3b04f1d",
+      "hash": "08d7b3e4e553df8d5b685e5c67777579b25659200b5e7fad878aad349e7a8e34"
+    },
+    {
+      "index": 99,
+      "timestamp": 1780390870.2559752,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2559345,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 28888,
+          "confidence": 0.8,
+          "run_id": "4818",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "08d7b3e4e553df8d5b685e5c67777579b25659200b5e7fad878aad349e7a8e34",
+      "hash": "78e914784f4c53c64869b9037644ed192a98b4c4fd1dc790e93e2935b6436071"
+    },
+    {
+      "index": 100,
+      "timestamp": 1780390870.2560344,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2559931,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 15,
+          "confidence": 0.824,
+          "run_id": "4817",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "78e914784f4c53c64869b9037644ed192a98b4c4fd1dc790e93e2935b6436071",
+      "hash": "c0742de9a66d8e340b8ab7abc2eaebe1b6830dda14e08485d9330e69cfe4bcde"
+    },
+    {
+      "index": 101,
+      "timestamp": 1780390870.2560918,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2560527,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 90932,
+          "confidence": 0.65,
+          "run_id": "4816",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Personal Context Filter",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "c0742de9a66d8e340b8ab7abc2eaebe1b6830dda14e08485d9330e69cfe4bcde",
+      "hash": "110036381e9859ad3ad5320bafd0e0cf8d121a3f13ecb1ee23c0602b60e82757"
+    },
+    {
+      "index": 102,
+      "timestamp": 1780390870.2561467,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2561095,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 668678,
+          "confidence": 0.816,
+          "run_id": "4815",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Idea Scorer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "110036381e9859ad3ad5320bafd0e0cf8d121a3f13ecb1ee23c0602b60e82757",
+      "hash": "6169cf3ec00ed1666d32e4cdd95f1e187ca5258d52652fb01d2b38d8b1e9cd06"
+    },
+    {
+      "index": 103,
+      "timestamp": 1780390870.256209,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2561638,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 152571,
+          "confidence": 0.6,
+          "run_id": "4814",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Trend Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "6169cf3ec00ed1666d32e4cdd95f1e187ca5258d52652fb01d2b38d8b1e9cd06",
+      "hash": "e34f7b8da0eb686eb8b4fb81230388df4dd3da7eab554e17f9fd82b84f985167"
+    },
+    {
+      "index": 104,
+      "timestamp": 1780390870.2562687,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2562275,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 219560,
+          "confidence": 0.424,
+          "run_id": "4813",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:LinkedIn Jobs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "e34f7b8da0eb686eb8b4fb81230388df4dd3da7eab554e17f9fd82b84f985167",
+      "hash": "d636ad0ce3b8a48e175664830c3856ccfc8f5054762a39094020d3c7772497a6"
+    },
+    {
+      "index": 105,
+      "timestamp": 1780390870.256328,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2562873,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 115594,
+          "confidence": 0.43,
+          "run_id": "4812",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Twitter/X Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d636ad0ce3b8a48e175664830c3856ccfc8f5054762a39094020d3c7772497a6",
+      "hash": "e3365bbdba4545a1a134d067c0a366f37f7c7962abdd859413744733b572509d"
+    },
+    {
+      "index": 106,
+      "timestamp": 1780390870.2563844,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2563465,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 38142,
+          "confidence": 0.484,
+          "run_id": "4811",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Job Posting Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "e3365bbdba4545a1a134d067c0a366f37f7c7962abdd859413744733b572509d",
+      "hash": "245fa6e362a2f7a8fe86af2ad9b3b04b3585ef1037d549365f7e37dca82f2a95"
+    },
+    {
+      "index": 107,
+      "timestamp": 1780390870.2564387,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2564023,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 32105,
+          "confidence": 0.424,
+          "run_id": "4810",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:RSS/Blogs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "245fa6e362a2f7a8fe86af2ad9b3b04b3585ef1037d549365f7e37dca82f2a95",
+      "hash": "18dc8ba9101dd58e4fe44fcd0485318ba829e0bd1292c368d0ec6159ba607234"
+    },
+    {
+      "index": 108,
+      "timestamp": 1780390870.2564993,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2564554,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 27253,
+          "confidence": 0.53,
+          "run_id": "4809",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:GitHub Trending Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "18dc8ba9101dd58e4fe44fcd0485318ba829e0bd1292c368d0ec6159ba607234",
+      "hash": "caa22d4100324899bd176f2a2af8e97b2fb8004911d13995a07cadbb84b2b520"
+    },
+    {
+      "index": 109,
+      "timestamp": 1780390870.2565627,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2565181,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 25931,
+          "confidence": 0.446,
+          "run_id": "4808",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:YouTube Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "caa22d4100324899bd176f2a2af8e97b2fb8004911d13995a07cadbb84b2b520",
+      "hash": "7a1057ae1fe6b075460079e837d1ecc5c4529d4807428019cd8393e9b191ab9e"
+    },
+    {
+      "index": 110,
+      "timestamp": 1780390870.2566354,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2565815,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 22862,
+          "confidence": 0.44,
+          "run_id": "4807",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:App Store Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "7a1057ae1fe6b075460079e837d1ecc5c4529d4807428019cd8393e9b191ab9e",
+      "hash": "0c695dd31ff722c6c6a1f27775e1bf8457e7dee6c0922b63911321e0dbf1dba4"
+    },
+    {
+      "index": 111,
+      "timestamp": 1780390870.2566984,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2566545,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 23444,
+          "confidence": 0.376,
+          "run_id": "4806",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:HackerNews Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0c695dd31ff722c6c6a1f27775e1bf8457e7dee6c0922b63911321e0dbf1dba4",
+      "hash": "11a2cf5feea3a8cbc6b9607aa222a6ef7b008dffb5e86bc04bb7afe0f11cf535"
+    },
+    {
+      "index": 112,
+      "timestamp": 1780390870.2567544,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.256717,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 21638,
+          "confidence": 0.46,
+          "run_id": "4805",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Crunchbase Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "11a2cf5feea3a8cbc6b9607aa222a6ef7b008dffb5e86bc04bb7afe0f11cf535",
+      "hash": "9d7d937215617079d06bcc906846161f66bc64a03214ff0d6c489527006177c9"
+    },
+    {
+      "index": 113,
+      "timestamp": 1780390870.2568138,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2567716,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 19405,
+          "confidence": 0.54,
+          "run_id": "4804",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Financial Signal Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9d7d937215617079d06bcc906846161f66bc64a03214ff0d6c489527006177c9",
+      "hash": "0d83dbc66f7dc34ef8a86042b0108bf548c0c5c0ff9bf596b03a3c6141c82ebe"
+    },
+    {
+      "index": 114,
+      "timestamp": 1780390870.25687,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2568326,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 20247,
+          "confidence": 0.646,
+          "run_id": "4803",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Dev.to Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0d83dbc66f7dc34ef8a86042b0108bf548c0c5c0ff9bf596b03a3c6141c82ebe",
+      "hash": "b798c9f8ae573583e009f0a333058e59bbdab6c93634358d0ff9a91452a680e5"
+    },
+    {
+      "index": 115,
+      "timestamp": 1780390870.2569737,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2568932,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 19189,
+          "confidence": 0.35,
+          "run_id": "4802",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Podcast Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "b798c9f8ae573583e009f0a333058e59bbdab6c93634358d0ff9a91452a680e5",
+      "hash": "9e8b148b66862e4bccbcc3697f07e594f7d9232f9f9bb2b43d57244aa769ed96"
+    },
+    {
+      "index": 116,
+      "timestamp": 1780390870.2570436,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.256995,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 11051,
+          "confidence": 0.27,
+          "run_id": "4801",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Google Trends Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9e8b148b66862e4bccbcc3697f07e594f7d9232f9f9bb2b43d57244aa769ed96",
+      "hash": "afaf5aa864106a28b40319785f5af7c8705fca21c70606c62ccbb8a7c95d50f3"
+    },
+    {
+      "index": 117,
+      "timestamp": 1780390870.2571092,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2570665,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 10571,
+          "confidence": 0.45,
+          "run_id": "4800",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Product Hunt Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "afaf5aa864106a28b40319785f5af7c8705fca21c70606c62ccbb8a7c95d50f3",
+      "hash": "bdf1fee3120157fe15674b1a71aeb7e5138854cbbf262895ead120fc4db41660"
+    },
+    {
+      "index": 118,
+      "timestamp": 1780390870.257164,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2571273,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 30486,
+          "confidence": 0.69,
+          "run_id": "4799",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "bdf1fee3120157fe15674b1a71aeb7e5138854cbbf262895ead120fc4db41660",
+      "hash": "c6932effb1fec6797b79fd52eb856d7e8bffc4498f875c6b52a2d490b0aa69e4"
+    },
+    {
+      "index": 119,
+      "timestamp": 1780390870.2572188,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2571816,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6675,
+          "confidence": 0.824,
+          "run_id": "4798",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "c6932effb1fec6797b79fd52eb856d7e8bffc4498f875c6b52a2d490b0aa69e4",
+      "hash": "553e162037665412431568d0eee05815051c3d0c0c298744ae172559878c1e22"
+    },
+    {
+      "index": 120,
+      "timestamp": 1780390870.2572794,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2572372,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 24500,
+          "confidence": 0.616,
+          "run_id": "4797",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "553e162037665412431568d0eee05815051c3d0c0c298744ae172559878c1e22",
+      "hash": "81e8c77f5abf196b521a5a51b08782d98b426e728b2313580135a06f3c01c4f3"
+    },
+    {
+      "index": 121,
+      "timestamp": 1780390870.25734,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2572994,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 5759,
+          "confidence": 0.824,
+          "run_id": "4796",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "81e8c77f5abf196b521a5a51b08782d98b426e728b2313580135a06f3c01c4f3",
+      "hash": "e85d7f57cfb150a76621f5821d9e85f5ec80f198ec8da363df17f14a1603515a"
+    },
+    {
+      "index": 122,
+      "timestamp": 1780390870.2573967,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2573586,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 26406,
+          "confidence": 0.67,
+          "run_id": "4795",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "e85d7f57cfb150a76621f5821d9e85f5ec80f198ec8da363df17f14a1603515a",
+      "hash": "bdcbefae580a36cd1a485481604effb9b18ab5afa70e903604375142eba2a787"
+    },
+    {
+      "index": 123,
+      "timestamp": 1780390870.2574587,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.257414,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6435,
+          "confidence": 0.75,
+          "run_id": "4794",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "bdcbefae580a36cd1a485481604effb9b18ab5afa70e903604375142eba2a787",
+      "hash": "79b64e3e86c6594407d6d6cedf4c3588680cb59bf7dbf5a4270df147d7d8f88b"
+    },
+    {
+      "index": 124,
+      "timestamp": 1780390870.2575204,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2574775,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 24854,
+          "confidence": 0.67,
+          "run_id": "4793",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "79b64e3e86c6594407d6d6cedf4c3588680cb59bf7dbf5a4270df147d7d8f88b",
+      "hash": "f65e72e442cd33d4bc2d6adea514ae7a26079ca598b596c6f23e58746878e589"
+    },
+    {
+      "index": 125,
+      "timestamp": 1780390870.2575788,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2575388,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6262,
+          "confidence": 0.766,
+          "run_id": "4792",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f65e72e442cd33d4bc2d6adea514ae7a26079ca598b596c6f23e58746878e589",
+      "hash": "7b1847aa4508cbe1bbf277dbb3c9b678bdf88f180091dbf14d3250911e2499ce"
+    },
+    {
+      "index": 126,
+      "timestamp": 1780390870.2576559,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2575972,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 29494,
+          "confidence": 0.7,
+          "run_id": "4791",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "7b1847aa4508cbe1bbf277dbb3c9b678bdf88f180091dbf14d3250911e2499ce",
+      "hash": "5c2da929ac02d57e4bf050ce81a58b3d67960f4f9613d9bb2f760b21285e5297"
+    },
+    {
+      "index": 127,
+      "timestamp": 1780390870.2577145,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2576752,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6168,
+          "confidence": 0.724,
+          "run_id": "4790",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "5c2da929ac02d57e4bf050ce81a58b3d67960f4f9613d9bb2f760b21285e5297",
+      "hash": "8f26ca4ef3e6010b7896c1ad2b8c1a0bb6cc70200edb41a3c170b1cefaf73965"
+    },
+    {
+      "index": 128,
+      "timestamp": 1780390870.2577727,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2577329,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 69725,
+          "confidence": 0.65,
+          "run_id": "4789",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Personal Context Filter",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "8f26ca4ef3e6010b7896c1ad2b8c1a0bb6cc70200edb41a3c170b1cefaf73965",
+      "hash": "ca2330975568e9f4cbd442acb69460807581f57160fdbef523d3dc5bbc1a1242"
+    },
+    {
+      "index": 129,
+      "timestamp": 1780390870.2578287,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2577918,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 565666,
+          "confidence": 0.746,
+          "run_id": "4788",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Idea Scorer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "ca2330975568e9f4cbd442acb69460807581f57160fdbef523d3dc5bbc1a1242",
+      "hash": "355ed2fcbb35b65078fcd69761f13f05fde7ec9963fa21a5effcb1415995c9c4"
+    },
+    {
+      "index": 130,
+      "timestamp": 1780390870.2578912,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2578459,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 6998,
+          "confidence": 0.534,
+          "run_id": "4787",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Trend Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "355ed2fcbb35b65078fcd69761f13f05fde7ec9963fa21a5effcb1415995c9c4",
+      "hash": "5c6c0ed5818a518d03b128252e6a10abfa0bb1cf70cd423aa729d5313b5b4d3e"
+    },
+    {
+      "index": 131,
+      "timestamp": 1780390870.257965,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2579236,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 16505,
+          "confidence": 0.516,
+          "run_id": "4786",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:HackerNews Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "5c6c0ed5818a518d03b128252e6a10abfa0bb1cf70cd423aa729d5313b5b4d3e",
+      "hash": "41ea51fcc6dd11d9641f85ab010b9dc8edcca9ae0d36ea980f671e5eae833ba4"
+    },
+    {
+      "index": 132,
+      "timestamp": 1780390870.2580285,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2579901,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 129691,
+          "confidence": 0.616,
+          "run_id": "4785",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Trend Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "41ea51fcc6dd11d9641f85ab010b9dc8edcca9ae0d36ea980f671e5eae833ba4",
+      "hash": "15279d65236a27a51527eabcb8916a37042e2844e3a90ce39588de8114ab436b"
+    },
+    {
+      "index": 133,
+      "timestamp": 1780390870.2580893,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.258046,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 219910,
+          "confidence": 0.57,
+          "run_id": "4784",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:LinkedIn Jobs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "15279d65236a27a51527eabcb8916a37042e2844e3a90ce39588de8114ab436b",
+      "hash": "5f323a58e960351104ab0354667ffbeda187f703ff98358f9eb0bcfc1f565868"
+    },
+    {
+      "index": 134,
+      "timestamp": 1780390870.2581456,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2581077,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 63871,
+          "confidence": 0.424,
+          "run_id": "4783",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Twitter/X Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "5f323a58e960351104ab0354667ffbeda187f703ff98358f9eb0bcfc1f565868",
+      "hash": "62d1c3be152059f7f5e2adbdd78b777586eea9fa71f9943cf3ef6b5638ad4c3c"
+    },
+    {
+      "index": 135,
+      "timestamp": 1780390870.258201,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.258163,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 35725,
+          "confidence": 0.65,
+          "run_id": "4782",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Job Posting Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "62d1c3be152059f7f5e2adbdd78b777586eea9fa71f9943cf3ef6b5638ad4c3c",
+      "hash": "ed8b6ed620a95d288c6c0f60d9c78a8011b6ad0ad8c8896610112722dbef7abb"
+    },
+    {
+      "index": 136,
+      "timestamp": 1780390870.2582633,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2582214,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 26219,
+          "confidence": 0.42,
+          "run_id": "4781",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:HackerNews Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "ed8b6ed620a95d288c6c0f60d9c78a8011b6ad0ad8c8896610112722dbef7abb",
+      "hash": "bbf935be293217efeac161197deec247a18c99b8aba91697af02d6ae787adc80"
+    },
+    {
+      "index": 137,
+      "timestamp": 1780390870.2583628,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.258282,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 25556,
+          "confidence": 0.524,
+          "run_id": "4780",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:GitHub Trending Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "bbf935be293217efeac161197deec247a18c99b8aba91697af02d6ae787adc80",
+      "hash": "d224caf8cda55f1fd521eff1376096cc1fff1b718566175c3f4ed81c9624e574"
+    },
+    {
+      "index": 138,
+      "timestamp": 1780390870.258423,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2583835,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 24285,
+          "confidence": 0.34,
+          "run_id": "4779",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:YouTube Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d224caf8cda55f1fd521eff1376096cc1fff1b718566175c3f4ed81c9624e574",
+      "hash": "3b3eb96295e7cca4da402c489d1438a301f702b1788fba8bad4bf66dd7bb3c60"
+    },
+    {
+      "index": 139,
+      "timestamp": 1780390870.2584903,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2584445,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 22069,
+          "confidence": 0.476,
+          "run_id": "4778",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Crunchbase Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "3b3eb96295e7cca4da402c489d1438a301f702b1788fba8bad4bf66dd7bb3c60",
+      "hash": "4a3a4b9968f45a1ff127ce037e1d3add61885b0d9451ad4027aa4c4e0e527bf1"
+    },
+    {
+      "index": 140,
+      "timestamp": 1780390870.2585492,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2585094,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 21218,
+          "confidence": 0.44,
+          "run_id": "4777",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:App Store Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "4a3a4b9968f45a1ff127ce037e1d3add61885b0d9451ad4027aa4c4e0e527bf1",
+      "hash": "be9be772956a56d0c9d80ba88645a90bfd0fc50675c8870f28215e4efa3c095c"
+    },
+    {
+      "index": 141,
+      "timestamp": 1780390870.2586331,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2585669,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 22328,
+          "confidence": 0.27,
+          "run_id": "4776",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Podcast Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "be9be772956a56d0c9d80ba88645a90bfd0fc50675c8870f28215e4efa3c095c",
+      "hash": "57e599ce129eef21a8ab6fc7fa0180c016144e010d277deba5c2c29f9fb41fca"
+    },
+    {
+      "index": 142,
+      "timestamp": 1780390870.2586935,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2586536,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 21670,
+          "confidence": 0.8,
+          "run_id": "4775",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Dev.to Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "57e599ce129eef21a8ab6fc7fa0180c016144e010d277deba5c2c29f9fb41fca",
+      "hash": "0966803f79eb4525c87ac5509ac427acd01c6c0f7b6e6c848987234f0bcddcd5"
+    },
+    {
+      "index": 143,
+      "timestamp": 1780390870.2587655,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2587233,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 16886,
+          "confidence": 0.42,
+          "run_id": "4774",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Financial Signal Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0966803f79eb4525c87ac5509ac427acd01c6c0f7b6e6c848987234f0bcddcd5",
+      "hash": "40c86f29bae8b8293bd9811f3ddf0d8c8168c799f52f963e1c10ec82ca87d5d4"
+    },
+    {
+      "index": 144,
+      "timestamp": 1780390870.258821,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2587836,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 12581,
+          "confidence": 0.41,
+          "run_id": "4773",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Google Trends Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "40c86f29bae8b8293bd9811f3ddf0d8c8168c799f52f963e1c10ec82ca87d5d4",
+      "hash": "836b6d76a2fa416d2c3fee92a8a9d1b27f8057cc61c876a30134c46c7ac16abb"
+    },
+    {
+      "index": 145,
+      "timestamp": 1780390870.258882,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2588382,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 11922,
+          "confidence": 0.454,
+          "run_id": "4772",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Product Hunt Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "836b6d76a2fa416d2c3fee92a8a9d1b27f8057cc61c876a30134c46c7ac16abb",
+      "hash": "e73a35857af13a1b48ec3e9916f90082cf3b71427dec6679469cf91e653ed12b"
+    },
+    {
+      "index": 146,
+      "timestamp": 1780390870.2589517,
+      "event_type": "process_exec",
+      "agent_id": "audit-full",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1780390870.2589,
+        "agent_id": "audit-full",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 12329,
+          "confidence": 0.254,
+          "run_id": "4771",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:RSS/Blogs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "e73a35857af13a1b48ec3e9916f90082cf3b71427dec6679469cf91e653ed12b",
+      "hash": "3018d6f87aad0bb8e558c2152631fb7311d941557e4142e89169a2df985bd554"
+    }
+  ]
+}

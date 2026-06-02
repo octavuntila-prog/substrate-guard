@@ -1,0 +1,25 @@
+{
+  "generator": "substrate-guard / AI Black Box",
+  "version": "1.0",
+  "generated_at": "2026-06-02T09:01:10.764551+00:00",
+  "organization": "Aisophical SRL",
+  "chain_integrity": {
+    "status": "VERIFIED",
+    "chain_length": 147,
+    "head_hash": "3018d6f87aad0bb8e558c2152631fb7311d941557e4142e89169a2df985bd554",
+    "algorithm": "HMAC-SHA256"
+  },
+  "compliance_status": {
+    "SOC_2_Type_II": "EVIDENCE_AVAILABLE",
+    "ISO_27001_2022": "EVIDENCE_AVAILABLE",
+    "ISO_42001_2023": "EVIDENCE_AVAILABLE",
+    "EU_AI_Act": "PARTIAL \u2014 audit trail + explainability ready"
+  },
+  "verification_stack": {
+    "Layer_1_observe": "Mock tracer (DB-batch ingestion via adapters); eBPF kernel hooks implemented, NOT wired in production cron (#38b)",
+    "Layer_2_policy": "Active \u2014 built-in Python engine, 7 rules (Rego/OPA available via --policy rego, not cron default)",
+    "Layer_3_verify": "Z3 available \u2014 formal artifact verification via CLI/benchmark (5 adversarial scenarios, 100%); NOT exercised per-event in batch audit",
+    "Audit_Chain": "INTACT (147 entries)"
+  },
+  "differentiator": "Others record what AI does. We prove it was correct."
+}
