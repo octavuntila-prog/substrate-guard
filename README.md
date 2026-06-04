@@ -17,7 +17,7 @@ One command: `substrate-guard` (also `ai-blackbox`). Z3 workflows use `verify` /
 
 substrate-guard is a 6-layer verification architecture that observes, decides, proves, and audits every action taken by autonomous AI agents — in real time, with cryptographic evidence.
 
-Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current version v13.4.0 (released May 18, 2026). The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
+Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current version v13.4.1 (released June 2, 2026). The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
 
 ## Production Results (verified May 27, 2026)
 
@@ -125,20 +125,20 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**L1**: Mock tracer; real eBPF kernel hooks designed but not production-wired (#38b deferred). **L2-L3**: Deployed in production (Research server, v13.4.0 cron audit pipeline).
+**L1**: The production cron is a batch-DB audit — correctly mock (it replays database records; no live process to observe). Real eBPF kernel hooks are wired in the separate live-monitor path (`monitor --live`), just not in the cron (#38b). **L2-L3**: Deployed in production (Research server, v13.4.1 cron audit pipeline).
 **L4-L6**: Prototyped with tests. Code exists, validated, not yet in production pipeline.
 
 ## How It Works
 
-**Observe (L1):** Mock tracer in current production deployment. eBPF kernel hooks are designed but not wired to the autonomous cron path (#38b deferred). Real kernel instrumentation has been tested locally during development.
+**Observe (L1):** The production cron is a batch-DB audit — it replays database records, so it correctly uses a mock tracer (no live process to observe). Real eBPF kernel observation is wired in the separate live-monitor path (`monitor --live`), not the cron (#38b). On the Research server, the live path currently falls back to mock — kernel headers are not installed, and there is no production driver for live observation there.
 
-**Decide (L2):** OPA/Rego policies evaluate each action against declarative rules. 80 policy tests cover authorization, rate limiting, data access, and behavioral constraints.
+**Decide (L2):** Built-in Python policy rules evaluate each action (OPA/Rego available via `--policy rego`, not the cron default). 80 policy tests cover authorization, rate limiting, data access, and behavioral constraints.
 
-**Prove (L3):** Z3 SMT solver generates formal mathematical proofs that agent behavior satisfies safety invariants. Not statistical confidence — mathematical certainty.
+**Prove (L3):** Z3 SMT solver generates formal mathematical proofs that AI-generated artifacts (code, tool APIs, CLI commands) satisfy safety invariants — mathematical certainty, not statistical confidence. Exercised via the CLI verifier and benchmark scenarios (not per-event in the batch cron audit).
 
 **Chain:** Every event is recorded in an HMAC-SHA256 tamper-evident chain. Each entry references the hash of the previous entry. Any modification breaks the chain — detectable instantly. Formal verification outcomes (`verify_artifact` / `session.verify`) append **`formal_verification`** entries with **`counterexample`** when a command or artifact is rejected, so audit exports retain *why* a check failed, not only that it failed.
 
-**Audit:** Daily automated cron audit (04:00 UTC on Research server, currently v13.4.0) verifies chain integrity, counts violations, measures latency, and exports compliance reports. M0.7 baseline window: 7/7 verified (May 19–25, 2026).
+**Audit:** Daily automated cron audit (04:00 UTC on Research server, currently v13.4.1) verifies chain integrity, counts violations, measures latency, and exports compliance reports. M0.7 baseline window: 7/7 verified (May 19–25, 2026).
 
 ## Codebase
 
@@ -263,7 +263,7 @@ What is **fully functional without Linux eBPF** vs. what needs a **real kernel /
 
 ## Production Deployment
 
-substrate-guard (this repository) runs on the **Research server** (89.167.66.225) — v13.4.0 deployed May 18, 2026. Daily automated cron audit at 04:00 UTC. M0.7 baseline window: 7/7 verified (May 19–25, 2026); zero missed cycles since v13.4.0 deployment.
+substrate-guard (this repository) runs on the **Research server** (89.167.66.225) — currently v13.4.1 (v13.4.0 deployed May 18, 2026; v13.4.1 patch June 2). Daily automated cron audit at 04:00 UTC. M0.7 baseline window: 7/7 verified (May 19–25, 2026); zero missed cycles since the May 18 deployment.
 
 ### Related Projects
 
