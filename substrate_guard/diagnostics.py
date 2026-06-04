@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -44,10 +45,21 @@ def run_doctor(json_output: bool = False) -> int:
 
     try:
         from bcc import BPF  # noqa: F401
-
-        _line("bcc (eBPF)", True, "import ok (needs Linux+root at runtime for L1)")
+        bcc_import_ok, bcc_err = True, ""
     except Exception as e:
-        _line("bcc (eBPF)", False, str(e)[:70])
+        bcc_import_ok, bcc_err = False, str(e)[:70]
+
+    # Import alone over-claims: bcc compiles agent_trace.c at runtime (LLVM),
+    # which needs kernel headers. Missing headers => eBPF cannot compile and
+    # the live path falls back to mock (validated 3 Jun on Research server).
+    if not bcc_import_ok:
+        _line("bcc (eBPF)", False, bcc_err)
+    elif not sys.platform.startswith("linux"):
+        _line("bcc (eBPF)", True, "import ok; eBPF needs Linux (mock on this platform)")
+    elif Path(f"/lib/modules/{os.uname().release}/build").exists():
+        _line("bcc (eBPF)", True, "import + kernel headers ok (real eBPF can compile)")
+    else:
+        _line("bcc (eBPF)", False, "import ok BUT kernel headers MISSING -> eBPF cannot compile; live path falls back to mock")
 
     for name, mod in (
         ("psycopg2 (Postgres CI)", "psycopg2"),
