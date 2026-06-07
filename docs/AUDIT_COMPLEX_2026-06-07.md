@@ -340,3 +340,15 @@ non-membership"; threshold/encoder caveats).
 paper title "ZK Proofs of Semantic Non-Membership"; `certificate_hash` → a keyed MAC; a
 soundness bound for the threshold; a semantic default encoder. The deep redesign (separate
 prover/verifier, a real ZK circuit) is out of scope for the prototype.
+
+## Residual-fix pass (2026-06-07, later)
+The honest residuals listed above were then attacked directly:
+- `f5c1b9e` tool_verifier: Z3 `unknown` now fails closed (not SAFE).
+- `cbcdf24` code_verifier: division by zero is reported as a violation (was uninterpreted by Z3).
+- `abaca14` chain: denormalized `event_type`/`agent_id` bound to the hashed `event_data`.
+- `6f3029b` comply: optional keyed HMAC MAC for the certificate (was an unkeyed self-checksum).
+
+**Still open (out of scope / external):** the `ZK-SNM` naming + the cited paper title (an
+external publication — the user's call); the threshold soundness bound and the non-semantic
+default encoder (inherent prototype limitations, honestly documented); L5 attest / L6 offline
+(not deeply audited this round). Full suite: 439 passed, 7 skipped.
