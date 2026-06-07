@@ -1,4 +1,10 @@
-"""ZK-SNM-style protocol: commit corpus embeddings, verify query non-membership."""
+"""Threshold semantic non-membership over a binding Merkle commitment.
+
+Branded "ZK-SNM" but NOT zero-knowledge: the verifier operates on cleartext
+embeddings (true ZK privacy would need a circuit backend — future work). Soundness
+is threshold-heuristic and encoder-dependent, not a cryptographic non-membership
+proof. See docs/AUDIT_COMPLEX_2026-06-07.md Part 3.
+"""
 
 from __future__ import annotations
 
@@ -26,6 +32,7 @@ class ZKSNMProtocol:
         self.verifier = NonMembershipVerifier(threshold=threshold)
         self.use_z3 = use_z3
         self._committed = False
+        self._committed_root: str | None = None
 
     def commit_training_data(self, documents: List[str]) -> dict[str, Any]:
         embeddings = self.fingerprinter.fingerprint_batch(documents)
@@ -35,6 +42,7 @@ class ZKSNMProtocol:
             self.commitment.add_embedding(row, doc_hash=dh)
         root = self.commitment.commit()
         self._committed = True
+        self._committed_root = root
         return {
             "phase": "commit",
             "commitment_root": root,
@@ -46,6 +54,17 @@ class ZKSNMProtocol:
     def verify_non_membership(self, query_document: str) -> dict[str, Any]:
         if not self._committed:
             raise RuntimeError("No training data committed. Call commit_training_data first.")
+
+        # Bind the verification to the committed corpus: the root recomputed from the
+        # embeddings actually being checked must equal the published commitment root.
+        # Otherwise a prover could commit corpus A, advertise its root, then verify
+        # against a different (e.g. empty) embedding set. (Single-process prototype:
+        # this binds at the API level, not against code mutating internals directly.)
+        if self.commitment.commit() != self._committed_root:
+            raise RuntimeError(
+                "Commitment binding failed: the embeddings being verified do not "
+                "match the published commitment root."
+            )
 
         query_emb = self.fingerprinter.fingerprint(query_document)
         committed = self.commitment.embeddings
@@ -70,8 +89,12 @@ class ZKSNMProtocol:
             "result": result,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "note": (
-                "Verification: numpy cosine + optional Z3 integer check. "
-                "True ZK privacy would need a circuit backend (future work)."
+                f"Threshold (cosine >= {self.verifier.threshold}) semantic "
+                "non-membership over a binding Merkle commitment. NOT zero-knowledge: "
+                "the verifier operates on cleartext embeddings (true ZK privacy needs "
+                "a circuit backend, future work). The Z3 step is a redundant integer "
+                "re-check, not an independent proof. certificate_hash is an unkeyed "
+                "integrity checksum, not a tamper-proof MAC."
             ),
         }
         cert_hash = hashlib.sha256(

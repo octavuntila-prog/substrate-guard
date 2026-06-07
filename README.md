@@ -116,7 +116,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 │  L1  eBPF         OBSERVE   Mock tracer (kernel hooks: #38b)│  ← Mock
 │  L2  OPA/Rego     DECIDE    Declarative policy enforcement  │  ← Deployed
 │  L3  Z3 SMT       PROVE     Bounded SMT verification        │  ← Deployed
-│  L4  ZK-SNM       COMPLY    Zero-knowledge compliance       │  ← Prototyped
+│  L4  ZK-SNM       COMPLY    Semantic non-membership         │  ← Prototyped
 │  L5  Ed25519      ATTEST    Cryptographic attestation        │  ← Prototyped
 │  L6  SQLite+CRDT  OFFLINE   Offline verification & sync     │  ← Prototyped
 │                                                             │

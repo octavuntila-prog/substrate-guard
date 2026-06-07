@@ -66,7 +66,15 @@ class NonMembershipVerifier:
         query_embedding: np.ndarray,
         committed_embeddings: List[np.ndarray],
     ) -> dict[str, Any]:
-        """Re-check dot(query, emb) < threshold using Z3 on scaled integers (constants only)."""
+        """Redundantly re-evaluate the NumPy dot products as scaled integers.
+
+        NOTE: this is NOT an independent SMT decision. The dot products are computed
+        in NumPy/Python and injected as Z3 IntVal CONSTANTS; the solver is asked
+        whether ``IntVal(dot) >= IntVal(thr)`` — an expression with no free variables,
+        so sat/unsat is a fixed evaluation of ``dot >= thr`` that Z3 cannot use to
+        catch any error in the NumPy computation. The verdict (``verified``) is
+        decided entirely by ``verify()`` above; this is a deterministic re-check.
+        """
         numpy_result = self.verify(query_embedding, committed_embeddings)
         try:
             import z3
@@ -96,6 +104,10 @@ class NonMembershipVerifier:
             "z3_violation_indices": z3_sat_violations,
             "z3_confirmed": z3_matches_numpy and len(z3_sat_violations) == len(
                 numpy_result.get("violations", [])
+            ),
+            "z3_note": (
+                "redundant deterministic re-evaluation of NumPy dot products as "
+                "integer constants; not an independent SMT decision (no free variables)"
             ),
             "backend": "numpy_cosine+z3_int",
             "time_ms": round(numpy_result["time_ms"] + extra_ms, 2),

@@ -58,3 +58,18 @@ def test_protocol_with_z3():
     assert "result" in cert
     res = cert["result"]
     assert "z3_confirmed" in res or res.get("z3_skipped") is True
+
+
+def test_commitment_binding_detects_corpus_swap():
+    """verify_non_membership must reject when the embeddings being checked no longer
+    match the committed root (a prover advertising corpus A's root but verifying a
+    different set). Confirmed-critical in docs/AUDIT_COMPLEX_2026-06-07.md Part 3."""
+    import numpy as np
+
+    fp = DeterministicFingerprinter()
+    p = ZKSNMProtocol(threshold=0.85, use_z3=False, fingerprinter=fp)
+    p.commit_training_data(["corpus-A-doc1", "corpus-A-doc2"])
+    # Tamper: change the committed embedding set after commit (resets the cached root).
+    p.commitment.add_embedding(np.zeros(384, dtype=np.float32))
+    with pytest.raises(RuntimeError, match="binding"):
+        p.verify_non_membership("any-query")
