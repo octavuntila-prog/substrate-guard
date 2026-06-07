@@ -7,7 +7,10 @@ import os
 from pathlib import Path
 
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+    Ed25519PrivateKey,
+    Ed25519PublicKey,
+)
 
 
 class DeviceKey:
@@ -71,6 +74,21 @@ class DeviceKey:
             return False
         try:
             self._verify_key.verify(signature, data)
+            return True
+        except Exception:
+            return False
+
+    @staticmethod
+    def verify_with_public_key(public_key_hex: str, data: bytes, signature: bytes) -> bool:
+        """Verify a signature against an arbitrary raw Ed25519 public key (hex).
+
+        Used to check a self-signed certificate against the key it embeds, rather
+        than against a fixed local key (which would accept any identity that fixed
+        key chose to sign).
+        """
+        try:
+            verifier = Ed25519PublicKey.from_public_bytes(bytes.fromhex(public_key_hex))
+            verifier.verify(signature, data)
             return True
         except Exception:
             return False

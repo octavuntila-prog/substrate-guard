@@ -75,14 +75,24 @@ class LocalCA:
         return self._current_cert
 
     def verify_cert(self, cert: dict[str, Any]) -> bool:
-        """Verify certificate signature (non-mutating)."""
+        """Verify a self-signed certificate against the key it embeds.
+
+        The signature must verify against the cert's OWN ``public_key`` — NOT
+        against ``self.device_key``. Verifying with the local key would accept
+        any ``public_key`` / ``device_id`` this CA's key chose to sign, i.e. an
+        identity spoof. (This remains self-attestation: there is no independent
+        root of trust binding ``device_id`` to a key — see
+        docs/AUDIT_COMPLEX_2026-06-07.md.)
+        """
+        from .device_key import DeviceKey
+
         c = dict(cert)
         sig_hex = c.pop("signature", None)
-        if not sig_hex:
+        pk_hex = c.get("public_key")
+        if not sig_hex or not pk_hex:
             return False
         payload = json.dumps(c, sort_keys=True).encode()
-        ok = self.device_key.verify(payload, bytes.fromhex(sig_hex))
-        return ok
+        return DeviceKey.verify_with_public_key(pk_hex, payload, bytes.fromhex(sig_hex))
 
     def attestation(self) -> dict[str, Any]:
         cert = self.current
