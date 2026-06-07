@@ -155,6 +155,24 @@ class TestChainExport:
         finally:
             os.unlink(path)
 
+    def test_export_denormalized_agent_id_tamper_fails(self):
+        """Mutating the denormalized agent_id on an exported entry (without touching
+        the hashed event_data) must be rejected -- the field is bound to event_data."""
+        chain = AuditChain(secret=SECRET)
+        chain.append({"type": "test", "agent_id": "real-agent", "x": 1})
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+            path = f.name
+        try:
+            chain.export(path)
+            data = json.loads(open(path).read())
+            data["entries"][0]["agent_id"] = "victim-agent"  # flip only the copy
+            open(path, "w").write(json.dumps(data))
+            ok, reason = AuditChain.verify_export(path, secret=SECRET)
+            assert ok is False
+            assert "agent_id" in reason.lower()
+        finally:
+            os.unlink(path)
+
     def test_wrong_secret_fails(self):
         chain = AuditChain(secret=SECRET)
         chain.append({"type": "test", "agent_id": "a1"})

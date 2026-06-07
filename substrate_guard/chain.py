@@ -185,7 +185,14 @@ class AuditChain:
                 return False, entry.index
             if entry.prev_hash != prev_hash:
                 return False, entry.index
-            
+            # Denormalized event_type/agent_id are not covered by the hash; require
+            # them to match the authenticated event_data so a tampered copy is caught.
+            if entry.agent_id != entry.event_data.get("agent_id", "unknown"):
+                return False, entry.index
+            _t = entry.event_data.get("type")
+            if _t is not None and entry.event_type != _t:
+                return False, entry.index
+
             prev_hash = entry.hash
 
         return True, None
@@ -258,6 +265,14 @@ class AuditChain:
                     f"Non-sequential index at position {expected_index} "
                     f"(got {entry_data['index']})"
                 )
+            # Denormalized event_type/agent_id are not in the hash; bind them to the
+            # authenticated event_data so a tampered copy is rejected.
+            ev_data = entry_data["event_data"]
+            if entry_data.get("agent_id", "unknown") != ev_data.get("agent_id", "unknown"):
+                return False, f"agent_id inconsistent with event_data at index {entry_data['index']}"
+            _t = ev_data.get("type")
+            if _t is not None and entry_data.get("event_type") != _t:
+                return False, f"event_type inconsistent with event_data at index {entry_data['index']}"
 
             prev_hash = entry_data["hash"]
             chain._head_hash = entry_data["hash"]
