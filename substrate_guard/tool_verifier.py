@@ -26,6 +26,7 @@ from z3 import (
     Contains,
     If,
     Int,
+    IntToStr,
     IntVal,
     Length,
     Not,
@@ -195,6 +196,19 @@ class ToolVerifier:
     ) -> ToolSafetyResult:
         """Verify tool against all forbidden patterns."""
         t0 = time.time()
+
+        # Without an operation_template we cannot model how parameters become an
+        # operation, so a SAFE/UNSAFE verdict would carry no meaning — abstain.
+        if not tool.operation_template:
+            return ToolSafetyResult(
+                status=ToolSafetyStatus.UNKNOWN,
+                tool_name=tool.name,
+                checks_passed=0,
+                checks_total=len(forbidden),
+                violations=[],
+                time_ms=(time.time() - t0) * 1000,
+            )
+
         violations = []
         checks_passed = 0
 
@@ -289,46 +303,65 @@ class ToolVerifier:
         z3_params: dict,
         pattern: ForbiddenPattern,
     ) -> Any:
-        """Build Z3 formula that is SAT iff the pattern can be triggered.
+        """Build a Z3 formula that is SAT iff some parameter assignment makes the
+        CONSTRUCTED operation contain a forbidden substring.
 
-        Strategy: For tools with enum params that construct operations,
-        we check if any enum value combination produces a dangerous operation.
-        For tools with string params, we use Z3 string containment.
+        This models ``tool.operation_template`` — the piece the original version
+        ignored. The old code checked whether a parameter VALUE contained a
+        keyword, which (a) flagged every tool with a free string param UNSAFE on
+        every pattern, and (b) certified a dangerous literal template such as
+        ``rm -rf /{mode}`` SAFE because the keyword was in the template, not a
+        param. We now substitute the symbolic params into the template and ask
+        whether the resulting operation string can contain any forbidden keyword.
         """
-        conditions = []
-
-        # Parse the pattern condition into checks
-        # Format: "operation contains 'X' or 'Y'"
-        cond = pattern.condition.lower()
-
-        # Check each param against dangerous patterns
-        for param in tool.params:
-            p_info = z3_params.get(param.name)
-            if not p_info:
-                continue
-
-            if p_info["type"] == "enum":
-                # Check if any enum value matches dangerous patterns
-                danger_keywords = self._extract_keywords(pattern.condition)
-                for kw in danger_keywords:
-                    for i, val in enumerate(param.enum_values):
-                        if kw.lower() in val.lower():
-                            conditions.append(p_info["var"] == i)
-
-            elif p_info["type"] == "string":
-                danger_keywords = self._extract_keywords(pattern.condition)
-                for kw in danger_keywords:
-                    conditions.append(Contains(p_info["var"], StringVal(kw)))
-
-            elif p_info["type"] == "bool":
-                # Check if enabling this bool triggers danger
-                if param.name.lower() in cond:
-                    conditions.append(p_info["var"] == True)
-
-        if not conditions:
+        keywords = self._extract_keywords(pattern.condition)
+        if not keywords:
             return None
+        operation = self._build_operation_string(tool, z3_params)
+        if operation is None:  # no template -> caller abstains (UNKNOWN)
+            return None
+        return Or(*[Contains(operation, StringVal(kw)) for kw in keywords])
 
-        return Or(*conditions)
+    def _build_operation_string(self, tool: ToolDefinition, z3_params: dict) -> Any:
+        """Build the operation as a Z3 string by substituting each parameter's
+        symbolic value into ``operation_template``.
+
+        Placeholders are ``{name}`` or ``${name}``. Returns ``None`` when the tool
+        has no template (the operation cannot be modeled).
+        """
+        if not tool.operation_template:
+            return None
+        template = tool.operation_template
+        parts: list[Any] = []
+        pos = 0
+        for m in re.finditer(r"\$?\{(\w+)\}", template):
+            literal = template[pos:m.start()]
+            if literal:
+                parts.append(StringVal(literal))
+            p_info = z3_params.get(m.group(1))
+            if p_info is None:
+                parts.append(StringVal(""))
+            elif p_info["type"] == "string":
+                parts.append(p_info["var"])  # attacker-controlled symbolic string
+            elif p_info["type"] == "enum":
+                vals = p_info["values"]
+                expr = StringVal(vals[-1])
+                for i in range(len(vals) - 1):
+                    expr = If(p_info["var"] == i, StringVal(vals[i]), expr)
+                parts.append(expr)
+            elif p_info["type"] == "int":
+                parts.append(IntToStr(p_info["var"]))  # decimal rendering
+            else:  # bool / unknown: does not render a keyword into the op
+                parts.append(StringVal(""))
+            pos = m.end()
+        if template[pos:]:
+            parts.append(StringVal(template[pos:]))
+        if not parts:
+            return StringVal(template)
+        op = parts[0]
+        for p in parts[1:]:
+            op = Concat(op, p)
+        return op
 
     def _extract_keywords(self, condition: str) -> list[str]:
         """Extract quoted keywords from pattern condition."""
