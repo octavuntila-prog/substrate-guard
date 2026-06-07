@@ -55,3 +55,30 @@ def test_verify_cert_rejects_foreign_key_signed_by_local(tmp_path):
     assert lca.verify_cert(spoof) is False
     # Sanity: a genuine cert (claims + signed by dk) still verifies.
     assert lca.verify_cert(dict(lca.current)) is True
+
+
+def test_verify_cert_rejects_mismatched_device_id(tmp_path):
+    """A cert signed by its OWN embedded key but claiming a device_id that is not
+    the key's fingerprint must be rejected. Otherwise any keypair holder can mint a
+    cert claiming an arbitrary identity (the signature verifies against their own
+    key). Residual found by the adversarial verification of commit 6d02143."""
+    dk = DeviceKey(key_dir=tmp_path / "k")
+    lca = LocalCA(dk, ca_dir=tmp_path / "c")
+    attacker = DeviceKey(key_dir=tmp_path / "atk")
+
+    cert_data = {
+        "version": 1,
+        "device_id": "aaaaaaaaaaaaaaaa",  # NOT sha256(attacker.public_key)[:16]
+        "public_key": attacker.public_key_hex,
+        "issued_at": "2026-06-07T00:00:00+00:00",
+        "expires_at": "2099-01-01T00:00:00+00:00",
+        "issuer": "substrate-guard-local-ca",
+        "serial": "deadbeefdeadbeef",
+    }
+    payload = json.dumps(cert_data, sort_keys=True).encode()
+    spoof = {**cert_data, "signature": attacker.sign(payload).hex()}
+
+    # Signature verifies against the embedded key, but device_id is forged.
+    assert lca.verify_cert(spoof) is False
+    # Sanity: a genuine cert (device_id == key fingerprint) still verifies.
+    assert lca.verify_cert(dict(lca.current)) is True

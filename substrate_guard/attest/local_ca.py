@@ -80,9 +80,11 @@ class LocalCA:
         The signature must verify against the cert's OWN ``public_key`` — NOT
         against ``self.device_key``. Verifying with the local key would accept
         any ``public_key`` / ``device_id`` this CA's key chose to sign, i.e. an
-        identity spoof. (This remains self-attestation: there is no independent
-        root of trust binding ``device_id`` to a key — see
-        docs/AUDIT_COMPLEX_2026-06-07.md.)
+        identity spoof. The claimed ``device_id`` is additionally bound to the
+        embedded key — it must equal the key's fingerprint — so a cert cannot
+        claim an identity that does not match its own key. (This remains
+        self-attestation: there is no external root binding the key to a physical
+        device — see docs/AUDIT_COMPLEX_2026-06-07.md.)
         """
         from .device_key import DeviceKey
 
@@ -90,6 +92,16 @@ class LocalCA:
         sig_hex = c.pop("signature", None)
         pk_hex = c.get("public_key")
         if not sig_hex or not pk_hex:
+            return False
+        # Bind the claimed identity to the key: device_id MUST equal the embedded
+        # key's fingerprint. Without this, an attacker holding ANY valid keypair
+        # could self-sign a cert claiming an arbitrary device_id and have it
+        # accepted (the signature verifies against their own embedded key).
+        try:
+            expected_id = hashlib.sha256(bytes.fromhex(pk_hex)).hexdigest()[:16]
+        except ValueError:
+            return False
+        if c.get("device_id") != expected_id:
             return False
         payload = json.dumps(c, sort_keys=True).encode()
         return DeviceKey.verify_with_public_key(pk_hex, payload, bytes.fromhex(sig_hex))
