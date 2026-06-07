@@ -5,10 +5,12 @@ SMT result (no counterexample found within the modeled fragment) or a concrete
 counterexample.
 
 This is NOT testing. Testing checks specific inputs. Within the modeled fragment
-(integer/linear arithmetic; no loops; non-negative floor-div/mod), it checks all
-inputs satisfying preconditions. Constructs outside the fragment are currently
-skipped rather than rejected, so a VERIFIED result is NOT a universal guarantee —
-see docs/AUDIT_COMPLEX_2026-06-07.md (P0).
+(integer/linear arithmetic; floored div/mod with correct sign semantics; no loops),
+it checks ALL inputs satisfying preconditions, and a division-by-zero is reported as
+a violation. Constructs OUTSIDE the fragment (loops, side-effecting calls, partial
+control flow, real-operand div/mod, ...) are recorded and force an abstain (UNKNOWN),
+so VERIFIED is returned ONLY when the whole function was faithfully modeled — see
+docs/AUDIT_COMPLEX_2026-06-07.md (P0).
 """
 
 import ast
@@ -17,7 +19,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from z3 import And, Not, Solver, sat, unsat
+from z3 import And, Not, Or, Solver, sat, unsat
 
 from .ast_translator import ASTTranslator, TranslationError, TranslationResult
 
@@ -170,9 +172,13 @@ class CodeVerifier:
             if precond:
                 solver.add(And(*precond))
 
-            # At least one postcondition is violated
+            # A violation is: at least one postcondition is violated, OR the function
+            # divides by zero (Python raises ZeroDivisionError, so it does not satisfy
+            # the spec for all inputs; Z3 otherwise leaves x/0 unconstrained and could
+            # report a spurious VERIFIED).
+            div_by_zero = [d == 0 for d in translation.nonzero_divisors]
             if postcond:
-                solver.add(Not(And(*postcond)))
+                solver.add(Or(Not(And(*postcond)), *div_by_zero))
             else:
                 return VerificationResult(
                     status=VerificationStatus.TRANSLATION_ERROR,

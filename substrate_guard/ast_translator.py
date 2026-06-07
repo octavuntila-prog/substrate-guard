@@ -57,6 +57,7 @@ class TranslationResult:
     path_conditions: list  # conditions under which each return is reached
     constraints: list  # additional constraints from assignments
     unsupported: list[str]  # warnings about unsupported constructs
+    nonzero_divisors: list = field(default_factory=list)  # divisors that must be != 0
 
 
 class ASTTranslator:
@@ -70,6 +71,7 @@ class ASTTranslator:
         self.variables: dict[str, Any] = {}  # current scope variables
         self.constraints: list = []
         self.unsupported: list[str] = []
+        self.nonzero_divisors: list = []  # divisors that must be proven != 0
         self._var_counter = 0
 
     def _fresh_var(self, base_name: str, sort: str = "int") -> Any:
@@ -107,6 +109,7 @@ class ASTTranslator:
             path_conditions=[],
             constraints=list(self.constraints),
             unsupported=list(self.unsupported),
+            nonzero_divisors=list(self.nonzero_divisors),
         )
 
     def _translate_params(self, func_def: ast.FunctionDef) -> dict:
@@ -410,6 +413,7 @@ class ASTTranslator:
             # Euclidean quotient down by one when the divisor is negative and the
             # remainder is non-zero, so the verdict is correct for every sign.
             if _is_int(left) and _is_int(right):
+                self.nonzero_divisors.append(right)
                 q = left / right
                 r = left % right
                 return If(And(right < 0, r != 0), q - 1, q)
@@ -419,6 +423,7 @@ class ASTTranslator:
             # always non-negative. Convert Euclidean r to Python's: r + divisor when
             # the divisor is negative and r is non-zero.
             if _is_int(left) and _is_int(right):
+                self.nonzero_divisors.append(right)
                 r = left % right
                 return If(And(right < 0, r != 0), r + right, r)
             raise TranslationError(None, "modulo modeled only for integer operands")

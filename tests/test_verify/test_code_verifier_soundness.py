@@ -66,6 +66,21 @@ def test_mod_negative_divisor_correct_semantics():
     assert not bad.verified, f"wrong mod spec wrongly accepted ({bad.status})"
 
 
+def test_division_by_zero_is_a_violation():
+    """A divisor that can be zero must be reported as a violation (Python raises
+    ZeroDivisionError), not silently VERIFIED via Z3's unconstrained x/0."""
+    src = "def f(x: int) -> int:\n    return 10 // x\n"
+    r = verify_code(src, Spec(postconditions=["__return__ >= -100"]))
+    assert not r.verified, f"div-by-zero wrongly VERIFIED ({r.status})"
+
+
+def test_division_safe_when_divisor_nonzero_by_precondition():
+    """When the precondition rules out a zero divisor, the function still verifies."""
+    src = "def g(x: int) -> int:\n    return 10 // x\n"
+    r = verify_code(src, Spec(preconditions=["x >= 1"], postconditions=["__return__ >= 0"]))
+    assert r.verified, f"safe division failed to VERIFY ({r.status})"
+
+
 def test_nested_conditional_return_does_not_verify():
     """A no-else `if` whose body returns on only SOME paths must force an abstain:
     the fall-through continuation (here `return -1`) was otherwise dropped, proving
