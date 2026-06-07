@@ -169,6 +169,47 @@ class TestChainExport:
         finally:
             os.unlink(path)
 
+    def test_export_reorder_fails(self):
+        """Reordering middle entries (head + count preserved, so chain_signature
+        still matches) must be rejected by the per-entry linkage walk."""
+        chain = AuditChain(secret=SECRET)
+        for i in range(4):
+            chain.append({"type": "test", "index": i, "agent_id": "a1"})
+
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+            path = f.name
+        try:
+            chain.export(path)
+            data = json.loads(open(path).read())
+            # swap two middle entries; last entry (head) and count unchanged
+            data["entries"][1], data["entries"][2] = data["entries"][2], data["entries"][1]
+            open(path, "w").write(json.dumps(data))
+            ok, reason = AuditChain.verify_export(path, secret=SECRET)
+            assert ok is False
+            assert "link" in reason.lower() or "index" in reason.lower()
+        finally:
+            os.unlink(path)
+
+    def test_export_delete_and_clone_fails(self):
+        """Deleting an entry and cloning another in its place (head + count
+        preserved) must be rejected by the per-entry linkage walk."""
+        chain = AuditChain(secret=SECRET)
+        for i in range(4):
+            chain.append({"type": "test", "index": i, "agent_id": "a1"})
+
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+            path = f.name
+        try:
+            chain.export(path)
+            data = json.loads(open(path).read())
+            # replace the entry at position 1 with a deep clone of position 0
+            data["entries"][1] = json.loads(json.dumps(data["entries"][0]))
+            open(path, "w").write(json.dumps(data))
+            ok, reason = AuditChain.verify_export(path, secret=SECRET)
+            assert ok is False
+        finally:
+            os.unlink(path)
+
     def test_export_format(self):
         chain = AuditChain(secret=SECRET)
         chain.append({"type": "test", "agent_id": "a1"})

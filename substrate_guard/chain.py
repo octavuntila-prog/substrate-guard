@@ -233,7 +233,8 @@ class AuditChain:
         chain = cls(secret=secret)
         
         entries = data.get("entries", [])
-        for entry_data in entries:
+        prev_hash = GENESIS_HASH
+        for expected_index, entry_data in enumerate(entries):
             # Rebuild chain entry by entry
             canonical = json.dumps(entry_data["event_data"], sort_keys=True, default=str)
             expected = chain._compute_hash(
@@ -244,7 +245,21 @@ class AuditChain:
             )
             if entry_data["hash"] != expected:
                 return False, f"Hash mismatch at index {entry_data['index']}"
-            
+            # Linkage + ordering: each entry must chain to the previous one and
+            # indices must be sequential. The chain_signature only binds the head
+            # hash and the count, so WITHOUT this per-entry walk an adversary
+            # holding only the exported JSON (no secret) could reorder middle
+            # entries or delete-and-clone one while keeping head/count intact and
+            # the file would still verify. Mirrors the in-memory verify() walk.
+            if entry_data["prev_hash"] != prev_hash:
+                return False, f"Broken chain link at index {entry_data['index']}"
+            if entry_data["index"] != expected_index:
+                return False, (
+                    f"Non-sequential index at position {expected_index} "
+                    f"(got {entry_data['index']})"
+                )
+
+            prev_hash = entry_data["hash"]
             chain._head_hash = entry_data["hash"]
             chain._entries.append(ChainEntry(**entry_data))
 
