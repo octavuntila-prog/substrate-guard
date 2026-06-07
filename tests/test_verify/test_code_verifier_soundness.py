@@ -44,3 +44,23 @@ def test_clean_function_still_verifies():
     )
     r = verify_code(src, Spec(preconditions=["x >= 0"], postconditions=["__return__ >= 0"]))
     assert r.verified, f"clean function failed to VERIFY (status={r.status})"
+
+
+def test_floordiv_negative_divisor_correct_semantics():
+    """Python floor division on a negative divisor must be modeled correctly:
+    7 // -2 == -4 (not Z3's Euclidean -3). The correct spec VERIFIES; the wrong one
+    is rejected. Before the fix this was inverted."""
+    src = "def f(x: int) -> int:\n    return x // -2\n"
+    ok = verify_code(src, Spec(preconditions=["x == 7"], postconditions=["__return__ == -4"]))
+    assert ok.verified, f"correct floor-div spec not VERIFIED ({ok.status})"
+    bad = verify_code(src, Spec(preconditions=["x == 7"], postconditions=["__return__ == -3"]))
+    assert not bad.verified, f"wrong floor-div spec wrongly accepted ({bad.status})"
+
+
+def test_mod_negative_divisor_correct_semantics():
+    """Python modulo takes the divisor's sign: 7 % -3 == -2 (not Z3's +1)."""
+    src = "def g(x: int) -> int:\n    return x % -3\n"
+    ok = verify_code(src, Spec(preconditions=["x == 7"], postconditions=["__return__ == -2"]))
+    assert ok.verified, f"correct mod spec not VERIFIED ({ok.status})"
+    bad = verify_code(src, Spec(preconditions=["x == 7"], postconditions=["__return__ == 1"]))
+    assert not bad.verified, f"wrong mod spec wrongly accepted ({bad.status})"

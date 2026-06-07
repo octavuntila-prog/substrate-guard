@@ -33,6 +33,11 @@ from z3 import (
 )
 
 
+def _is_int(x: Any) -> bool:
+    """True iff x is a Z3 integer-sorted expression (not Real or bool)."""
+    return isinstance(x, ArithRef) and x.is_int()
+
+
 class TranslationError(Exception):
     """Raised when AST contains unsupported constructs."""
 
@@ -372,10 +377,23 @@ class ASTTranslator:
         elif isinstance(op, ast.Mult):
             return left * right
         elif isinstance(op, ast.FloorDiv):
-            # Z3 integer division
-            return left / right
+            # Python floor division differs from Z3 integer (Euclidean) division on
+            # negative operands: Python 7 // -2 == -4 but Z3 7/-2 == -3. Adjust the
+            # Euclidean quotient down by one when the divisor is negative and the
+            # remainder is non-zero, so the verdict is correct for every sign.
+            if _is_int(left) and _is_int(right):
+                q = left / right
+                r = left % right
+                return If(And(right < 0, r != 0), q - 1, q)
+            raise TranslationError(None, "floor division modeled only for integer operands")
         elif isinstance(op, ast.Mod):
-            return left % right
+            # Python modulo takes the sign of the divisor; Z3's Euclidean mod is
+            # always non-negative. Convert Euclidean r to Python's: r + divisor when
+            # the divisor is negative and r is non-zero.
+            if _is_int(left) and _is_int(right):
+                r = left % right
+                return If(And(right < 0, r != 0), r + right, r)
+            raise TranslationError(None, "modulo modeled only for integer operands")
         elif isinstance(op, ast.Pow):
             # Limited: only integer exponents
             if isinstance(right, int) or (hasattr(right, "as_long") and right.is_int()):
