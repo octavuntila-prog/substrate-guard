@@ -274,3 +274,50 @@ real, wrapped in unsound failure-handling and overstated "mathematical certainty
   accurate** but the security-dimension framing was refuted by its verifier; the SAME issue was
   **confirmed** under the crypto dimension (HIGH, see local_store.py:23-24 above). Net: it is a real
   finding; only one of two duplicate framings was rejected.
+
+---
+
+# Part 3 — Remediation status (2026-06-07)
+
+All findings below were fixed verify-from-source and regression-tested (full suite **426 passed,
+7 skipped**). The remediation was then **adversarially re-verified** by a 13-agent pass that re-read
+each diff and attempted bypasses — which found 4 of the 10 first-round fixes were only *partial*; 3
+had real residuals (verify_cert `device_id`, code nested-if, hw `verify_equivalence`) and were
+subsequently **completed**. That honest second pass is why the table distinguishes "closed" from
+"closed after residual-fix".
+
+## Closed (verified)
+| Finding | Fix commit(s) | Status |
+|---------|---------------|--------|
+| **C1** `verify_export` forgeable without the key | `a8c877d` | CLOSED — per-entry linkage + index walk; reorder/delete-clone rejected |
+| **C2** ToolVerifier ignores `operation_template` | `1ca9751` | CLOSED — substitutes params into the template, checks the constructed operation |
+| **LocalCA identity spoof** | `6d02143` + `3a25bf7` | CLOSED — verifies the embedded key AND binds `device_id` to its fingerprint |
+| **code_verifier** drop→VERIFIED | `3b0d009` + `0a7fe02` | CLOSED — abstains on dropped constructs AND on conditional-return in if-without-else |
+| **distill_verifier** unknown→VALID + dropped exponent | `7e7e9de` | CLOSED — abstain → UNCHECKED/UNPARSEABLE; INCONCLUSIVE trace status |
+| **hw_verifier** silent-skip | `10ff211` + `3366b9d` | CLOSED — `verify()` AND `verify_equivalence()` abstain on unmodeled instructions |
+| **FloorDiv/Mod** negative-operand semantics | `8bd22c4` | CLOSED — Python floored semantics; exhaustively checked -12..12 |
+| **offline** hardcoded HMAC key | `3a864e7` | CLOSED — fail-loud; insecure default must be opted into |
+| **agent_id / timestamp overwrite** | `844fa8d` | CLOSED — defaults only when unset; provenance preserved |
+| **L3 "mathematical certainty" overclaims** | `6005c79` + drift-guard | scoped to bounded checking; `tests/test_integration/test_docs_drift_guard.py` fails the build on metric drift |
+| **tool_verifier stale module docstring** | (docs) | CLOSED — docstring now describes the implemented operation_template modeling |
+
+## Documented residuals (NOT closed — honest accounting)
+- **chain (low):** the denormalized `ChainEntry.event_type`/`agent_id` fields are not in the hash
+  payload (the `event_data` dict IS), so those two copies are mutable on an export without detection;
+  shared with in-memory `verify()`. Also: rollback/replay of an older fully-valid signed export is not
+  detectable (no freshness binding). Closing either needs a breaking hash/signature-format change.
+- **code_verifier (low):** division by zero is left uninterpreted by Z3 (pre-existing); a spurious
+  verdict is possible at `divisor == 0`.
+- **tool_verifier (disclosed):** a Z3 `unknown` result falls back to *safe*; a free-string parameter is
+  conservatively flagged UNSAFE on every pattern.
+- **distill_verifier (cosmetic/robustness):** `_verify_evaluation` maps Z3 `unknown` → INVALID (sound
+  over-reject, inconsistent with `_check_implication`); a pre-existing `AttributeError` on
+  `BooleanTrue/False` simplification is a robustness bug, not a false-ALL_VALID.
+- **L4 comply (ZK-SNM):** Merkle domain separation / non-membership / "fake Z3" gaps — a prototype layer,
+  audited next.
+
+## Process closure
+`tests/test_integration/test_docs_drift_guard.py` asserts the README production metrics, the package
+version, and the policy-rule count against their committed source-of-truth JSON (the smoke-audit /
+smoke-compliance artifacts) — closing the silent-regression channel (Recommendation #7) that allowed
+the original 79 / 0.54% / 0.14 ms headline drift.
