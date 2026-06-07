@@ -1,14 +1,17 @@
-"""Z3 Tool API Verifier — bounded parameter-value checking for AI agent tool definitions.
+"""Z3 Tool API Verifier — bounded operation-safety checking for AI agent tool definitions.
 
-Given a tool definition (name, parameters, allowed operations) and a set of
-forbidden operation patterns, checks whether a parameter VALUE can match a
-forbidden pattern. NOTE: it does not yet substitute parameters into
-operation_template, so the SAFE/UNSAFE verdict is not a proof over the
-constructed operation — see docs/AUDIT_COMPLEX_2026-06-07.md (P1).
+Given a tool definition (name, parameters, operation_template) and a set of
+forbidden operation patterns, substitutes the symbolic parameters into
+operation_template (enum -> If-chain, int -> IntToStr, string -> symbolic var)
+and checks via Z3 string theory whether the CONSTRUCTED operation can contain a
+forbidden substring for any admissible parameter assignment. A tool with no
+operation_template returns UNKNOWN (the operation cannot be modeled).
 
-The intended contribution is applying SMT to tool-API safety (Gap #1 in the
-paper); the current implementation is a bounded prototype pending the
-operation_template modeling noted above.
+Scope / soundness caveats (see docs/AUDIT_COMPLEX_2026-06-07.md): a free string
+parameter is conservatively flaggable (the attacker controls it); a Z3 `unknown`
+result currently falls back to safe; and the check is substring-based, not a full
+command-grammar parse. The intended contribution is applying SMT to tool-API safety
+(Gap #1 in the paper).
 """
 
 import json
