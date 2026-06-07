@@ -187,13 +187,31 @@ class CodeVerifier:
             elapsed = (time.time() - t0) * 1000
 
             if result == unsat:
-                # No violation exists → VERIFIED
+                # No violation exists in the modeled fragment. But if the
+                # translator had to DROP any construct (loops, side-effecting
+                # calls, complex targets, unknown statements), the solver proved a
+                # property about a strictly weaker model than the real function,
+                # so VERIFIED would be unsound. Abstain (UNKNOWN) instead — a sound
+                # verifier must never return VERIFIED when its model is weaker than
+                # reality on the property in question.
+                if translation.unsupported:
+                    return VerificationResult(
+                        status=VerificationStatus.UNKNOWN,
+                        function_name=func_name,
+                        spec_description=spec.description,
+                        time_ms=elapsed,
+                        warnings=translation.unsupported + [
+                            "Cannot return VERIFIED: the function contains "
+                            "constructs outside the modeled fragment (see above) — "
+                            "abstaining to stay sound."
+                        ],
+                    )
+                # No violation AND nothing dropped → VERIFIED
                 return VerificationResult(
                     status=VerificationStatus.VERIFIED,
                     function_name=func_name,
                     spec_description=spec.description,
                     time_ms=elapsed,
-                    warnings=translation.unsupported,
                 )
 
             elif result == sat:

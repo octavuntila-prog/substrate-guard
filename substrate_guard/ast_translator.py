@@ -242,7 +242,15 @@ class ASTTranslator:
             return None
 
         elif isinstance(stmt, ast.Expr):
-            # Expression statement (like a function call) - skip
+            # A bare expression statement. A string constant is a docstring and is
+            # safely ignored; anything else (e.g. a side-effecting call) is NOT
+            # modeled, so record it as unsupported — otherwise the verdict could
+            # silently prove a property about a function whose effects were dropped.
+            if not (isinstance(stmt.value, ast.Constant) and isinstance(stmt.value.value, str)):
+                self.unsupported.append(
+                    f"Line {stmt.lineno}: unmodeled expression statement "
+                    f"({type(stmt.value).__name__}) — effects dropped"
+                )
             return None
 
         elif isinstance(stmt, ast.Assert):
