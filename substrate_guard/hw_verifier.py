@@ -148,6 +148,7 @@ class RISCVSimulator:
         self.ecall_count = 0
         self.instruction_count = 0
         self.constraints: list = []
+        self.unsupported: list[str] = []
         self._step = 0
 
     def _reg_idx(self, name: str) -> int:
@@ -287,6 +288,11 @@ class RISCVSimulator:
                 "reg": parts[1],
                 "instruction": inst,
             })
+            if op.startswith("l"):
+                # Memory contents are not modeled, so the loaded value is unknown:
+                # havoc the destination register with a fresh unconstrained value
+                # instead of silently keeping its previous symbolic contents.
+                self._set_reg(parts[1], BitVec(f"load_{len(self.memory_accesses)}", BV_WIDTH))
 
         # System call
         elif op == "ecall":
@@ -297,8 +303,11 @@ class RISCVSimulator:
             pass
 
         else:
-            # Unknown instruction — skip with warning
-            pass
+            # Unknown / unmodeled instruction — including control-flow branches and
+            # jumps (beq/bne/blt/bge/j/jal/...), which this straight-line simulator
+            # does not model. Record it so verify() ABSTAINS instead of proving a
+            # property about a program whose effect here was silently dropped.
+            self.unsupported.append(f"unmodeled instruction: {inst}")
 
 
 class HardwareVerifier:
@@ -336,6 +345,17 @@ class HardwareVerifier:
                 status=HWVerifyStatus.PARSE_ERROR,
                 property_name=spec.description,
                 error=str(e),
+                time_ms=(time.time() - t0) * 1000,
+            )
+
+        # If the program used any construct this straight-line simulator cannot
+        # model (control-flow branches/jumps, unknown opcodes), the symbolic state
+        # is a weaker model than the real program — abstain instead of VERIFIED.
+        if sim.unsupported:
+            return HWVerifyResult(
+                status=HWVerifyStatus.UNKNOWN,
+                property_name=spec.description,
+                error="Abstaining: unmodeled instructions — " + "; ".join(sim.unsupported[:5]),
                 time_ms=(time.time() - t0) * 1000,
             )
 
