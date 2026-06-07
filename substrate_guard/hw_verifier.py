@@ -475,6 +475,19 @@ class HardwareVerifier:
                 time_ms=(time.time() - t0) * 1000,
             )
 
+        # Same soundness guard as verify(): if either sequence used a construct the
+        # simulator cannot model (control-flow branches/jumps, unknown opcodes), the
+        # symbolic state is weaker than reality — abstain instead of VERIFIED.
+        if sim_a.unsupported or sim_b.unsupported:
+            return HWVerifyResult(
+                status=HWVerifyStatus.UNKNOWN,
+                property_name="equivalence",
+                error="Abstaining: unmodeled instructions — " + "; ".join(
+                    (sim_a.unsupported + sim_b.unsupported)[:5]
+                ),
+                time_ms=(time.time() - t0) * 1000,
+            )
+
         idx = sim_a._reg_idx(output_reg)
         out_a = sim_a.regs[idx]
         out_b = sim_b.regs[idx]

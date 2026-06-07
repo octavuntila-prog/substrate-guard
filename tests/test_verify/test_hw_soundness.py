@@ -35,3 +35,15 @@ def test_clean_straightline_still_verifies():
     spec = HWSpec(postconditions={"a0": ("==", 7)}, description="a0 == 7")
     r = HardwareVerifier().verify(asm, spec)
     assert r.status == HWVerifyStatus.VERIFIED, f"clean program failed to VERIFY ({r.status})"
+
+
+def test_verify_equivalence_abstains_on_branch():
+    """verify_equivalence must apply the SAME abstain guard as verify(): if either
+    sequence uses a control-flow branch the simulator cannot model, it must not
+    return VERIFIED. asm_b branches over its body, so it is NOT equivalent to the
+    straight-line asm_a under real semantics. Residual found by the adversarial
+    verification of commit 10ff211."""
+    asm_a = "addi a0, zero, 99\n"
+    asm_b = "beq zero, zero, end\naddi a0, zero, 99\nend:\n"
+    r = HardwareVerifier().verify_equivalence(asm_a, asm_b, input_regs=[], output_reg="a0")
+    assert r.status != HWVerifyStatus.VERIFIED, f"branch-containing equivalence wrongly VERIFIED ({r.status})"
