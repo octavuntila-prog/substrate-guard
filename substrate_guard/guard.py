@@ -516,7 +516,11 @@ class GuardSession:
         Note: Does NOT add to tracer queue to avoid double-processing.
         The event goes directly through policy evaluation.
         """
-        event.agent_id = self.agent_id
+        # Only default the agent label when the event has none — do NOT overwrite
+        # the adapter-set per-agent id (the audit groups by it and the HMAC chain
+        # records it; overwriting collapsed unique_agents to 1 and erased attribution).
+        if getattr(event, "agent_id", None) in (None, "", "unknown"):
+            event.agent_id = self.agent_id
         # Add to tracer stream for observability, but drain queue to prevent
         # double-processing in process_events()
         if self._guard._tracer:

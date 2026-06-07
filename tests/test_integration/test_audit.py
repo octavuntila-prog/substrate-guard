@@ -219,6 +219,36 @@ class TestAuditPipeline:
         # Runs should be clean
         assert run_report.policy_violations == 0
 
+    def test_inject_preserves_agent_id_and_timestamp(self):
+        """The audit inject path must NOT overwrite the adapter-set per-agent id or
+        the historical DB timestamp. Overwriting collapsed unique_agents to 1 and
+        erased the exported chain's temporal provenance (the paper's headline
+        artifact). See docs/AUDIT_COMPLEX_2026-06-07.md."""
+        from substrate_guard.guard import Guard
+
+        all_events = []
+        for t in MOCK_TRACES:
+            all_events.extend(PipelineTraceAdapter.db_row_to_events(t))
+
+        # Snapshot what the adapter set, per event.
+        pre = [(e, e.agent_id, e.timestamp) for e in all_events]
+        pre_agents = {a for _, a, _ in pre}
+        assert len(pre_agents) > 1, f"fixture should have multiple agents, got {pre_agents}"
+        assert "unknown" not in pre_agents
+
+        guard = Guard(observe=True, policy="nonexistent/", verify=True, use_mock=True)
+        with guard.monitor("audit-full") as session:
+            for event in all_events:
+                session.inject_and_evaluate(event)
+
+        # Per-agent id and historical timestamp survive the inject pipeline.
+        for e, a0, t0 in pre:
+            assert e.agent_id == a0, f"agent_id overwritten: {a0!r} -> {e.agent_id!r}"
+            assert e.timestamp == t0, f"timestamp overwritten: {t0} -> {e.timestamp}"
+        post_agents = {e.agent_id for e in all_events}
+        assert post_agents == pre_agents
+        assert "audit-full" not in post_agents, "session label leaked into event agent_id"
+
     def test_large_scale_audit(self):
         """Simulate auditing 1,000 traces matching real schema."""
         from substrate_guard.integrations.vendor_bridge import VendorBridge

@@ -197,7 +197,11 @@ class AgentTracer:
 
     def inject_event(self, event: Event) -> None:
         """Manually inject an event (for testing or synthetic events)."""
-        event.timestamp = time.time()
+        # Only stamp events that have no time — do NOT overwrite the historical DB
+        # timestamp the cron adapters set (overwriting collapsed the exported chain's
+        # temporal provenance to the audit-run wall clock).
+        if not getattr(event, "timestamp", 0):
+            event.timestamp = time.time()
         self._stream.add(event)
         try:
             self._event_queue.put_nowait(event)
