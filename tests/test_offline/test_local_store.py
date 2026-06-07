@@ -4,7 +4,69 @@ from __future__ import annotations
 
 import json
 
-from substrate_guard.offline.local_store import GENESIS_PREV, LocalStore
+import pytest
+
+from substrate_guard.chain import ChainConfigError
+from substrate_guard.offline.local_store import (
+    GENESIS_PREV,
+    INSECURE_DEFAULT_HMAC_KEY,
+    LocalStore,
+)
+
+
+def test_no_key_no_env_raises(tmp_path, monkeypatch):
+    """No hmac_key, no env var, no opt-in → ChainConfigError (fail-loud).
+
+    Aligns LocalStore with the L4 AuditChain discipline (v13.4.0 Decision 1):
+    no silent fallback to a hardcoded, publicly-known default key.
+    """
+    monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+    with pytest.raises(ChainConfigError):
+        LocalStore(tmp_path / "x.db")
+
+
+def test_empty_key_raises(tmp_path, monkeypatch):
+    """hmac_key="" must not sneak past the truthy check → ChainConfigError."""
+    monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+    with pytest.raises(ChainConfigError):
+        LocalStore(tmp_path / "x.db", hmac_key="")
+
+
+def test_env_var_used_when_no_param(tmp_path, monkeypatch):
+    """GUARD_HMAC_SECRET env (unified with L4) is used when no param given.
+
+    Also verifies the stable env key still verifies the SAME DB after reopen —
+    the reason LocalStore's opt-in uses a stable key, not a random one.
+    """
+    monkeypatch.setenv("GUARD_HMAC_SECRET", "env-secret-key")
+    s = LocalStore(tmp_path / "x.db")
+    s.store_event("t", "L", {"a": 1})
+    assert s.verify_chain()["valid"]
+    s.close()
+    s2 = LocalStore(tmp_path / "x.db")
+    assert s2.verify_chain()["valid"]
+    s2.close()
+
+
+def test_allow_insecure_default_opt_in(tmp_path, monkeypatch):
+    """Explicit opt-in → constructs and produces a valid chain (demo path)."""
+    monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+    s = LocalStore(tmp_path / "x.db", allow_insecure_default=True)
+    s.store_event("t", "L", {"a": 1})
+    assert s.verify_chain()["valid"]
+    s.close()
+
+
+def test_insecure_default_is_the_known_dev_key(tmp_path, monkeypatch):
+    """Opt-in fallback uses the publicly-known dev key, not a random one."""
+    monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+    a = LocalStore(tmp_path / "a.db", allow_insecure_default=True)
+    b = LocalStore(tmp_path / "b.db", hmac_key=INSECURE_DEFAULT_HMAC_KEY)
+    ea = a.store_event("t", "L", {"z": 1})
+    eb = b.store_event("t", "L", {"z": 1})
+    assert ea["hmac_hash"] == eb["hmac_hash"]
+    a.close()
+    b.close()
 
 
 def test_store_and_verify_empty_ok(tmp_path):

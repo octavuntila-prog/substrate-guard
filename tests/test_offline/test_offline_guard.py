@@ -2,7 +2,37 @@
 
 from __future__ import annotations
 
+import pytest
+
+from substrate_guard.chain import ChainConfigError
 from substrate_guard.offline.offline_guard import OfflineGuard
+
+
+def test_no_hmac_key_raises(tmp_path, monkeypatch):
+    """No hmac_key in config and no env var, no opt-in → ChainConfigError.
+
+    OfflineGuard threads its LocalStore through the same L4 fail-loud
+    discipline (v13.4.0 Decision 1) — it must not silently fall back to a
+    publicly-known default key.
+    """
+    monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+    with pytest.raises(ChainConfigError):
+        OfflineGuard({"offline_db": str(tmp_path / "o.db")})
+
+
+def test_allow_insecure_default_opt_in(tmp_path, monkeypatch):
+    """Explicit allow_insecure_default in config → constructs (demo/testing)."""
+    monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+    g = OfflineGuard(
+        {
+            "offline_db": str(tmp_path / "o.db"),
+            "allow_insecure_default": True,
+        }
+    )
+    r = g.record("e", "L", {"x": 1})
+    assert r["mode"] == "offline"
+    assert g.chain_report()["events"] == 1
+    g.local.close()
 
 
 def test_record_goes_local_when_pg_down(tmp_path):
@@ -40,6 +70,7 @@ def test_record_remote_when_configured_and_pg_up(monkeypatch, tmp_path):
         {
             "offline_db": str(tmp_path / "o.db"),
             "remote_store": remote,
+            "hmac_key": "hk",
         }
     )
     r = g.record("e", "L", {"z": 3})

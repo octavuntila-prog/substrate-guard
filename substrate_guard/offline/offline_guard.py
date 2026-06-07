@@ -20,7 +20,11 @@ class OfflineGuard:
         db = config.get("offline_db")
         if not db:
             raise ValueError("offline_db path is required in config")
-        self.local = LocalStore(db_path=db, hmac_key=config.get("hmac_key"))
+        self.local = LocalStore(
+            db_path=db,
+            hmac_key=config.get("hmac_key"),
+            allow_insecure_default=config.get("allow_insecure_default", False),
+        )
         self.health = ConnectivityChecker(
             pg_host=config.get("pg_host", "127.0.0.1"),
             pg_port=int(config.get("pg_port", 1)),

@@ -5,27 +5,83 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import logging
 import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from ..chain import ChainConfigError
+
 GENESIS_PREV = "0" * 64
+
+# Publicly-known key used ONLY when the caller explicitly opts in via
+# ``allow_insecure_default=True`` (demo / testing). It is committed to source,
+# so anyone can forge the chain with it — it provides no tamper resistance and
+# must never be selected silently.
+INSECURE_DEFAULT_HMAC_KEY = "substrate-guard-default-dev-key"
+
+logger = logging.getLogger("substrate_guard.offline")
 
 
 class LocalStore:
     """WAL-mode SQLite for events when PostgreSQL / network is unavailable."""
 
-    def __init__(self, db_path: str | Path, hmac_key: str | bytes | None = None) -> None:
+    def __init__(
+        self,
+        db_path: str | Path,
+        hmac_key: str | bytes | None = None,
+        allow_insecure_default: bool = False,
+    ) -> None:
         self.db_path = Path(db_path)
+        self.hmac_key = self._resolve_hmac_key(hmac_key, allow_insecure_default)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        raw = hmac_key or os.environ.get("GUARD_HMAC_KEY", "substrate-guard-default-dev-key")
-        self.hmac_key = raw.encode() if isinstance(raw, str) else raw
         self.conn = __import__("sqlite3").connect(str(self.db_path))
         self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.execute("PRAGMA synchronous=NORMAL")
         self._init_schema()
+
+    @staticmethod
+    def _resolve_hmac_key(
+        hmac_key: str | bytes | None,
+        allow_insecure_default: bool,
+    ) -> bytes:
+        """Resolve the HMAC key, failing loud when none is configured.
+
+        Mirrors the L4 ``AuditChain`` discipline (v13.4.0 Decision 1): an
+        explicit key — ``hmac_key=`` parameter or the ``GUARD_HMAC_SECRET``
+        environment variable (unified with L4; was ``GUARD_HMAC_KEY``) — is
+        required, and the insecure fallback must be opted into rather than
+        applied silently behind a hardcoded default.
+
+        Unlike ``AuditChain`` — whose opt-in generates a *random* per-process
+        key — ``LocalStore`` persists events to SQLite and must verify the
+        same DB across process restarts, so a random key would render a
+        reopened store unverifiable. The opt-in here therefore selects a
+        *stable* but publicly-known dev key, clearly labelled insecure.
+
+        Raises:
+            ChainConfigError: If no key is available (neither parameter nor
+                ``GUARD_HMAC_SECRET`` env) and ``allow_insecure_default`` is
+                False (the default).
+        """
+        raw = hmac_key or os.environ.get("GUARD_HMAC_SECRET", "")
+        if not raw:
+            if not allow_insecure_default:
+                raise ChainConfigError(
+                    "LocalStore requires an HMAC key. Pass hmac_key=, set the "
+                    "GUARD_HMAC_SECRET environment variable, or pass "
+                    "allow_insecure_default=True (demo/testing only — uses a "
+                    "publicly-known key that provides no tamper resistance)."
+                )
+            logger.warning(
+                "LocalStore using the publicly-known insecure default HMAC "
+                "key — the offline audit chain is NOT tamper-evident. Set "
+                "GUARD_HMAC_SECRET or pass hmac_key= for any real use."
+            )
+            raw = INSECURE_DEFAULT_HMAC_KEY
+        return raw.encode() if isinstance(raw, str) else raw
 
     def _init_schema(self) -> None:
         self.conn.executescript(
