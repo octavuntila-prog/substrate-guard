@@ -344,9 +344,11 @@ class CLIVerifier:
     Z3 boolean formula: each pattern is a Bool that is True if the command matches.
     The command is SAFE iff no structural hit and no regex pattern matches.
 
-    While the regex matching is concrete (not symbolic), the Z3 encoding
-    gives us a formal proof structure: we can express the safety property
-    as a theorem and the verification as its proof.
+    The Z3 encoding only RECORDS the concrete pattern-match results (each
+    pattern Bool is set to its literal regex outcome); it performs no symbolic
+    reasoning over the command space and cannot change the regex+AST verdict.
+    Treat this as structural-AST + regex denylist matching, not an SMT proof —
+    see docs/AUDIT_COMPLEX_2026-06-07.md (P0/P4).
     """
 
     def __init__(self, patterns: list[dict] | None = None):

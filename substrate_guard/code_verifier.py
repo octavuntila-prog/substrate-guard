@@ -1,10 +1,14 @@
-"""Z3 Code Verifier — formal verification of LLM-generated functions.
+"""Z3 Code Verifier — bounded SMT checking of LLM-generated functions.
 
-Takes a Python function + specification (pre/post conditions)
-and returns a mathematical proof of correctness or a counterexample.
+Takes a Python function + specification (pre/post conditions) and returns an
+SMT result (no counterexample found within the modeled fragment) or a concrete
+counterexample.
 
-This is NOT testing. Testing checks specific inputs.
-This proves correctness for ALL possible inputs satisfying preconditions.
+This is NOT testing. Testing checks specific inputs. Within the modeled fragment
+(integer/linear arithmetic; no loops; non-negative floor-div/mod), it checks all
+inputs satisfying preconditions. Constructs outside the fragment are currently
+skipped rather than rejected, so a VERIFIED result is NOT a universal guarantee —
+see docs/AUDIT_COMPLEX_2026-06-07.md (P0).
 """
 
 import ast

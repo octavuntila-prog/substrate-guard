@@ -19,13 +19,13 @@ substrate-guard is a 6-layer verification architecture that observes, decides, p
 
 Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current version v13.4.1 (released June 2, 2026). The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
 
-## Production Results (verified May 27, 2026)
+## Production Results (v13.4.1 cron audit, 2026-06-02)
 
 | Metric | Value |
 |--------|-------|
-| Events processed | Mock observe + demo scenarios + cron audit (Research server) |
-| Violations detected | 79 (0.54%) |
-| Latency | 0.14ms/event |
+| Events processed | 147 (cron audit over platform-DB `agent_runs`, Research server) |
+| Violations detected | 0 (0.0%) — the audited agents are benign internal scanners; adversarial **detection** is demonstrated in [Benchmark Results](#benchmark-results) (Malicious 4/4, Prompt Injection 4/3) |
+| Latency | 3.41 ms/event (501 ms / 147 events) |
 | HMAC-SHA256 chain | Wired in v13.4.0 (cron path); per-run chain export, cryptographic verify_export |
 | Cron audits | M0.7 baseline window: 7/7 verified (May 19–25, 2026) |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
@@ -115,7 +115,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 │                                                             │
 │  L1  eBPF         OBSERVE   Mock tracer (kernel hooks: #38b)│  ← Mock
 │  L2  OPA/Rego     DECIDE    Declarative policy enforcement  │  ← Deployed
-│  L3  Z3 SMT       PROVE     Formal mathematical proofs      │  ← Deployed
+│  L3  Z3 SMT       PROVE     Bounded SMT verification        │  ← Deployed
 │  L4  ZK-SNM       COMPLY    Zero-knowledge compliance       │  ← Prototyped
 │  L5  Ed25519      ATTEST    Cryptographic attestation        │  ← Prototyped
 │  L6  SQLite+CRDT  OFFLINE   Offline verification & sync     │  ← Prototyped
@@ -134,7 +134,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 
 **Decide (L2):** Built-in Python policy rules evaluate each action (OPA/Rego available via `--policy rego`, not the cron default). 80 policy tests cover authorization, rate limiting, data access, and behavioral constraints.
 
-**Prove (L3):** Z3 SMT solver generates formal mathematical proofs that AI-generated artifacts (code, tool APIs, CLI commands) satisfy safety invariants — mathematical certainty, not statistical confidence. Exercised via the CLI verifier and benchmark scenarios (not per-event in the batch cron audit).
+**Prove (L3):** Z3 SMT solver checks AI-generated artifacts (code, tool APIs, CLI commands) against safety invariants within a bounded modeled fragment — sound on each verifier's declared subset, **not** a universal proof (constructs outside the subset are not yet rejected; see [docs/AUDIT_COMPLEX_2026-06-07.md](docs/AUDIT_COMPLEX_2026-06-07.md)). Exercised via the CLI verifier and benchmark scenarios (not per-event in the batch cron audit).
 
 **Chain:** Every event is recorded in an HMAC-SHA256 tamper-evident chain. Each entry references the hash of the previous entry. Any modification breaks the chain — detectable instantly. Formal verification outcomes (`verify_artifact` / `session.verify`) append **`formal_verification`** entries with **`counterexample`** when a command or artifact is rejected, so audit exports retain *why* a check failed, not only that it failed.
 
@@ -196,7 +196,7 @@ The broader SUBSTRATE ecosystem includes a separate production stack on the **CP
 | Code Generation | 4 | 0 | Correctly allowed |
 | Malicious Agent | 4 | 4 | Correctly blocked |
 | Prompt Injection | 4 | 3 | Correctly blocked |
-| Resource Abuse | 15 | 10 | Correctly allowed (within limits) |
+| Resource Abuse | 151 | 0 | Correctly allowed (rate/budget enforcement is dict-API only, not exercised on the observe path) |
 
 ## Compliance Exports
 

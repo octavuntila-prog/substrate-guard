@@ -1,4 +1,4 @@
-"""Z3 Hardware Verifier — formal verification for assembly-level AI outputs.
+"""Z3 Hardware Verifier — bounded symbolic checking of straight-line RV32I assembly.
 
 Domain 5 from S3's emergent discovery: AssemblyGuard, VerifyChain.
 Verifies that AI-generated assembly (RISC-V style) satisfies safety properties
@@ -8,8 +8,10 @@ Supported instruction subset (RISC-V RV32I):
   - Arithmetic: add, sub, mul, and, or, xor, sll, srl, sra
   - Immediate: addi, andi, ori, xori, slli, srli, srai
   - Comparison: slt, slti, sltu
-  - Memory: lw, sw (modeled abstractly)
-  - Branch: beq, bne, blt, bge (modeled as conditional paths)
+  - Memory: lw, sw (addresses modeled; stored VALUES not modeled)
+  - Branch: beq, bne, blt, bge (NOT yet implemented — control flow is dropped;
+    multi-path assembly is checked only along the straight-line path; see
+    docs/AUDIT_COMPLEX_2026-06-07.md (P0))
   - System: ecall (flagged as potentially dangerous)
 
 Properties we can verify:

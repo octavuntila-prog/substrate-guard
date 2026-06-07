@@ -114,14 +114,13 @@ class ComplianceExporter:
                 },
                 "CC8.1_change_management": {
                     "description": "The entity authorizes, designs, develops, configures, documents, tests, approves, and implements changes",
-                    "control": "Z3 SMT formal verification proves mathematical correctness of AI-generated code, tool APIs, CLI commands, hardware assembly, and distilled models",
+                    "control": "Z3 SMT verification checks AI-generated code, tool APIs, CLI commands, hardware assembly, and distilled models against safety specifications within a bounded modeled fragment (sound on each verifier's declared subset; Z3 available but NOT exercised per-event in the batch cron audit — #38b)",
                     "evidence": {
                         "verification_engine": "Z3 SMT Solver",
                         "domains_covered": ["code", "tool_api", "cli", "hardware_riscv", "distillation"],
                         "benchmark_scenarios": 5,
-                        "accuracy": "100%",
-                        "false_positives": 0,
-                        "false_negatives": 0,
+                        "benchmark_accuracy": "100% on the 5-scenario benchmark suite (design target, not a measured per-event control on this evidence set)",
+                        "scope_note": "Sound only within each verifier's modeled fragment; out-of-subset constructs are not exercised per-event in the batch cron (#38b). The CLI verifier maintains a documented known-gap inventory; false-positive/false-negative rates are not measured on this evidence set.",
                     },
                 },
                 "CC4.1_monitoring_controls": {
@@ -212,7 +211,7 @@ class ComplianceExporter:
                 },
                 "ai_system_lifecycle": {
                     "description": "Management of AI system throughout its lifecycle",
-                    "implementation": "Continuous monitoring via cron (daily 04:00 audit), real-time policy evaluation, formal verification of outputs",
+                    "implementation": "Daily batch cron audit (04:00 UTC) over platform-DB records; per-event built-in policy evaluation; Z3 formal verification available but not exercised per-event in the batch path (#38b)",
                     "evidence": {
                         "monitoring_frequency": "continuous + daily audit",
                         "total_events_evaluated": self._chain.length,

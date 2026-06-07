@@ -1,4 +1,4 @@
-"""Z3 Distillation Verifier — formal verification of reasoning post-compression.
+"""Z3 Distillation Verifier — bounded SMT checking of reasoning post-compression.
 
 Domain 3 from S3's emergent discovery: DistillCheck.
 Verifies that mathematical reasoning traces from distilled (smaller) models
@@ -6,7 +6,9 @@ preserve the correctness of the original (larger) model.
 
 The key insight: when you compress a 70B model to 7B, the model might
 produce plausible-looking reasoning that's mathematically wrong. Testing
-catches some errors; Z3 catches ALL errors within the supported domain.
+catches some errors; Z3 checks steps within the supported algebraic fragment.
+Steps it cannot faithfully encode (high-degree powers, non-linear, Z3-unknown)
+should abstain, not pass — see docs/AUDIT_COMPLEX_2026-06-07.md (P0).
 
 Approach:
 1. Parse reasoning trace into structured steps
