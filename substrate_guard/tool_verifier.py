@@ -2,16 +2,23 @@
 
 Given a tool definition (name, parameters, operation_template) and a set of
 forbidden operation patterns, substitutes the symbolic parameters into
-operation_template (enum -> If-chain, int -> IntToStr, string -> symbolic var)
-and checks via Z3 string theory whether the CONSTRUCTED operation can contain a
-forbidden substring for any admissible parameter assignment. A tool with no
-operation_template returns UNKNOWN (the operation cannot be modeled).
+operation_template (enum -> If-chain, int -> IntToStr, string -> attacker-controlled
+symbolic var) and checks via Z3 string theory whether the CONSTRUCTED operation can
+contain a forbidden substring for any admissible parameter assignment. A tool with no
+operation_template returns UNKNOWN — the operation cannot be modeled, so a SAFE/UNSAFE
+verdict would carry no meaning.
 
-Scope / soundness caveats (see docs/AUDIT_COMPLEX_2026-06-07.md): a free string
-parameter is conservatively flaggable (the attacker controls it); a Z3 `unknown`
-result currently falls back to safe; and the check is substring-based, not a full
-command-grammar parse. The intended contribution is applying SMT to tool-API safety
-(Gap #1 in the paper).
+Audit status (docs/AUDIT_COMPLEX_2026-06-07.md, P1): the core finding — that the
+verdict was not a proof over the constructed operation, because parameters were never
+substituted into operation_template — is now RESOLVED by the modeling above, and a Z3
+`unknown` result now fails closed (treated as a potential violation, not SAFE). One
+residual remains honestly open:
+  - a free string parameter is substituted as a fully attacker-controlled symbolic
+    string, so any forbidden keyword is trivially reachable; such tools are
+    conservatively over-flagged UNSAFE (sound but imprecise — a false-positive risk).
+Matching is substring containment, not a full command-grammar parse.
+
+The intended contribution is applying SMT to tool-API safety (Gap #1 in the paper).
 """
 
 import json
@@ -298,7 +305,13 @@ class ToolVerifier:
         elif result == unsat:
             return {"safe": True}
         else:
-            return {"safe": True}  # Conservative: unknown → assume safe with warning
+            # Z3 returned unknown (timeout / undecidable). We CANNOT prove the pattern
+            # is unreachable, so the sound (no-false-SAFE) direction is to report a
+            # potential violation rather than assume safe.
+            return {
+                "safe": False,
+                "counterexample": {"_note": "Z3 returned unknown — safety not proven"},
+            }
 
     def _build_trigger_check(
         self,
