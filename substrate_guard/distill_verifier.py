@@ -73,6 +73,7 @@ class TraceStatus(str, Enum):
     ALL_VALID = "all_valid"
     HAS_ERRORS = "has_errors"
     PARSE_FAILURE = "parse_failure"
+    INCONCLUSIVE = "inconclusive"  # some steps could not be faithfully checked
 
 
 @dataclass
@@ -107,6 +108,7 @@ class TraceVerification:
     valid_count: int = 0
     invalid_count: int = 0
     unparseable_count: int = 0
+    unchecked_count: int = 0
     time_ms: float = 0.0
     problem: str = ""
 
@@ -205,7 +207,11 @@ def sympy_to_z3(expr: sympy.Expr, var_map: dict[str, Any]) -> Any:
             for _ in range(int(exp)):
                 result = result * base
             return result
-        return sympy_to_z3(expr.args[0], var_map)  # fallback: ignore exponent
+        # Exponent outside the faithfully-modeled integer range 0..10 (or a
+        # symbolic exponent). Do NOT silently drop it — returning the base would
+        # turn x**12 into x and prove a DIFFERENT claim. Raise so the caller marks
+        # the step UNPARSEABLE instead of accepting it as VALID.
+        raise ValueError(f"unsupported exponent {exp!r} (only integer 0..10 modeled)")
 
     if isinstance(expr, sympy.Abs):
         inner = sympy_to_z3(expr.args[0], var_map)
@@ -285,6 +291,7 @@ class DistillationVerifier:
         valid = 0
         invalid = 0
         unparseable = 0
+        unchecked = 0
 
         for i, step in enumerate(steps):
             sv = self._verify_step(i + 1, step)
@@ -295,13 +302,20 @@ class DistillationVerifier:
                 invalid += 1
             elif sv.status == StepStatus.UNPARSEABLE:
                 unparseable += 1
+            elif sv.status == StepStatus.UNCHECKED:
+                unchecked += 1
 
         elapsed = (time.time() - t0) * 1000
 
         if invalid > 0:
             status = TraceStatus.HAS_ERRORS
-        elif unparseable > 0 and valid == 0:
+        elif valid == 0 and (unparseable > 0 or unchecked > 0):
             status = TraceStatus.PARSE_FAILURE
+        elif unparseable > 0 or unchecked > 0:
+            # Some steps could not be faithfully checked (Z3 unknown, or an
+            # expression outside the modeled fragment). The trace is NOT
+            # all-valid — reporting ALL_VALID here would over-claim soundness.
+            status = TraceStatus.INCONCLUSIVE
         else:
             status = TraceStatus.ALL_VALID
 
@@ -311,6 +325,7 @@ class DistillationVerifier:
             valid_count=valid,
             invalid_count=invalid,
             unparseable_count=unparseable,
+            unchecked_count=unchecked,
             time_ms=elapsed,
             problem=problem,
         )
@@ -540,10 +555,13 @@ class DistillationVerifier:
                 actual=f"Does not follow from {before}",
             )
         else:
+            # Z3 returned unknown (timeout / undecidable). Unknown must NOT be
+            # accepted as VALID — that is the unsound direction. Abstain.
             return StepVerification(
                 step_number=step_num,
-                status=StepStatus.VALID,  # conservative: unknown → accept
+                status=StepStatus.UNCHECKED,
                 raw_text=raw_text,
+                error="Z3 returned unknown (timeout or undecidable) — not proven",
             )
 
     def _sympy_eq_to_z3(self, eq: sympy.Eq, var_map: dict) -> Any:
