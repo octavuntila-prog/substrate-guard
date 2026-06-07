@@ -313,11 +313,30 @@ subsequently **completed**. That honest second pass is why the table distinguish
 - **distill_verifier (cosmetic/robustness):** `_verify_evaluation` maps Z3 `unknown` → INVALID (sound
   over-reject, inconsistent with `_check_implication`); a pre-existing `AttributeError` on
   `BooleanTrue/False` simplification is a robustness bug, not a false-ALL_VALID.
-- **L4 comply (ZK-SNM):** Merkle domain separation / non-membership / "fake Z3" gaps — a prototype layer,
-  audited next.
+- **L4 comply (ZK-SNM):** audited + partially remediated — see the dedicated section below.
 
 ## Process closure
 `tests/test_integration/test_docs_drift_guard.py` asserts the README production metrics, the package
 version, and the policy-rule count against their committed source-of-truth JSON (the smoke-audit /
 smoke-compliance artifacts) — closing the silent-regression channel (Recommendation #7) that allowed
 the original 79 / 0.54% / 0.14 ms headline drift.
+
+## L4 comply (ZK-SNM) — audit + remediation
+A 26-agent adversarial pass (empirically RUN, like Part 2) found the L4 layer's branding
+far exceeds its implementation. **Confirmed-critical:** the Merkle commitment was malleable
+(no leaf/node domain separation → forged inclusion; odd-leaf duplication → size-equivocation);
+verification was not bound to the committed root (commit corpus A, verify a different set); a
+perturbed member is certified non-member (threshold false-negative). **Confirmed-high:** the Z3
+step is decorative (a constant comparison with no free variables; the verdict is independent of
+it); there is no zero-knowledge (cleartext embeddings); the default encoder only catches
+byte-exact duplicates.
+
+**Fixed:** `be3d95b` domain-separates + count-binds the Merkle commitment (binding now sound);
+`469a887` binds verification to the committed root and honestly relabels the claims (Z3 →
+"redundant integer re-check"; README/note "Zero-knowledge compliance" → "semantic
+non-membership"; threshold/encoder caveats).
+
+**Residual (NOT closed — user's call, paper-tied):** the `ZK-SNM` class/CLI naming + the cited
+paper title "ZK Proofs of Semantic Non-Membership"; `certificate_hash` → a keyed MAC; a
+soundness bound for the threshold; a semantic default encoder. The deep redesign (separate
+prover/verifier, a real ZK circuit) is out of scope for the prototype.
