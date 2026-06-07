@@ -64,3 +64,19 @@ def test_mod_negative_divisor_correct_semantics():
     assert ok.verified, f"correct mod spec not VERIFIED ({ok.status})"
     bad = verify_code(src, Spec(preconditions=["x == 7"], postconditions=["__return__ == 1"]))
     assert not bad.verified, f"wrong mod spec wrongly accepted ({bad.status})"
+
+
+def test_nested_conditional_return_does_not_verify():
+    """A no-else `if` whose body returns on only SOME paths must force an abstain:
+    the fall-through continuation (here `return -1`) was otherwise dropped, proving
+    a false property. Real f(x) for 5<=x<=50 returns -1 (< 0), violating the spec.
+    Residual found by the adversarial verification of commit 3b0d009."""
+    src = (
+        "def f(x: int) -> int:\n"
+        "    if x > 0:\n"
+        "        if x > 100:\n"
+        "            return 999\n"
+        "    return -1\n"
+    )
+    r = verify_code(src, Spec(preconditions=["x >= 5", "x <= 50"], postconditions=["__return__ >= 0"]))
+    assert not r.verified, f"nested conditional-return wrongly VERIFIED ({r.status})"

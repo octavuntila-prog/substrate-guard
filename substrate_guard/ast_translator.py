@@ -182,6 +182,23 @@ class ASTTranslator:
                 return then_result
             return else_result
 
+        # No-else `if` whose body returns only on SOME paths. The early-return
+        # merge above handles only bodies that DEFINITELY return; a partial return
+        # cannot be faithfully joined with the fall-through continuation, so record
+        # it and abstain (via the non-empty `unsupported` gate) instead of silently
+        # dropping a branch and proving a property about a strictly weaker model.
+        if (
+            isinstance(stmt, ast.If)
+            and not stmt.orelse
+            and self._contains_return(stmt.body)
+            and not self._branch_returns(stmt.body)
+        ):
+            self.unsupported.append(
+                f"Line {stmt.lineno}: conditional return inside if-without-else "
+                "(partial control flow not modeled)"
+            )
+            return self._translate_body_from(stmts, idx + 1)
+
         # Normal statement processing
         result = self._translate_stmt(stmt)
         if result is not None:
@@ -199,6 +216,17 @@ class ASTTranslator:
                 then_returns = self._branch_returns(stmt.body)
                 else_returns = bool(stmt.orelse) and self._branch_returns(stmt.orelse)
                 if then_returns and else_returns:
+                    return True
+        return False
+
+    def _contains_return(self, stmts: list[ast.stmt]) -> bool:
+        """True if any statement in the subtree contains a Return (possibly on
+        only some paths)."""
+        for stmt in stmts:
+            if isinstance(stmt, ast.Return):
+                return True
+            if isinstance(stmt, ast.If):
+                if self._contains_return(stmt.body) or self._contains_return(stmt.orelse):
                     return True
         return False
 
