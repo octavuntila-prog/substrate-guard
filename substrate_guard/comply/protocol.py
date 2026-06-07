@@ -9,6 +9,7 @@ proof. See docs/AUDIT_COMPLEX_2026-06-07.md Part 3.
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 from datetime import datetime, timezone
 from typing import Any, List
@@ -26,11 +27,13 @@ class ZKSNMProtocol:
         threshold: float = 0.85,
         use_z3: bool = True,
         fingerprinter: DeterministicFingerprinter | SemanticFingerprinter | None = None,
+        hmac_key: str | None = None,
     ) -> None:
         self.fingerprinter = fingerprinter or DeterministicFingerprinter()
         self.commitment = EmbeddingCommitment()
         self.verifier = NonMembershipVerifier(threshold=threshold)
         self.use_z3 = use_z3
+        self._hmac_key = hmac_key.encode() if hmac_key else None
         self._committed = False
         self._committed_root: str | None = None
 
@@ -94,13 +97,20 @@ class ZKSNMProtocol:
                 "the verifier operates on cleartext embeddings (true ZK privacy needs "
                 "a circuit backend, future work). The Z3 step is a redundant integer "
                 "re-check, not an independent proof. certificate_hash is an unkeyed "
-                "integrity checksum, not a tamper-proof MAC."
+                "checksum unless an hmac_key is configured (then a keyed HMAC MAC)."
             ),
         }
-        cert_hash = hashlib.sha256(
-            json.dumps(certificate, sort_keys=True, default=str).encode()
-        ).hexdigest()
-        certificate["certificate_hash"] = cert_hash
+        cert_bytes = json.dumps(certificate, sort_keys=True, default=str).encode()
+        if self._hmac_key is not None:
+            # Keyed MAC: tamper-evident (only a holder of the key can recompute it).
+            certificate["certificate_hash"] = hmac.new(
+                self._hmac_key, cert_bytes, hashlib.sha256
+            ).hexdigest()
+            certificate["certificate_hash_alg"] = "HMAC-SHA256"
+        else:
+            # Unkeyed integrity checksum: NOT tamper-proof (anyone can recompute it).
+            certificate["certificate_hash"] = hashlib.sha256(cert_bytes).hexdigest()
+            certificate["certificate_hash_alg"] = "SHA256 (unkeyed checksum)"
         return certificate
 
     def verify_batch(self, query_documents: List[str]) -> dict[str, Any]:

@@ -73,3 +73,22 @@ def test_commitment_binding_detects_corpus_swap():
     p.commitment.add_embedding(np.zeros(384, dtype=np.float32))
     with pytest.raises(RuntimeError, match="binding"):
         p.verify_non_membership("any-query")
+
+
+def test_certificate_keyed_mac():
+    """With an hmac_key the certificate hash is a tamper-evident keyed MAC."""
+    fp = DeterministicFingerprinter()
+    p = ZKSNMProtocol(use_z3=False, fingerprinter=fp, hmac_key="secret-key")
+    p.commit_training_data(["doc-a"])
+    cert = p.verify_non_membership("query-b")
+    assert cert["certificate_hash_alg"] == "HMAC-SHA256"
+    assert len(cert["certificate_hash"]) == 64
+
+
+def test_certificate_unkeyed_checksum_labeled():
+    """Without a key the hash is honestly labeled an unkeyed checksum."""
+    fp = DeterministicFingerprinter()
+    p = ZKSNMProtocol(use_z3=False, fingerprinter=fp)
+    p.commit_training_data(["doc-a"])
+    cert = p.verify_non_membership("query-b")
+    assert "unkeyed" in cert["certificate_hash_alg"].lower()
