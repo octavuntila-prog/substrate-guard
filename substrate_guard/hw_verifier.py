@@ -174,6 +174,37 @@ class RISCVSimulator:
             return int(s, 16)
         return int(s)
 
+    def _imm12(self, s: str) -> int:
+        """Decode a 12-bit SIGNED immediate / load-store offset to its real value.
+
+        RV32I I-type immediates and load/store offsets are 12-bit two's-complement
+        fields: bit 11 is the sign bit and the value sign-extends to 32 bits. An
+        operand written as 0x800..0xFFF (2048..4095) is the raw bit pattern of that
+        field and denotes -2048..-1 on silicon — NOT a positive 2048..4095. Not
+        sign-extending let the model treat `lw x1, 0x800(x10)` as an in-bounds
+        base+2048 (false VERIFIED) when real hardware computes base-2048.
+
+          * value already in [-2048, 2047]   -> valid signed operand, used as-is
+          * value in [2048, 4095]            -> unsigned encoding of the field; the
+                                                sign bit is set, so sign-extend
+          * anything else                    -> does not fit a 12-bit field at all;
+                                                flag it unsupported so verify()
+                                                ABSTAINS rather than modeling an
+                                                instruction hardware cannot encode
+
+        Shift immediates (slli/srli/srai) route through here too, but stay correct
+        because the caller masks with & 0x1F and sign-extension never alters the low
+        5 bits.
+        """
+        raw = self._parse_imm(s)
+        if -2048 <= raw <= 2047:
+            return raw
+        if 2048 <= raw <= 4095:
+            return raw - 0x1000
+        self.unsupported.append(f"immediate out of 12-bit range: {s.strip()}")
+        low = raw & 0xFFF
+        return low - 0x1000 if low & 0x800 else low
+
     def execute(self, instructions: list[str]):
         """Symbolically execute a sequence of instructions."""
         for inst in instructions:
@@ -230,7 +261,8 @@ class RISCVSimulator:
         # I-type: op rd, rs1, imm
         elif op in ("addi", "andi", "ori", "xori", "slli", "srli", "srai", "slti"):
             rd, rs1 = parts[1], parts[2]
-            imm = BitVecVal(self._parse_imm(parts[3]), BV_WIDTH)
+            # 12-bit SIGNED immediate (sign-extended) — see _imm12().
+            imm = BitVecVal(self._imm12(parts[3]), BV_WIDTH)
             v1 = self._get_reg(rs1)
 
             if op == "addi":
@@ -272,14 +304,19 @@ class RISCVSimulator:
 
         # Memory (abstract model — track accesses, don't model memory contents)
         elif op in ("lw", "sw", "lb", "sb", "lh", "sh"):
-            # Parse offset(rs1)
+            # Parse offset(rs1). The offset is a 12-bit SIGNED field, sign-extended
+            # to 32 bits exactly like an I-type immediate (see _imm12) — so
+            # `0x800(x10)` is base-2048, NOT base+2048. Accept hex or decimal.
             if "(" in parts[2]:
-                match = re.match(r'(-?\d+)\((\w+)\)', parts[2])
+                match = re.match(r'(-?(?:0x[0-9a-fA-F]+|\d+))\((\w+)\)', parts[2])
                 if match:
-                    offset = int(match.group(1))
+                    offset = self._imm12(match.group(1))
                     base_reg = match.group(2)
                     addr = self._get_reg(base_reg) + BitVecVal(offset, BV_WIDTH)
                 else:
+                    # Unparseable operand: don't silently model the address as 0
+                    # (which looks in-bounds and would falsely VERIFY) — abstain.
+                    self.unsupported.append(f"unparseable memory operand: {parts[2]}")
                     addr = BitVecVal(0, BV_WIDTH)
             else:
                 addr = self._get_reg(parts[2])
