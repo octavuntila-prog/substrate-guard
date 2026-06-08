@@ -108,3 +108,25 @@ def test_sync_already_present_row_is_marked_not_re_pushed(tmp_path):
     assert out["status"] == "complete", out   # already-present counts as synced
     assert store.count(synced=False) == 0      # marked, not re-pushed
     store.close()
+
+
+def test_sync_sqlite_constraint_drop_not_falsely_complete(tmp_path):
+    """A row silently dropped by a remote SQLite constraint (INSERT OR IGNORE no-op,
+    rowcount 0, no exception -- same signature as already-present) must NOT be marked
+    synced or reported 'complete'; the existence check keeps it unsynced, not lost."""
+    store = LocalStore(tmp_path / "local.db", hmac_key="k")
+    store.store_event("audit", "guard", {"n": 1}, agent_id=None)  # agent_id NULL
+    remote_path = tmp_path / "remote.db"
+    rc = sqlite3.connect(str(remote_path))
+    rc.execute(  # remote schema with agent_id NOT NULL -> the NULL event is dropped
+        "CREATE TABLE guard_events (id TEXT PRIMARY KEY, timestamp TEXT, event_type TEXT,"
+        " agent_id TEXT NOT NULL, layer TEXT, data TEXT, hmac_hash TEXT, prev_hash TEXT, source TEXT)"
+    )
+    rc.commit()
+    rc.close()
+
+    out = SyncEngine(store, lambda: sqlite3.connect(str(remote_path))).sync()
+    assert out["status"] != "complete", out    # not falsely complete
+    assert out["synced"] == 0
+    assert store.count(synced=False) == 1       # row stays unsynced, not lost
+    store.close()

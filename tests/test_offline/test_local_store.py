@@ -152,6 +152,16 @@ def test_concurrent_store_event_no_fork(tmp_path):
     s.close()
 
 
+def test_hmac_distinguishes_none_and_empty_agent_id(tmp_path):
+    """agent_id=None and agent_id="" must produce DIFFERENT HMACs -- None must not
+    collapse to "" (a DB-write attacker could otherwise flip between them undetected)."""
+    s = LocalStore(tmp_path / "x.db", hmac_key="k")
+    h_none = s._compute_hmac("id", "t", "audit", None, "L", "{}", "p")
+    h_empty = s._compute_hmac("id", "t", "audit", "", "L", "{}", "p")
+    assert h_none != h_empty
+    s.close()
+
+
 def test_different_hmac_key_different_chain(tmp_path):
     a = LocalStore(tmp_path / "a.db", hmac_key="aaa")
     b = LocalStore(tmp_path / "b.db", hmac_key="bbb")

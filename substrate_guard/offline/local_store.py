@@ -129,7 +129,8 @@ class LocalStore:
         # propagated to L6).
         payload = "\x1f".join([
             prev_hash, event_id, timestamp, event_type,
-            agent_id or "", layer, data,
+            "\x00" if agent_id is None else agent_id,  # None must not collapse to ""
+            layer, data,
         ]).encode()
         return hmac.new(self.hmac_key, payload, hashlib.sha256).hexdigest()
 

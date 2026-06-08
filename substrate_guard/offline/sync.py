@@ -66,6 +66,17 @@ class SyncEngine:
                         event["agent_id"], event["layer"], json.dumps(event["data"]),
                         event["hmac_hash"], event["prev_hash"], "offline_sync",
                     ))
+                    # SQLite INSERT OR IGNORE swallows NOT NULL / CHECK violations as a
+                    # silent no-op (rowcount 0, no exception) -- the SAME signature as an
+                    # already-present row. Mark synced only if the row is ACTUALLY on the
+                    # remote, else a constraint-dropped row would be lost as a false
+                    # "complete". (Postgres raises such violations, so it is unaffected.)
+                    if is_sqlite and cur.rowcount == 0:
+                        present = conn.execute(
+                            "SELECT 1 FROM guard_events WHERE id = ?", (event["id"],)
+                        ).fetchone()
+                        if present is None:
+                            raise RuntimeError("row silently dropped by a remote constraint")
                     # Commit PER ROW: a later row's failure cannot roll back an
                     # already-synced row (Postgres aborts the whole txn on a failed
                     # statement), and an idempotent no-op (row already present) still

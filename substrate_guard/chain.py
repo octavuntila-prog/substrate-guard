@@ -211,19 +211,24 @@ class AuditChain:
         The export includes a chain_signature — HMAC of the final hash,
         so the entire export can be verified as a unit.
         """
+        # Snapshot entries + head TOGETHER under the lock so a concurrent append cannot
+        # produce a torn export (count/head/entry-list captured at different instants).
+        with self._lock:
+            entries = list(self._entries)
+            head = self._head_hash
         chain_data = {
             "version": "1.0",
             "format": "substrate-guard-audit-chain",
             "created_at": time.time(),
-            "entries_count": len(self._entries),
+            "entries_count": len(entries),
             "genesis_hash": GENESIS_HASH,
-            "head_hash": self._head_hash,
+            "head_hash": head,
             "chain_signature": hmac.new(
                 self._secret,
-                f"chain:{self._head_hash}:{len(self._entries)}".encode(),
+                f"chain:{head}:{len(entries)}".encode(),
                 hashlib.sha256,
             ).hexdigest(),
-            "entries": [e.to_dict() for e in self._entries],
+            "entries": [e.to_dict() for e in entries],
         }
 
         Path(path).write_text(json.dumps(chain_data, indent=2, default=str))
