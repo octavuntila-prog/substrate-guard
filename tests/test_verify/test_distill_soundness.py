@@ -61,3 +61,17 @@ def test_power_tower_does_not_dos():
     r = v.verify_trace("t", [{"expression": "9**9**9", "value": "0"}])
     assert time.time() - t0 < 5, "power-tower took too long (DoS)"
     assert r is not None
+
+
+def test_eager_function_and_nested_power_dos_rejected():
+    """factorial/binomial/fibonacci eagerly evaluate to astronomically large ints, and
+    chained powers like (2**1000)**1000 each pass a per-exponent check but multiply --
+    all must be rejected fast (CPU/memory DoS + int->str ValueError), not computed."""
+    import time
+
+    v = DistillationVerifier()
+    for expr in ("factorial(50000)", "fibonacci(200000)", "binomial(100000,50000)", "(2**1000)**1000"):
+        t0 = time.time()
+        r = v.verify_trace("t", [{"expression": expr, "value": "0"}])
+        assert time.time() - t0 < 5, f"{expr} took too long (DoS)"
+        assert r is not None

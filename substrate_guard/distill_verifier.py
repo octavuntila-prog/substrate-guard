@@ -157,6 +157,14 @@ def safe_parse(expr_str: str) -> sympy.Expr | None:
 
     if len(expr_str) > 1000:
         return None  # reject pathologically long inputs (DoS guard)
+    # DoS denylist: functions SymPy EAGERLY evaluates to astronomically large integers
+    # (factorial(50000), fibonacci(200000), binomial(...)) are outside the modeled
+    # arithmetic subset -- reject by name BEFORE parse_expr can burn CPU computing them.
+    _low = expr_str.lower()
+    if any(fn in _low for fn in (
+        "factorial", "binomial", "fibonacci", "gamma", "lucas", "catalan",
+    )):
+        return None
     try:
         parsed = parse_expr(expr_str, transformations=TRANSFORMATIONS, evaluate=False)
     except Exception:
@@ -164,12 +172,19 @@ def safe_parse(expr_str: str) -> sympy.Expr | None:
             parsed = sympify(expr_str, evaluate=False)
         except Exception:
             return None
-    # Reject power-towers / huge exponents BEFORE any downstream evaluation computes an
-    # astronomically large number (CPU/memory DoS + int->str ValueError). A modeled
-    # exponent is a small integer anyway (sympy_to_z3 bounds it to 0..10).
+    # Reject huge/nested powers and oversized constants BEFORE any downstream evaluation
+    # computes an astronomically large number (CPU/memory DoS + int->str ValueError).
+    # A modeled exponent is a small integer (sympy_to_z3 bounds it to 0..10); chained
+    # powers like (2**1000)**1000 each pass a per-exponent check but MULTIPLY, so also
+    # reject a Pow whose base contains a Pow. bit_length avoids the int->str overflow.
     try:
         for p in parsed.atoms(sympy.Pow):
-            if not (p.exp.is_Integer and abs(int(p.exp)) <= 1000):
+            if not (p.exp.is_Integer and abs(int(p.exp)) <= 100):
+                return None
+            if p.base.has(sympy.Pow):
+                return None
+        for n in parsed.atoms(sympy.Integer):
+            if int(n).bit_length() > 400:  # ~120 digits
                 return None
     except Exception:
         return None
