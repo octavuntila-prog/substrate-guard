@@ -37,6 +37,15 @@ def test_clean_straightline_still_verifies():
     assert r.status == HWVerifyStatus.VERIFIED, f"clean program failed to VERIFY ({r.status})"
 
 
+def test_itype_shift_masks_shamt():
+    """RV32I I-type shifts use only imm[4:0]; `srli x1,x10,32` masks shamt to 0, so
+    x1 == x10 (unchanged) and 'x1 == 0' must NOT be VERIFIED. The R-type path already
+    masked; the I-type path did not -> false VERIFIED."""
+    spec = HWSpec(postconditions={"x1": ("==", 0)}, description="x1==0")
+    r = HardwareVerifier().verify("srli x1, x10, 32\n", spec)
+    assert r.status != HWVerifyStatus.VERIFIED, f"unmasked srli shamt wrongly VERIFIED ({r.status})"
+
+
 def test_verify_equivalence_abstains_on_branch():
     """verify_equivalence must apply the SAME abstain guard as verify(): if either
     sequence uses a control-flow branch the simulator cannot model, it must not

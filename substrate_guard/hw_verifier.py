@@ -242,12 +242,14 @@ class RISCVSimulator:
             elif op == "xori":
                 self._set_reg(rd, v1 ^ imm)
             elif op == "slli":
-                self._set_reg(rd, v1 << imm)
+                # RV32I shift amount is imm[4:0] only -- mask like the R-type path,
+                # else shamt>=32 diverges from silicon (Z3 BV<<33 == 0, real == <<1).
+                self._set_reg(rd, v1 << (imm & BitVecVal(0x1F, BV_WIDTH)))
             elif op == "srli":
                 from z3 import LShR
-                self._set_reg(rd, LShR(v1, imm))
+                self._set_reg(rd, LShR(v1, imm & BitVecVal(0x1F, BV_WIDTH)))
             elif op == "srai":
-                self._set_reg(rd, v1 >> imm)
+                self._set_reg(rd, v1 >> (imm & BitVecVal(0x1F, BV_WIDTH)))
             elif op == "slti":
                 self._set_reg(rd, If(v1 < imm, BitVecVal(1, BV_WIDTH),
                                      BitVecVal(0, BV_WIDTH)))
