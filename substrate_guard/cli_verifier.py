@@ -9,8 +9,6 @@ import time
 from dataclasses import dataclass, field
 from enum import Enum
 
-from z3 import And, Bool, BoolVal, Not, Or, Solver, sat, unsat
-
 
 class CLISafetyStatus(str, Enum):
     SAFE = "safe"
@@ -340,15 +338,13 @@ class CLIVerifier:
 
     **AST-first (Bijuteria #5):** :func:`structural_scan` runs first — bash
     (Tree-sitter), Python ``ast``, SQL ``sqlparse``, JSON ``json``, YAML (``pyyaml`` / ``safe_load``).
-    Then regex patterns compile into a
-    Z3 boolean formula: each pattern is a Bool that is True if the command matches.
-    The command is SAFE iff no structural hit and no regex pattern matches.
+    Then a regex denylist runs: the command is SAFE iff there is no structural hit
+    and no regex pattern matches.
 
-    The Z3 encoding only RECORDS the concrete pattern-match results (each
-    pattern Bool is set to its literal regex outcome); it performs no symbolic
-    reasoning over the command space and cannot change the regex+AST verdict.
-    Treat this as structural-AST + regex denylist matching, not an SMT proof —
-    see docs/AUDIT_COMPLEX_2026-06-07.md (P0/P4).
+    This is structural-AST + regex denylist matching, NOT an SMT proof. (A prior
+    version wrapped the concrete regex outcomes in a Z3 ``BoolVal`` SAT check with no
+    free variables; it could not change the regex+AST verdict, so the decorative
+    solver was removed.) See docs/AUDIT_COMPLEX_2026-06-07.md (P0/P4).
     """
 
     def __init__(self, patterns: list[dict] | None = None):
@@ -360,46 +356,20 @@ class CLIVerifier:
         structural = _structural_cli_violations(command)
         violations = list(structural)
 
-        solver = Solver()
-
-        # Create a Bool variable for each pattern
-        pattern_vars = []
+        # Regex denylist: a command is unsafe iff it matches any dangerous pattern.
         for pat_def in self.patterns:
-            pat_var = Bool(f"matches_{pat_def['name']}")
-            pattern_vars.append(pat_var)
-
-            # Concretely evaluate if command matches this pattern
-            matched = False
-            matched_text = ""
             for regex in pat_def["patterns"]:
                 m = re.search(regex, command)
                 if m:
-                    matched = True
-                    matched_text = m.group()
+                    violations.append(CLIViolation(
+                        pattern_name=pat_def["name"],
+                        description=pat_def["description"],
+                        matched_text=m.group(),
+                    ))
                     break
 
-            # Assert the concrete match result
-            solver.add(pat_var == BoolVal(matched))
-
-            if matched:
-                violations.append(CLIViolation(
-                    pattern_name=pat_def["name"],
-                    description=pat_def["description"],
-                    matched_text=matched_text,
-                ))
-
-        # Safety property: command is safe iff no pattern matches
-        safety = And(*[Not(pv) for pv in pattern_vars])
-        solver.add(safety)
-
-        result = solver.check()
         elapsed = (time.time() - t0) * 1000
-
-        if structural or result != sat:
-            status = CLISafetyStatus.UNSAFE
-        else:
-            status = CLISafetyStatus.SAFE
-
+        status = CLISafetyStatus.UNSAFE if violations else CLISafetyStatus.SAFE
         return CLISafetyResult(
             status=status,
             command=command,
