@@ -351,4 +351,4 @@ The honest residuals listed above were then attacked directly:
 **Still open (out of scope / external):** the `ZK-SNM` naming + the cited paper title (an
 external publication — the user's call); the threshold soundness bound and the non-semantic
 default encoder (inherent prototype limitations, honestly documented); L5 attest / L6 offline
-(not deeply audited this round). Full suite: 439 passed, 7 skipped.
+(audited 2026-06-08 — SOUND: Ed25519 signature covers {event, attestation}, tamper-evidence confirmed; SQLite sync union correct. Only loose claims scoped — self-attestation, "CRDT" framing). Full suite: 439 passed, 7 skipped.

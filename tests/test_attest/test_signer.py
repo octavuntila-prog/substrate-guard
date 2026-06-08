@@ -32,3 +32,16 @@ def test_tamper_breaks_verification(tmp_path):
     signed = signer.sign_event({"a": 1})
     signed["a"] = 2
     assert not signer.verify_signed_event(signed)
+
+
+def test_attestation_field_tamper_breaks_verification(tmp_path):
+    """Mutating an attestation field (e.g. device_id) must break verification -- the
+    signature covers {event, attestation}, not just the event body. Confirmed by the
+    L5 audit (docs/AUDIT_COMPLEX_2026-06-07.md)."""
+    dk = DeviceKey(key_dir=tmp_path / "k")
+    fp = DeviceFingerprint()
+    lca = LocalCA(dk, ca_dir=tmp_path / "c")
+    signer = EventSigner(dk, fp, lca)
+    signed = signer.sign_event({"a": 1})
+    signed["device_attestation"]["device_id"] = "victim"
+    assert not signer.verify_signed_event(signed)

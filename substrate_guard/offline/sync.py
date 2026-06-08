@@ -11,7 +11,14 @@ logger = logging.getLogger("substrate_guard.offline.sync")
 
 
 class SyncEngine:
-    """Append-only merge: INSERT with conflict ignore / OR IGNORE — CRDT-style union by id."""
+    """Append-only merge via INSERT OR IGNORE: a union by primary-key id.
+
+    Assumes event ids are unique per event (UUIDs over an append-only log), so
+    id-existence == event-identity. NOT a general CRDT: on a same-id conflict with
+    DIFFERENT data, OR IGNORE keeps the existing remote row (no value-level merge or
+    conflict detection). Edge: a row whose ``mark_synced`` fails after a successful
+    remote insert is re-pushed as a harmless no-op OR IGNORE on the next cycle.
+    """
 
     def __init__(
         self,

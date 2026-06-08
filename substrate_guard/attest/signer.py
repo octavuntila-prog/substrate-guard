@@ -43,6 +43,15 @@ class EventSigner:
         return out
 
     def verify_signed_event(self, signed_event: dict[str, Any]) -> bool:
+        """Verify a signed event against THIS signer's device key.
+
+        Self-attestation: validates events signed by the local device key only
+        (the embedded signature is checked against ``self.device_key``, not against
+        the attestation's ``public_key`` — which is a truncated preview). There is
+        no cross-device PKI, so an event from another device is not validated here.
+        The signature covers ``{event, attestation}``, so the event body AND every
+        attestation field (device_id, fingerprint, ...) are tamper-evident.
+        """
         att = signed_event.get("device_attestation")
         if not isinstance(att, dict):
             return False
