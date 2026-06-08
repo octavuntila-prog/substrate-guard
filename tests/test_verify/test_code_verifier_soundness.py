@@ -95,3 +95,52 @@ def test_nested_conditional_return_does_not_verify():
     )
     r = verify_code(src, Spec(preconditions=["x >= 5", "x <= 50"], postconditions=["__return__ >= 0"]))
     assert not r.verified, f"nested conditional-return wrongly VERIFIED ({r.status})"
+
+
+def test_asymmetric_if_else_then_returns_does_not_verify():
+    """if/else sibling of the no-else partial-return case (commit 0a7fe02): the
+    THEN branch returns while the ELSE branch falls through to a continuation
+    (`return y`). The old _translate_if returned the then value UNCONDITIONALLY,
+    dropping both the branch condition and the fall-through path AND failing to
+    record an unsupported construct — a false VERIFIED. Real f(0) == 5 < 10,
+    so the spec is violated and the verifier must NOT return VERIFIED."""
+    src = (
+        "def f(x: int) -> int:\n"
+        "    if x > 0:\n"
+        "        return 100\n"
+        "    else:\n"
+        "        y = 5\n"
+        "    return y\n"
+    )
+    r = verify_code(src, Spec(postconditions=["__return__ >= 10"]))
+    assert not r.verified, f"asymmetric if/else (then returns) wrongly VERIFIED ({r.status})"
+
+
+def test_asymmetric_if_else_else_returns_does_not_verify():
+    """Mirror shape: the ELSE branch returns while the THEN branch falls through
+    to the continuation (`return y`). Same unsound drop as above. Real f(5) == 5
+    < 10, so the spec is violated and the verifier must NOT return VERIFIED."""
+    src = (
+        "def f(x: int) -> int:\n"
+        "    if x > 0:\n"
+        "        y = 5\n"
+        "    else:\n"
+        "        return 100\n"
+        "    return y\n"
+    )
+    r = verify_code(src, Spec(postconditions=["__return__ >= 10"]))
+    assert not r.verified, f"asymmetric if/else (else returns) wrongly VERIFIED ({r.status})"
+
+
+def test_symmetric_if_else_both_return_still_verifies():
+    """Guard against over-abstaining: when BOTH branches return, the if IS
+    faithfully modeled as a Z3 If(), so a correct spec must still VERIFY."""
+    src = (
+        "def f(x: int) -> int:\n"
+        "    if x > 0:\n"
+        "        return 100\n"
+        "    else:\n"
+        "        return 50\n"
+    )
+    r = verify_code(src, Spec(postconditions=["__return__ >= 10"]))
+    assert r.verified, f"symmetric if/else failed to VERIFY ({r.status})"

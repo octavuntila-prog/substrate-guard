@@ -322,11 +322,27 @@ class ASTTranslator:
 
         # Merge return values
         if then_result is not None and else_result is not None:
+            # Both branches return — a faithful Z3 If() over the two values.
             return If(condition, then_result, else_result)
-        elif then_result is not None:
-            return then_result
-        elif else_result is not None:
-            return else_result
+
+        if then_result is not None or else_result is not None:
+            # Exactly ONE branch returns; the other falls through to the
+            # statements AFTER this if (its continuation), which is not visible
+            # from inside _translate_if. The returning branch therefore cannot
+            # be faithfully joined with that continuation: returning its value
+            # unconditionally (the old behaviour) silently drops BOTH the branch
+            # condition and the fall-through path, proving a property about a
+            # strictly weaker model than the real function (a false VERIFIED).
+            # Record it and abstain via the non-empty `unsupported` gate in
+            # code_verifier. This is the if/else sibling of the no-else
+            # partial-return case handled in _translate_body_from.
+            self.unsupported.append(
+                f"Line {if_stmt.lineno}: asymmetric if/else — only one branch "
+                "returns while the other falls through (partial control flow "
+                "not modeled)"
+            )
+            return then_result if then_result is not None else else_result
+
         return None
 
     def _merge_vars(self, condition, saved_vars, then_vars, else_vars):
