@@ -155,13 +155,25 @@ def safe_parse(expr_str: str) -> sympy.Expr | None:
     expr_str = expr_str.replace("−", "-")
     expr_str = re.sub(r"(\d)([a-zA-Z])", r"\1*\2", expr_str)  # 3x → 3*x
 
+    if len(expr_str) > 1000:
+        return None  # reject pathologically long inputs (DoS guard)
     try:
-        return parse_expr(expr_str, transformations=TRANSFORMATIONS)
+        parsed = parse_expr(expr_str, transformations=TRANSFORMATIONS, evaluate=False)
     except Exception:
         try:
-            return sympify(expr_str)
+            parsed = sympify(expr_str, evaluate=False)
         except Exception:
             return None
+    # Reject power-towers / huge exponents BEFORE any downstream evaluation computes an
+    # astronomically large number (CPU/memory DoS + int->str ValueError). A modeled
+    # exponent is a small integer anyway (sympy_to_z3 bounds it to 0..10).
+    try:
+        for p in parsed.atoms(sympy.Pow):
+            if not (p.exp.is_Integer and abs(int(p.exp)) <= 1000):
+                return None
+    except Exception:
+        return None
+    return parsed
 
 
 def sympy_to_z3(expr: sympy.Expr, var_map: dict[str, Any]) -> Any:
@@ -174,10 +186,12 @@ def sympy_to_z3(expr: sympy.Expr, var_map: dict[str, Any]) -> Any:
         return IntVal(int(expr))
 
     if isinstance(expr, sympy.Rational):
-        return RealVal(float(expr))
+        # EXACT rational, NOT float() (which rounds e.g. (10**16+1)/10**16 to 1.0 and
+        # makes Z3 "prove" a false equality). p/q as exact Z3 reals.
+        return RealVal(int(expr.p)) / RealVal(int(expr.q))
 
     if isinstance(expr, sympy.Float):
-        return RealVal(float(expr))
+        return RealVal(str(expr))  # decimal string -> exact Z3 real (no float() round)
 
     if isinstance(expr, sympy.Symbol):
         name = str(expr)
@@ -566,6 +580,11 @@ class DistillationVerifier:
 
     def _sympy_eq_to_z3(self, eq: sympy.Eq, var_map: dict) -> Any:
         """Convert SymPy Eq to Z3 equality."""
+        if not isinstance(eq, sympy.Eq):
+            # sympy.Eq(x, x) collapses to sympy.true (a BooleanAtom with no .lhs/.rhs);
+            # raise so the caller marks the step UNPARSEABLE instead of crashing on
+            # eq.lhs with an AttributeError.
+            raise ValueError(f"equation simplified to a constant boolean: {eq}")
         lhs_z3 = sympy_to_z3(eq.lhs, var_map)
         rhs_z3 = sympy_to_z3(eq.rhs, var_map)
         return lhs_z3 == rhs_z3
