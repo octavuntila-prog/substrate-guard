@@ -12,6 +12,19 @@ def engine():
     return PolicyEngine(policy_path="nonexistent/", use_opa_binary=False)
 
 
+def test_evaluate_does_not_crash_on_malformed_input():
+    """Malformed-but-valid JSON (wrong field types) must not crash the builtin
+    evaluator; it fails SAFE (denies an unevaluable rule) instead of raising."""
+    eng = PolicyEngine(policy_path="nonexistent/", use_opa_binary=False)
+    # action is a string, not a dict -> coerced to {}, no crash
+    d1 = eng.evaluate({"agent": {"id": "a"}, "action": "not-a-dict", "context": {}})
+    assert isinstance(d1, PolicyDecision)
+    # a field a rule does string ops on is the wrong type -> rule fails safe (deny)
+    d2 = eng.evaluate({"agent": {"id": "a"}, "action": {"type": "file_write", "path": 12345}, "context": {}})
+    assert isinstance(d2, PolicyDecision)
+    assert d2.denied
+
+
 # ============================================
 # DENY tests — 25 actions that must be blocked
 # ============================================

@@ -269,14 +269,27 @@ class PolicyEngine:
     def _evaluate_builtin(self, input_data: dict) -> PolicyDecision:
         """Evaluate using built-in Python rules (no OPA dependency)."""
         deny_reasons = []
-        
+
+        # Defensive: malformed-but-valid JSON can make these non-dicts (e.g. a string
+        # `action`); coerce so the rules' .get() / string ops do not crash.
         action = input_data.get("action", {})
         agent = input_data.get("agent", {})
         context = input_data.get("context", {})
-        action_type = action.get("type", "")
+        if not isinstance(action, dict):
+            action = {}
+        if not isinstance(agent, dict):
+            agent = {}
+        if not isinstance(context, dict):
+            context = {}
 
         for rule in self._builtin_rules:
-            reason = rule["check"](action, agent, context)
+            try:
+                reason = rule["check"](action, agent, context)
+            except Exception as e:
+                # A rule must not crash the evaluator on a malformed field. Fail SAFE:
+                # treat an unevaluable rule as a denial, not a silent pass.
+                logger.warning("Policy rule %s errored on input: %s", rule.get("name", "?"), e)
+                reason = f"policy rule {rule.get('name', '?')} could not evaluate input (malformed)"
             if reason:
                 deny_reasons.append(reason)
 
