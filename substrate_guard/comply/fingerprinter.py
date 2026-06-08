@@ -9,10 +9,18 @@ import numpy as np
 
 
 class DeterministicFingerprinter:
-    """384-dim L2-normalized embedding from SHA-256 expansion (no ML, reproducible)."""
+    """384-dim L2-normalized embedding from SHA-256 expansion (no ML, reproducible).
+
+    NON-SEMANTIC: the embedding is a hash of the EXACT document string, so it detects
+    only byte-exact duplicates -- two semantically similar but textually different
+    documents get unrelated embeddings (cosine ~0). The "semantic non-membership"
+    guarantee is therefore VACUOUS under this default encoder; use SemanticFingerprinter
+    (sentence-transformers) for real semantic matching.
+    """
 
     ENCODER = "deterministic-sha256-v1"
     DIMENSIONS = 384
+    is_semantic = False
 
     def fingerprint(self, document: str) -> np.ndarray:
         raw = np.empty(self.DIMENSIONS, dtype=np.float64)
@@ -46,6 +54,7 @@ class SemanticFingerprinter:
 
     ENCODER = "all-MiniLM-L6-v2"
     DIMENSIONS = 384
+    is_semantic = True
 
     def __init__(self, model_name: str | None = None):
         self._model_name = model_name or self.ENCODER

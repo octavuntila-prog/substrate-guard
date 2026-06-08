@@ -88,14 +88,18 @@ class ZKSNMProtocol:
             "query_hash": self.fingerprinter.document_hash(query_document),
             "commitment_root": self.commitment.commit(),
             "encoder": self.fingerprinter.protocol_id,
+            "semantic": bool(getattr(self.fingerprinter, "is_semantic", False)),
             "threshold": self.verifier.threshold,
             "result": result,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "note": (
-                f"Threshold (cosine >= {self.verifier.threshold}) semantic "
-                "non-membership over a binding Merkle commitment. NOT zero-knowledge: "
-                "the verifier operates on cleartext embeddings (true ZK privacy needs "
-                "a circuit backend, future work). The Z3 step is a redundant integer "
+                f"Threshold (cosine >= {self.verifier.threshold}) non-membership over "
+                "a binding Merkle commitment. The `semantic` field reflects the encoder: "
+                "with the default deterministic encoder it is FALSE -- matching is "
+                "BYTE-EXACT only, so the 'semantic' guarantee is vacuous; use "
+                "SemanticFingerprinter for real semantic matching. NOT zero-knowledge: "
+                "the verifier operates on cleartext embeddings (true ZK privacy needs a "
+                "circuit backend, future work). The Z3 step is a redundant integer "
                 "re-check, not an independent proof. certificate_hash is an unkeyed "
                 "checksum unless an hmac_key is configured (then a keyed HMAC MAC)."
             ),

@@ -92,3 +92,12 @@ def test_certificate_unkeyed_checksum_labeled():
     p.commit_training_data(["doc-a"])
     cert = p.verify_non_membership("query-b")
     assert "unkeyed" in cert["certificate_hash_alg"].lower()
+
+
+def test_certificate_marks_non_semantic_default_encoder():
+    """The default deterministic encoder is NON-semantic; the certificate must say so
+    (semantic=false), so the 'semantic non-membership' claim is honestly qualified."""
+    p = ZKSNMProtocol(use_z3=False)  # default DeterministicFingerprinter
+    p.commit_training_data(["doc-a"])
+    cert = p.verify_non_membership("doc-b")
+    assert cert["semantic"] is False

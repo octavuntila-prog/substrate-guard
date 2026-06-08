@@ -68,3 +68,20 @@ def test_sync_no_factory(tmp_path):
     out = SyncEngine(store, None).sync()
     assert out["status"] == "no_connection_factory"
     store.close()
+
+
+def test_sync_all_failed_reports_failed_not_complete(tmp_path):
+    """When every row fails (here the remote table is missing), the status must be
+    'failed' -- not 'complete'. The audited bug reported "complete" with synced=0 on a
+    Postgres remote where the SQLite-only SQL no-op'd every row."""
+    store = LocalStore(tmp_path / "local.db", hmac_key="k")
+    store.store_event("audit", "guard", {"n": 1})
+
+    def factory():
+        return sqlite3.connect(str(tmp_path / "empty_remote.db"))  # no guard_events table
+
+    out = SyncEngine(store, factory).sync()
+    assert out["status"] == "failed", out
+    assert out["synced"] == 0
+    assert store.count(synced=False) == 1  # local event stays unsynced
+    store.close()
