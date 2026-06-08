@@ -7,6 +7,7 @@ import hmac
 import json
 import logging
 import os
+import threading
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -37,9 +38,18 @@ class LocalStore:
         self.db_path = Path(db_path)
         self.hmac_key = self._resolve_hmac_key(hmac_key, allow_insecure_default)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self.conn = __import__("sqlite3").connect(str(self.db_path))
+        # check_same_thread=False + a re-entrant lock: usable from worker threads (a
+        # thread-bound connection silently lost writes). isolation_level=None
+        # (autocommit) so store_event can hold an explicit BEGIN IMMEDIATE write lock
+        # for an ATOMIC read-tail-then-append -- otherwise concurrent writers (even
+        # across processes) both chain from the same tail and FORK the chain.
+        self._lock = threading.RLock()
+        self.conn = __import__("sqlite3").connect(
+            str(self.db_path), check_same_thread=False, isolation_level=None
+        )
         self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.execute("PRAGMA synchronous=NORMAL")
+        self.conn.execute("PRAGMA busy_timeout=5000")
         self._init_schema()
 
     @staticmethod
@@ -109,8 +119,18 @@ class LocalStore:
         )
         self.conn.commit()
 
-    def _compute_hmac(self, data: str, prev_hash: str) -> str:
-        payload = f"{prev_hash}:{data}".encode()
+    def _compute_hmac(
+        self, event_id: str, timestamp: str, event_type: str,
+        agent_id: str | None, layer: str, data: str, prev_hash: str,
+    ) -> str:
+        # Bind EVERY authenticated column (not just data+prev_hash) with an
+        # unambiguous unit separator, so a tampered event_type/agent_id/timestamp/
+        # layer/id is detected by verify_chain (the chain.py denormalized-field fix,
+        # propagated to L6).
+        payload = "\x1f".join([
+            prev_hash, event_id, timestamp, event_type,
+            agent_id or "", layer, data,
+        ]).encode()
         return hmac.new(self.hmac_key, payload, hashlib.sha256).hexdigest()
 
     def _get_last_hash(self) -> str:
@@ -129,25 +149,27 @@ class LocalStore:
         event_id = str(uuid.uuid4())
         timestamp = datetime.now(timezone.utc).isoformat()
         data_json = json.dumps(data, sort_keys=True)
-        prev_hash = self._get_last_hash()
-        hmac_hash = self._compute_hmac(data_json, prev_hash)
-        self.conn.execute(
-            """INSERT INTO events
-               (id, timestamp, event_type, agent_id, layer, data,
-                hmac_hash, prev_hash, synced)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)""",
-            (
-                event_id,
-                timestamp,
-                event_type,
-                agent_id,
-                layer,
-                data_json,
-                hmac_hash,
-                prev_hash,
-            ),
-        )
-        self.conn.commit()
+        with self._lock:
+            # BEGIN IMMEDIATE takes the write lock BEFORE reading the tail, so the
+            # read-tail + append is atomic across processes (no chain fork).
+            self.conn.execute("BEGIN IMMEDIATE")
+            try:
+                prev_hash = self._get_last_hash()
+                hmac_hash = self._compute_hmac(
+                    event_id, timestamp, event_type, agent_id, layer, data_json, prev_hash
+                )
+                self.conn.execute(
+                    """INSERT INTO events
+                       (id, timestamp, event_type, agent_id, layer, data,
+                        hmac_hash, prev_hash, synced)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)""",
+                    (event_id, timestamp, event_type, agent_id, layer,
+                     data_json, hmac_hash, prev_hash),
+                )
+                self.conn.execute("COMMIT")
+            except Exception:
+                self.conn.execute("ROLLBACK")
+                raise
         return {
             "id": event_id,
             "timestamp": timestamp,
@@ -156,13 +178,14 @@ class LocalStore:
         }
 
     def get_unsynced(self, limit: int = 1000) -> list[dict[str, Any]]:
-        rows = self.conn.execute(
-            """SELECT id, timestamp, event_type, agent_id, layer,
-                      data, hmac_hash, prev_hash
-               FROM events WHERE synced = 0
-               ORDER BY rowid ASC LIMIT ?""",
-            (limit,),
-        ).fetchall()
+        with self._lock:
+            rows = self.conn.execute(
+                """SELECT id, timestamp, event_type, agent_id, layer,
+                          data, hmac_hash, prev_hash
+                   FROM events WHERE synced = 0
+                   ORDER BY rowid ASC LIMIT ?""",
+                (limit,),
+            ).fetchall()
         return [
             {
                 "id": r[0],
@@ -181,47 +204,52 @@ class LocalStore:
         if not event_ids:
             return
         # One bound parameter per row (no dynamic IN (...) SQL); sqlite3.executemany batches safely.
-        self.conn.executemany(
-            "UPDATE events SET synced = 1 WHERE id = ?",
-            [(eid,) for eid in event_ids],
-        )
-        self.conn.commit()
+        with self._lock:
+            self.conn.executemany(
+                "UPDATE events SET synced = 1 WHERE id = ?",
+                [(eid,) for eid in event_ids],
+            )
+            self.conn.commit()
 
     def verify_chain(self) -> dict[str, Any]:
-        rows = self.conn.execute(
-            "SELECT data, hmac_hash, prev_hash FROM events ORDER BY rowid ASC"
-        ).fetchall()
+        with self._lock:
+            rows = self.conn.execute(
+                "SELECT id, timestamp, event_type, agent_id, layer, data, "
+                "hmac_hash, prev_hash FROM events ORDER BY rowid ASC"
+            ).fetchall()
         if not rows:
             return {"valid": True, "events": 0}
         expected_prev = GENESIS_PREV
-        for i, (data, stored_hash, prev_hash) in enumerate(rows):
+        for i, (eid, ts, etype, aid, layer, data, stored_hash, prev_hash) in enumerate(rows):
             if prev_hash != expected_prev:
                 return {
                     "valid": False,
                     "broken_at": i,
                     "reason": "prev_hash mismatch",
                 }
-            computed = self._compute_hmac(data, prev_hash)
+            computed = self._compute_hmac(eid, ts, etype, aid, layer, data, prev_hash)
             if computed != stored_hash:
                 return {"valid": False, "broken_at": i, "reason": "hmac mismatch"}
             expected_prev = stored_hash
         return {"valid": True, "events": len(rows)}
 
     def count(self, synced: bool | None = None) -> int:
-        if synced is None:
-            return self.conn.execute("SELECT COUNT(*) FROM events").fetchone()[0]
-        return self.conn.execute(
-            "SELECT COUNT(*) FROM events WHERE synced = ?",
-            (1 if synced else 0,),
-        ).fetchone()[0]
+        with self._lock:
+            if synced is None:
+                return self.conn.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+            return self.conn.execute(
+                "SELECT COUNT(*) FROM events WHERE synced = ?",
+                (1 if synced else 0,),
+            ).fetchone()[0]
 
     def log_sync(self, events_synced: int, target: str) -> None:
         ts = datetime.now(timezone.utc).isoformat()
-        self.conn.execute(
-            "INSERT INTO sync_log (synced_at, events_synced, target) VALUES (?, ?, ?)",
-            (ts, events_synced, target),
-        )
-        self.conn.commit()
+        with self._lock:
+            self.conn.execute(
+                "INSERT INTO sync_log (synced_at, events_synced, target) VALUES (?, ?, ?)",
+                (ts, events_synced, target),
+            )
+            self.conn.commit()
 
     def close(self) -> None:
         self.conn.close()

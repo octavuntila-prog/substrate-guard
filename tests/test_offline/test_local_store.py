@@ -58,13 +58,14 @@ def test_allow_insecure_default_opt_in(tmp_path, monkeypatch):
 
 
 def test_insecure_default_is_the_known_dev_key(tmp_path, monkeypatch):
-    """Opt-in fallback uses the publicly-known dev key, not a random one."""
+    """Opt-in fallback uses the publicly-known dev key, not a random one.
+
+    Compares the RESOLVED key directly: the HMAC now binds the per-event id +
+    timestamp, so two identical events legitimately get different hashes."""
     monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
     a = LocalStore(tmp_path / "a.db", allow_insecure_default=True)
     b = LocalStore(tmp_path / "b.db", hmac_key=INSECURE_DEFAULT_HMAC_KEY)
-    ea = a.store_event("t", "L", {"z": 1})
-    eb = b.store_event("t", "L", {"z": 1})
-    assert ea["hmac_hash"] == eb["hmac_hash"]
+    assert a.hmac_key == b.hmac_key == INSECURE_DEFAULT_HMAC_KEY.encode()
     a.close()
     b.close()
 
@@ -114,6 +115,40 @@ def test_first_event_prev_is_genesis(tmp_path):
         "SELECT prev_hash FROM events ORDER BY rowid ASC LIMIT 1"
     ).fetchone()
     assert row[0] == GENESIS_PREV
+    s.close()
+
+
+def test_hmac_binds_event_type(tmp_path):
+    """Tampering a denormalized column (event_type) must break verify_chain -- the
+    HMAC binds every authenticated column, not just data + prev_hash."""
+    s = LocalStore(tmp_path / "x.db", hmac_key="k")
+    ev = s.store_event("audit", "L", {"n": 1})
+    assert s.verify_chain()["valid"]
+    s.conn.execute("UPDATE events SET event_type = 'forged' WHERE id = ?", (ev["id"],))
+    assert s.verify_chain()["valid"] is False
+    s.close()
+
+
+def test_concurrent_store_event_no_fork(tmp_path):
+    """Concurrent store_event from many threads must not fork the HMAC chain (atomic
+    read-tail-then-append under BEGIN IMMEDIATE + lock; a thread-bound connection
+    previously lost writes / forked the chain)."""
+    import threading
+
+    s = LocalStore(tmp_path / "x.db", hmac_key="k")
+
+    def worker():
+        for i in range(25):
+            s.store_event("audit", "L", {"i": i})
+
+    threads = [threading.Thread(target=worker) for _ in range(6)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert s.count() == 150
+    assert s.verify_chain()["valid"], "chain forked under concurrency"
     s.close()
 
 
