@@ -293,7 +293,12 @@ class ToolVerifier:
         can_trigger = self._build_trigger_check(tool, z3_params, pattern)
 
         if can_trigger is None:
-            return {"safe": True}
+            # The forbidden pattern yielded no checkable keyword, so we CANNOT prove the
+            # constructed operation avoids it -- fail closed, do not certify SAFE.
+            return {
+                "safe": False,
+                "counterexample": {"_note": "forbidden pattern has no checkable keyword -- safety not proven"},
+            }
 
         solver.add(can_trigger)
         result = solver.check()

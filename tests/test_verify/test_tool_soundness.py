@@ -65,3 +65,15 @@ def test_no_template_is_unknown():
         operation_template=None,
     )
     assert verify_tool(tool, forbidden=DELETE).status == ToolSafetyStatus.UNKNOWN
+
+
+def test_pattern_without_keywords_is_not_falsely_safe():
+    """A forbidden pattern whose condition yields no checkable keyword must not certify
+    a dangerous template SAFE -- _check_pattern fails closed. Residual of f5c1b9e."""
+    tool = ToolDefinition(
+        name="cleanup", description="cleanup",
+        params=[ToolParam(name="mode", type="enum", enum_values=["a", "b"])],
+        operation_template="rm -rf /{mode}",
+    )
+    nokw = [ForbiddenPattern("destructive", "no recursive delete", "operation must not be destructive")]
+    assert verify_tool(tool, forbidden=nokw).status != ToolSafetyStatus.SAFE
