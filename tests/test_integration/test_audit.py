@@ -304,6 +304,9 @@ V13216_REQUIRED_KEYS = frozenset({
 
 M12_NEW_KEYS = frozenset({'policy_engine', 'policy_engine_source'})
 
+# v13.4.2: the ACTIVE engine (runtime truth), distinct from the requested policy_engine.
+M13_NEW_KEYS = frozenset({'policy_engine_active'})
+
 
 @pytest.fixture
 def mock_audit_db(monkeypatch):
@@ -402,6 +405,9 @@ class TestPolicyEngineWiring:
         )
         summary = _load_summary(tmp_path)
         assert summary['policy_engine'] == 'rego'
+        # Honest active-vs-requested: rego was REQUESTED but (no OPA binary in the
+        # test env) the builtin engine actually ran.
+        assert summary['policy_engine_active'] == 'builtin'
 
     def test_schema_v13216_fields_preserved(self, tmp_path, mock_audit_db):
         """Regression: all 11 v13.2.16 top-level fields remain in v13.3.0 schema."""
@@ -446,6 +452,6 @@ class TestPolicyEngineWiring:
             policy_source='default',
         )
         summary = _load_summary(tmp_path)
-        expected = V13216_REQUIRED_KEYS | M12_NEW_KEYS
+        expected = V13216_REQUIRED_KEYS | M12_NEW_KEYS | M13_NEW_KEYS
         extra = summary.keys() - expected
         assert not extra, f"Unexpected fields in summary: {extra}"

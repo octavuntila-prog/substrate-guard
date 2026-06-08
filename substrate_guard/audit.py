@@ -468,6 +468,7 @@ def run_audit(
         "substrate_guard_version": substrate_guard_version,
         "policy_engine": policy_mode,
         "policy_engine_source": policy_source,
+        "policy_engine_active": guard._policy.active_engine if guard._policy else policy_mode,
         "db_records": {
             "pipeline_traces": len(traces),
             "agent_runs": len(runs),
@@ -487,7 +488,7 @@ def run_audit(
         "violations_detail": violations[:50],  # first 50 for paper
         "layers": {
             "observe": "eBPF" if (guard._tracer and not guard._tracer.is_mock) else "mock",
-            "policy": policy_mode,
+            "policy": guard._policy.active_engine if guard._policy else policy_mode,
             "verify": "z3 (available, not exercised per-event in batch)" if guard._z3_available else "unavailable",
         },
         "server": {

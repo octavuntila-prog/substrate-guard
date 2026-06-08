@@ -155,10 +155,11 @@ class PolicyEngine:
         """
         from ..observe.events import Event, FileEvent, NetworkEvent, ProcessEvent
 
+        meta = getattr(event, "metadata", None) or {}
         input_data = {
             "agent": {
                 "id": event.agent_id,
-                "role": "unknown",
+                "role": meta.get("role", "unknown"),
             },
             "action": {
                 "type": event.type.value,
@@ -170,6 +171,14 @@ class PolicyEngine:
                 "comm": event.comm,
             }
         }
+        # Live-state rules (budget_enforcement, rate_limiting) fire ONLY when the
+        # event carries the state in its metadata. The retrospective DB-batch cron
+        # path does not populate it, so those 2 of 7 rules stay inert there BY DESIGN
+        # (not silently disabled) -- they are reachable on a live path that sets
+        # event.metadata["budget_remaining"] / ["api_calls_last_minute"].
+        for _k in ("budget_remaining", "api_calls_last_minute"):
+            if _k in meta:
+                input_data["context"][_k] = meta[_k]
 
         if isinstance(event, FileEvent):
             input_data["action"]["path"] = event.path
@@ -188,6 +197,14 @@ class PolicyEngine:
     def batch_evaluate(self, events: list) -> list[PolicyDecision]:
         """Evaluate a batch of events."""
         return [self.evaluate_event(e) for e in events]
+
+    @property
+    def active_engine(self) -> str:
+        """The engine that ACTUALLY decides events at runtime: 'opa' only when the
+        OPA binary is present AND .rego policies were loaded; otherwise 'builtin'.
+        Distinct from the *requested* mode -- a `--policy rego` run on a host without
+        the OPA binary still decides with the builtin Python rules."""
+        return "opa" if (self._opa_bin and self._policies) else "builtin"
 
     @property
     def stats(self) -> dict:
