@@ -157,13 +157,13 @@ def safe_parse(expr_str: str) -> sympy.Expr | None:
 
     if len(expr_str) > 1000:
         return None  # reject pathologically long inputs (DoS guard)
-    # DoS denylist: functions SymPy EAGERLY evaluates to astronomically large integers
-    # (factorial(50000), fibonacci(200000), binomial(...)) are outside the modeled
-    # arithmetic subset -- reject by name BEFORE parse_expr can burn CPU computing them.
-    _low = expr_str.lower()
-    if any(fn in _low for fn in (
-        "factorial", "binomial", "fibonacci", "gamma", "lucas", "catalan",
-    )):
+    # DoS: SymPy EAGERLY evaluates ANY function call inside parse_expr (factorial,
+    # primorial, bernoulli, harmonic, ...) to an astronomically large number, before the
+    # constant guards below can fire. The modeled subset has NO functions, so reject any
+    # function-call SYNTAX (identifier immediately followed by "(") up front. A name
+    # denylist was both incomplete (missed primorial/bernoulli/harmonic) AND over-blocked
+    # legit symbols named gamma/lucas/catalan; matching the call syntax avoids both.
+    if re.search(r"[A-Za-z_]\w*\s*\(", expr_str):
         return None
     try:
         parsed = parse_expr(expr_str, transformations=TRANSFORMATIONS, evaluate=False)

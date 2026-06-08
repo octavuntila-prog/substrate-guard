@@ -70,8 +70,23 @@ def test_eager_function_and_nested_power_dos_rejected():
     import time
 
     v = DistillationVerifier()
-    for expr in ("factorial(50000)", "fibonacci(200000)", "binomial(100000,50000)", "(2**1000)**1000"):
+    for expr in ("factorial(50000)", "fibonacci(200000)", "binomial(100000,50000)",
+                 "primorial(50000)", "bernoulli(50000)", "harmonic(200000)",
+                 "(2**1000)**1000"):
         t0 = time.time()
         r = v.verify_trace("t", [{"expression": expr, "value": "0"}])
         assert time.time() - t0 < 5, f"{expr} took too long (DoS)"
         assert r is not None
+
+
+def test_legit_symbol_containing_function_substring_not_overblocked():
+    """A symbol whose NAME merely contains a denied substring (gamma_factor, lucas_num,
+    catalan_number) must still parse -- the earlier substring denylist over-blocked any
+    expression containing those substrings; matching function-call SYNTAX does not.
+    (Bare gamma/lucas are genuine SymPy functions and parse out regardless.)"""
+    from substrate_guard.distill_verifier import safe_parse
+
+    assert safe_parse("gamma_factor + 1") is not None
+    assert safe_parse("2*lucas_num") is not None
+    assert safe_parse("catalan_number") is not None
+    assert safe_parse("factorial(5)") is None  # a real call is still rejected

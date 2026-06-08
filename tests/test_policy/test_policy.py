@@ -36,6 +36,8 @@ def test_type_confusion_does_not_fail_open():
     assert eng.evaluate({"action": {"type": None, "path": "/etc/passwd"}}).denied
     # command as a list -> str(list) lacks the literal 'rm -rf' substring
     assert eng.evaluate({"action": {"type": "process_exec", "command": ["rm", "-rf", "/"]}}).denied
+    # filename is substring-matched too but was missed by an earlier per-field deny list
+    assert eng.evaluate({"action": {"type": "process_exec", "filename": ["rm", "-rf", "/"]}}).denied
 
 
 def test_non_dict_input_does_not_crash():

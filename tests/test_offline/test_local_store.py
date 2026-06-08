@@ -158,7 +158,9 @@ def test_hmac_distinguishes_none_and_empty_agent_id(tmp_path):
     s = LocalStore(tmp_path / "x.db", hmac_key="k")
     h_none = s._compute_hmac("id", "t", "audit", None, "L", "{}", "p")
     h_empty = s._compute_hmac("id", "t", "audit", "", "L", "{}", "p")
+    h_nul = s._compute_hmac("id", "t", "audit", "\x00", "L", "{}", "p")
     assert h_none != h_empty
+    assert h_none != h_nul  # None must not collide with a real agent_id == "\x00"
     s.close()
 
 

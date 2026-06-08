@@ -291,16 +291,19 @@ class PolicyEngine:
         if not isinstance(context, dict):
             context = {}
 
-        # Fail-safe on TYPE CONFUSION: the rules gate and substring-match these fields,
-        # so a structured/mistyped value (type=["file_write"], command=["rm","-rf","/"],
-        # type=null) would slip past every `x in (...)` check and be silently ALLOWED.
-        # A present-but-non-string value here is evasive -> deny, never auto-allow.
-        for fld in ("type", "path", "command", "target_path", "file_path",
-                    "url", "host", "target"):
-            if fld in action and not isinstance(action[fld], str):
-                deny_reasons.append(
-                    f"malformed action.{fld} (expected string, got {type(action[fld]).__name__})"
-                )
+        # Fail-safe on TYPE CONFUSION: the rules gate on action.type and substring-match
+        # string fields, so an evasive value slips past every `x in (...)` check and is
+        # silently ALLOWED. NON-ENUMERATED (an earlier per-field list missed `filename`):
+        # the gating type must be a clean non-empty string, and NO action field may be a
+        # structured (list/dict) value -- str(["rm","-rf","/"]) lacks the literal
+        # substring. Scalar-but-wrong types (path=12345) are caught by the per-rule
+        # try/except below.
+        atype = action.get("type")
+        if "type" in action and not (isinstance(atype, str) and atype):
+            deny_reasons.append("malformed or missing action.type (cannot classify)")
+        for _k, _v in action.items():
+            if isinstance(_v, (list, dict)):
+                deny_reasons.append(f"malformed action.{_k} (structured value not allowed)")
 
         for rule in self._builtin_rules:
             try:

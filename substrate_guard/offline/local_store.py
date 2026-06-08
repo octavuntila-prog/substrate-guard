@@ -129,7 +129,10 @@ class LocalStore:
         # propagated to L6).
         payload = "\x1f".join([
             prev_hash, event_id, timestamp, event_type,
-            "\x00" if agent_id is None else agent_id,  # None must not collapse to ""
+            # Type-tag None vs string so None never collides with a real agent_id: None
+            # -> "\x00" (1 byte); every string -> "\x01"+value (so agent_id="\x00" ->
+            # "\x01\x00", distinct from None). An earlier "\x00" sentinel collided.
+            "\x00" if agent_id is None else "\x01" + agent_id,
             layer, data,
         ]).encode()
         return hmac.new(self.hmac_key, payload, hashlib.sha256).hexdigest()

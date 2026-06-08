@@ -320,6 +320,19 @@ class ASTTranslator:
         # Merge variables modified in either branch using Z3 If()
         self._merge_vars(condition, saved_vars, then_vars, else_vars)
 
+        # If EITHER branch only PARTIALLY returns (e.g. an inner if-without-else that
+        # returns on some sub-paths), _translate_body still yields a non-None value but
+        # the fall-through continuation INSIDE that branch is dropped -- the both-return
+        # merge below would then be a false VERIFIED. Abstain. (Sibling of the no-else
+        # partial-return case in _translate_body_from.)
+        for _body in (if_stmt.body, if_stmt.orelse):
+            if _body and self._contains_return(_body) and not self._branch_returns(_body):
+                self.unsupported.append(
+                    f"Line {if_stmt.lineno}: branch with a partial/conditional return "
+                    "(continuation not modeled)"
+                )
+                return then_result if then_result is not None else else_result
+
         # Merge return values
         if then_result is not None and else_result is not None:
             # Both branches return — a faithful Z3 If() over the two values.

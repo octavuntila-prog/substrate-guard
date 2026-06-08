@@ -144,3 +144,21 @@ def test_symmetric_if_else_both_return_still_verifies():
     )
     r = verify_code(src, Spec(postconditions=["__return__ >= 10"]))
     assert r.verified, f"symmetric if/else failed to VERIFY ({r.status})"
+
+
+def test_nested_partial_return_in_branch_does_not_verify():
+    """A branch that returns on only SOME sub-paths (an inner if-without-else) while the
+    other branch returns: _translate_body yields non-None for BOTH, so the both-return
+    merge dropped the fall-through `return 5`. Real f(1)=5 < 10, so the spec is violated
+    and the verifier must abstain. Residual found re-verifying commit fc0214d."""
+    src = (
+        "def f(x: int) -> int:\n"
+        "    if x > 0:\n"
+        "        if x > 100:\n"
+        "            return 200\n"
+        "    else:\n"
+        "        return 50\n"
+        "    return 5\n"
+    )
+    r = verify_code(src, Spec(postconditions=["__return__ >= 10"]))
+    assert not r.verified, f"nested partial-return wrongly VERIFIED ({r.status})"
