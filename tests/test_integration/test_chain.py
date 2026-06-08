@@ -173,6 +173,47 @@ class TestChainExport:
         finally:
             os.unlink(path)
 
+    def test_export_event_type_tamper_without_type_key_fails(self):
+        """A forged denormalized event_type must be rejected even when the original
+        event_data had no 'type' key. The earlier binding was conditional on 'type'
+        being present, so a no-type event left event_type forgeable."""
+        chain = AuditChain(secret=SECRET)
+        chain.append({"agent_id": "a", "x": 1})  # dict WITHOUT a 'type' key
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+            path = f.name
+        try:
+            chain.export(path)
+            data = json.loads(open(path).read())
+            data["entries"][0]["event_type"] = "forged"  # flip only the denormalized copy
+            open(path, "w").write(json.dumps(data))
+            ok, reason = AuditChain.verify_export(path, secret=SECRET)
+            assert ok is False
+            assert "event_type" in reason.lower()
+        finally:
+            os.unlink(path)
+
+    def test_concurrent_appends_are_serialized(self):
+        """Concurrent appends from many threads must not produce duplicate indices or
+        break verify() -- append acquires a lock over the index+head critical section."""
+        import threading
+
+        chain = AuditChain(secret=SECRET)
+
+        def worker():
+            for i in range(50):
+                chain.append({"type": "test", "agent_id": "a", "i": i})
+
+        threads = [threading.Thread(target=worker) for _ in range(8)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        assert len(chain._entries) == 400
+        assert [e.index for e in chain._entries] == list(range(400)), "duplicate/non-sequential indices"
+        ok, idx = chain.verify()
+        assert ok, f"verify failed at index {idx}"
+
     def test_wrong_secret_fails(self):
         chain = AuditChain(secret=SECRET)
         chain.append({"type": "test", "agent_id": "a1"})

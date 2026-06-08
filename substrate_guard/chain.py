@@ -28,6 +28,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import threading
 import time
 import os
 from dataclasses import dataclass, field, asdict
@@ -117,6 +118,7 @@ class AuditChain:
         self._secret = resolved_secret_bytes
         self._entries: list[ChainEntry] = []
         self._head_hash: str = GENESIS_HASH
+        self._lock = threading.Lock()  # serialize append; snapshot verify reads
 
     def _compute_hash(self, index: int, timestamp: float,
                       event_data: str, prev_hash: str) -> str:
@@ -129,10 +131,9 @@ class AuditChain:
         
         Accepts either an Event object (from observe layer) or a dict.
         """
-        index = len(self._entries)
-        timestamp = time.time()
-
-        # Normalize to dict
+        # Normalize to dict (no shared state). The raw fallback carries type="raw"
+        # INSIDE event_data so the denormalized event_type is always bound to a hashed
+        # field (the verify/verify_export event_type check is unconditional).
         if hasattr(event, 'to_dict'):
             event_data = event.to_dict()
             event_type = event_data.get("type", "unknown")
@@ -142,27 +143,30 @@ class AuditChain:
             event_type = event.get("type", "unknown")
             agent_id = event.get("agent_id", "unknown")
         else:
-            event_data = {"raw": str(event)}
+            event_data = {"raw": str(event), "type": "raw"}
             event_type = "raw"
             agent_id = "unknown"
 
         # Canonical JSON for deterministic hashing
         canonical = json.dumps(event_data, sort_keys=True, default=str)
-        
-        entry_hash = self._compute_hash(index, timestamp, canonical, self._head_hash)
 
-        entry = ChainEntry(
-            index=index,
-            timestamp=timestamp,
-            event_type=event_type,
-            agent_id=agent_id,
-            event_data=event_data,
-            prev_hash=self._head_hash,
-            hash=entry_hash,
-        )
-
-        self._entries.append(entry)
-        self._head_hash = entry_hash
+        # Critical section: index + head_hash + append must be atomic across threads,
+        # else concurrent appends produce duplicate indices and break verify().
+        with self._lock:
+            index = len(self._entries)
+            timestamp = time.time()
+            entry_hash = self._compute_hash(index, timestamp, canonical, self._head_hash)
+            entry = ChainEntry(
+                index=index,
+                timestamp=timestamp,
+                event_type=event_type,
+                agent_id=agent_id,
+                event_data=event_data,
+                prev_hash=self._head_hash,
+                hash=entry_hash,
+            )
+            self._entries.append(entry)
+            self._head_hash = entry_hash
 
         return entry
 
@@ -173,24 +177,28 @@ class AuditChain:
             (True, None) if chain is intact
             (False, index) if chain breaks at given index
         """
+        with self._lock:
+            entries = list(self._entries)  # consistent snapshot; no lock held during walk
         prev_hash = GENESIS_HASH
 
-        for entry in self._entries:
+        for entry in entries:
             canonical = json.dumps(entry.event_data, sort_keys=True, default=str)
             expected = self._compute_hash(
                 entry.index, entry.timestamp, canonical, prev_hash
             )
-            
+
             if entry.hash != expected:
                 return False, entry.index
             if entry.prev_hash != prev_hash:
                 return False, entry.index
             # Denormalized event_type/agent_id are not covered by the hash; require
             # them to match the authenticated event_data so a tampered copy is caught.
+            # UNCONDITIONAL: event_data always carries a 'type' (default "unknown",
+            # "raw" for the raw fallback), so a forged event_type is rejected even when
+            # the original had no explicit type.
             if entry.agent_id != entry.event_data.get("agent_id", "unknown"):
                 return False, entry.index
-            _t = entry.event_data.get("type")
-            if _t is not None and entry.event_type != _t:
+            if entry.event_type != entry.event_data.get("type", "unknown"):
                 return False, entry.index
 
             prev_hash = entry.hash
@@ -270,8 +278,7 @@ class AuditChain:
             ev_data = entry_data["event_data"]
             if entry_data.get("agent_id", "unknown") != ev_data.get("agent_id", "unknown"):
                 return False, f"agent_id inconsistent with event_data at index {entry_data['index']}"
-            _t = ev_data.get("type")
-            if _t is not None and entry_data.get("event_type") != _t:
+            if entry_data.get("event_type") != ev_data.get("type", "unknown"):
                 return False, f"event_type inconsistent with event_data at index {entry_data['index']}"
 
             prev_hash = entry_data["hash"]
