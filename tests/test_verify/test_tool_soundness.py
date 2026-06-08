@@ -77,3 +77,21 @@ def test_pattern_without_keywords_is_not_falsely_safe():
     )
     nokw = [ForbiddenPattern("destructive", "no recursive delete", "operation must not be destructive")]
     assert verify_tool(tool, forbidden=nokw).status != ToolSafetyStatus.SAFE
+
+
+def test_unmodelable_param_is_not_falsely_safe():
+    """A placeholder whose param cannot be modeled (enum with no values, or an
+    unrecognized type) must be attacker-controlled, not "" -- else a dangerous template
+    is falsely SAFE. Residual of b0b5599 (_build_operation_string used StringVal(''))."""
+    t1 = ToolDefinition(
+        name="shell", description="run",
+        params=[ToolParam(name="cmd", type="enum", enum_values=None)],
+        operation_template="exec {cmd}",
+    )
+    assert verify_tool(t1, forbidden=DELETE).status != ToolSafetyStatus.SAFE
+    t2 = ToolDefinition(
+        name="shell2", description="run",
+        params=[ToolParam(name="cmd", type="text")],
+        operation_template="exec {cmd}",
+    )
+    assert verify_tool(t2, forbidden=DELETE).status != ToolSafetyStatus.SAFE

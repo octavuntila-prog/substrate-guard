@@ -361,7 +361,11 @@ class ToolVerifier:
                 parts.append(StringVal(literal))
             p_info = z3_params.get(m.group(1))
             if p_info is None:
-                parts.append(StringVal(""))
+                # Unmodelable/unconstrained placeholder (enum with no values, an
+                # unrecognized param type, or an unknown name): model it as a FREE
+                # attacker-controlled string, NOT "" -- "" under-approximates the
+                # reachable operations and yields a FALSE SAFE.
+                parts.append(String(f"unmodeled_{m.group(1)}"))
             elif p_info["type"] == "string":
                 parts.append(p_info["var"])  # attacker-controlled symbolic string
             elif p_info["type"] == "enum":
