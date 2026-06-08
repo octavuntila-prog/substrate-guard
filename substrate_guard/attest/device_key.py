@@ -1,8 +1,17 @@
-"""Ed25519 device identity using cryptography (no PyNaCl required)."""
+"""Ed25519 device identity using cryptography (no PyNaCl required).
+
+The private key is stored UNENCRYPTED on disk (raw Ed25519, NoEncryption) and is
+protected by file permissions: owner-only via ``chmod 0o600`` on POSIX and via an
+``icacls`` ACL restriction on Windows. The audited gap was that Windows had NO
+restriction (``chmod`` only toggles the read-only bit there), leaving the key
+readable by other accounts. At-rest passphrase encryption is future work; until
+then ``key_dir`` should live on a protected volume.
+"""
 
 from __future__ import annotations
 
 import hashlib
+import logging
 import os
 from pathlib import Path
 
@@ -11,6 +20,8 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
     Ed25519PublicKey,
 )
+
+logger = logging.getLogger("substrate_guard.attest")
 
 
 class DeviceKey:
@@ -44,14 +55,56 @@ class DeviceKey:
         )
         self._private_path.write_bytes(priv)
         self._public_path.write_bytes(pub)
+        self._restrict_private()
         if os.name != "nt":
             try:
-                os.chmod(self._private_path, 0o600)
                 os.chmod(self._public_path, 0o644)
             except OSError:
                 pass
         self._signing_key = sk
         self._verify_key = sk.public_key()
+
+    def _restrict_private(self) -> None:
+        """Restrict the at-rest private key to the owner only.
+
+        POSIX: ``chmod 0o600``. Windows: ``os.chmod`` only toggles the read-only bit
+        (not the ACL), so use ``icacls`` to remove inherited permissions and grant
+        the current user alone -- otherwise the unencrypted key is readable by other
+        accounts. Failures are logged loudly (the key is exposed), never raised.
+        """
+        path = self._private_path
+        if not path.exists():
+            return
+        if os.name != "nt":
+            try:
+                os.chmod(path, 0o600)
+            except OSError as e:
+                logger.warning("Could not chmod device private key: %s", e)
+            return
+        import getpass
+        import shutil
+        import subprocess
+
+        icacls = shutil.which("icacls")  # full path (avoids partial-path exec)
+        if icacls is None:
+            logger.warning(
+                "icacls not found; cannot restrict the device private-key ACL. The key "
+                "at %s is stored UNENCRYPTED and may be readable by other accounts.", path,
+            )
+            return
+        user = os.environ.get("USERNAME") or getpass.getuser()
+        try:
+            subprocess.run(
+                [icacls, str(path), "/inheritance:r", "/grant:r", f"{user}:F"],
+                check=True, capture_output=True, timeout=15,
+            )
+        except Exception as e:  # best-effort hardening: must not crash key setup
+            logger.warning(
+                "Could not restrict the device private-key ACL on Windows (%s). The "
+                "key at %s is stored UNENCRYPTED and may be readable by other accounts "
+                "-- restrict it manually or move key_dir to a protected location.",
+                e, path,
+            )
 
     def _load(self) -> None:
         priv_bytes = self._private_path.read_bytes()
@@ -63,6 +116,7 @@ class DeviceKey:
         )
         if not self._public_path.exists():
             self._public_path.write_bytes(pub)
+        self._restrict_private()  # ensure an existing key is owner-only
 
     def sign(self, data: bytes) -> bytes:
         if self._signing_key is None:
