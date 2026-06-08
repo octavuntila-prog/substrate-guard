@@ -162,3 +162,19 @@ def test_nested_partial_return_in_branch_does_not_verify():
     )
     r = verify_code(src, Spec(postconditions=["__return__ >= 10"]))
     assert not r.verified, f"nested partial-return wrongly VERIFIED ({r.status})"
+
+
+def test_function_falling_off_the_end_does_not_verify():
+    """A function whose body does not return on all paths falls off the end with an
+    implicit `return None` (not modeled). f(0) returns None, violating __return__>=100,
+    so the verifier must abstain rather than prove a property over the early returns
+    only. Residual found re-verifying commit 1b5e006."""
+    src = (
+        "def f(x: int) -> int:\n"
+        "    if x > 100:\n"
+        "        return 200\n"
+        "    if x > 50:\n"
+        "        return 100\n"
+    )
+    r = verify_code(src, Spec(postconditions=["__return__ >= 100"]))
+    assert not r.verified, f"fall-off-the-end function wrongly VERIFIED ({r.status})"

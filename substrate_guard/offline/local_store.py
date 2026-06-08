@@ -127,14 +127,14 @@ class LocalStore:
         # unambiguous unit separator, so a tampered event_type/agent_id/timestamp/
         # layer/id is detected by verify_chain (the chain.py denormalized-field fix,
         # propagated to L6).
-        payload = "\x1f".join([
-            prev_hash, event_id, timestamp, event_type,
-            # Type-tag None vs string so None never collides with a real agent_id: None
-            # -> "\x00" (1 byte); every string -> "\x01"+value (so agent_id="\x00" ->
-            # "\x01\x00", distinct from None). An earlier "\x00" sentinel collided.
-            "\x00" if agent_id is None else "\x01" + agent_id,
-            layer, data,
-        ]).encode()
+        # Canonical JSON list -> UNAMBIGUOUS field boundaries (no \x1f delimiter
+        # injection, where an embedded separator rebalances content across fields to
+        # forge a collision) AND native None-vs-"" distinction (null vs ""), so any
+        # tampered field is detected by verify_chain. Replaces a "\x1f".join that emitted
+        # the fields raw.
+        payload = json.dumps(
+            [prev_hash, event_id, timestamp, event_type, agent_id, layer, data]
+        ).encode()
         return hmac.new(self.hmac_key, payload, hashlib.sha256).hexdigest()
 
     def _get_last_hash(self) -> str:

@@ -72,7 +72,7 @@ def test_eager_function_and_nested_power_dos_rejected():
     v = DistillationVerifier()
     for expr in ("factorial(50000)", "fibonacci(200000)", "binomial(100000,50000)",
                  "primorial(50000)", "bernoulli(50000)", "harmonic(200000)",
-                 "(2**1000)**1000"):
+                 "1000000!", "2000000!!", "(2**1000)**1000"):  # ! = postfix factorial
         t0 = time.time()
         r = v.verify_trace("t", [{"expression": expr, "value": "0"}])
         assert time.time() - t0 < 5, f"{expr} took too long (DoS)"

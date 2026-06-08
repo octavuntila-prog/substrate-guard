@@ -164,6 +164,17 @@ def test_hmac_distinguishes_none_and_empty_agent_id(tmp_path):
     s.close()
 
 
+def test_hmac_no_delimiter_injection(tmp_path):
+    """Distinct (layer, data) tuples that the old "\\x1f".join collided (content
+    rebalanced across the field boundary) must now hash differently -- json field
+    boundaries are unambiguous."""
+    s = LocalStore(tmp_path / "x.db", hmac_key="k")
+    h1 = s._compute_hmac("id", "t", "audit", "a", "L", "A\x1fB", "p")
+    h2 = s._compute_hmac("id", "t", "audit", "a", "L\x1fA", "B", "p")
+    assert h1 != h2  # the old join produced byte-identical payloads here
+    s.close()
+
+
 def test_different_hmac_key_different_chain(tmp_path):
     a = LocalStore(tmp_path / "a.db", hmac_key="aaa")
     b = LocalStore(tmp_path / "b.db", hmac_key="bbb")

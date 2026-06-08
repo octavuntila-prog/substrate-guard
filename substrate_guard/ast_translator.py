@@ -103,6 +103,15 @@ class ASTTranslator:
         # Translate function body
         return_expr = self._translate_body(func_def.body)
 
+        # If the body does NOT return on all paths, Python falls off the end with an
+        # implicit `return None`, which the modeled subset does not represent. Proving a
+        # __return__ property would then ignore that path (a false VERIFIED), so flag it
+        # and let code_verifier abstain via the non-empty `unsupported` gate.
+        if not self._branch_returns(func_def.body):
+            self.unsupported.append(
+                "Function may fall off the end (implicit return None not modeled)"
+            )
+
         return TranslationResult(
             params=params,
             return_expr=return_expr,

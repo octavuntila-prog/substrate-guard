@@ -160,10 +160,11 @@ def safe_parse(expr_str: str) -> sympy.Expr | None:
     # DoS: SymPy EAGERLY evaluates ANY function call inside parse_expr (factorial,
     # primorial, bernoulli, harmonic, ...) to an astronomically large number, before the
     # constant guards below can fire. The modeled subset has NO functions, so reject any
-    # function-call SYNTAX (identifier immediately followed by "(") up front. A name
-    # denylist was both incomplete (missed primorial/bernoulli/harmonic) AND over-blocked
-    # legit symbols named gamma/lucas/catalan; matching the call syntax avoids both.
-    if re.search(r"[A-Za-z_]\w*\s*\(", expr_str):
+    # function-call SYNTAX (identifier immediately followed by "(") AND the postfix
+    # factorial operator "!" (enabled by factorial_notation in standard_transformations,
+    # e.g. "1000000!"), both up front. A name denylist was incomplete and over-blocked
+    # legit symbols; matching the call syntax + "!" avoids both.
+    if "!" in expr_str or re.search(r"[A-Za-z_]\w*\s*\(", expr_str):
         return None
     try:
         parsed = parse_expr(expr_str, transformations=TRANSFORMATIONS, evaluate=False)
