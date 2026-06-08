@@ -16,8 +16,10 @@ class SyncEngine:
     Assumes event ids are unique per event (UUIDs over an append-only log), so
     id-existence == event-identity. NOT a general CRDT: on a same-id conflict with
     DIFFERENT data, OR IGNORE keeps the existing remote row (no value-level merge or
-    conflict detection). Edge: a row whose ``mark_synced`` fails after a successful
-    remote insert is re-pushed as a harmless no-op OR IGNORE on the next cycle.
+    conflict detection). Each row is committed INDIVIDUALLY, so a later row's failure
+    cannot roll back an already-synced row (PostgreSQL aborts the whole transaction on
+    a failed statement), and an idempotent no-op for an already-present row still
+    commits -- so it is marked synced rather than re-pushed forever.
     """
 
     def __init__(
@@ -64,11 +66,17 @@ class SyncEngine:
                         event["agent_id"], event["layer"], json.dumps(event["data"]),
                         event["hmac_hash"], event["prev_hash"], "offline_sync",
                     ))
-                    if cur.rowcount and cur.rowcount > 0:
-                        synced_ids.append(event["id"])
+                    # Commit PER ROW: a later row's failure cannot roll back an
+                    # already-synced row (Postgres aborts the whole txn on a failed
+                    # statement), and an idempotent no-op (row already present) still
+                    # commits -- so it is marked synced, not re-pushed forever. A row
+                    # is marked ONLY after its remote commit succeeds (no data loss).
+                    conn.commit()
+                    synced_ids.append(event["id"])
                 except Exception as e:
+                    with suppress(Exception):
+                        conn.rollback()  # clear Postgres aborted-transaction state
                     logger.warning("Failed to sync event %s: %s", event["id"], e)
-            conn.commit()
             with suppress(Exception):
                 cur.close()
             with suppress(Exception):

@@ -85,3 +85,26 @@ def test_sync_all_failed_reports_failed_not_complete(tmp_path):
     assert out["synced"] == 0
     assert store.count(synced=False) == 1  # local event stays unsynced
     store.close()
+
+
+def test_sync_already_present_row_is_marked_not_re_pushed(tmp_path):
+    """An event already on the remote (e.g. a prior sync that did not mark locally)
+    must be marked synced on the next pass -- not reported failed and re-pushed
+    forever (the regression in the cur.rowcount 'honest status' change)."""
+    store = LocalStore(tmp_path / "local.db", hmac_key="k")
+    store.store_event("audit", "guard", {"n": 1})
+    ev = store.get_unsynced(limit=1)[0]
+    remote_path = tmp_path / "remote.db"
+    rc = _remote_schema(remote_path)
+    rc.execute(  # pre-insert the row remotely (id is the PRIMARY KEY)
+        "INSERT INTO guard_events (id,timestamp,event_type,agent_id,layer,data,"
+        "hmac_hash,prev_hash,source) VALUES (?,?,?,?,?,?,?,?,?)",
+        (ev["id"], "t", "audit", "a", "guard", "{}", "h", "p", "pre"),
+    )
+    rc.commit()
+    rc.close()
+
+    out = SyncEngine(store, lambda: sqlite3.connect(str(remote_path))).sync()
+    assert out["status"] == "complete", out   # already-present counts as synced
+    assert store.count(synced=False) == 0      # marked, not re-pushed
+    store.close()
