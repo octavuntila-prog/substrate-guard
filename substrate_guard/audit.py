@@ -344,7 +344,7 @@ def run_audit(
     if all(v == -1 for v in counts.values()):
         print(f"{C.RED}  ✗ Cannot connect to database{C.RESET}")
         print(f"  URL: {db_url[:30]}...")
-        return 1
+        return 2  # 2 = audit ERROR (DB connect), distinct from 1 = violations
     
     for table, count in counts.items():
         if count >= 0:
@@ -616,7 +616,7 @@ def main():
         print(f"Use --db-url or set credentials in .env / environment.")
         print(f"\nExample:")
         print(f"  python3 -m substrate_guard.audit --db-url postgresql://user:pass@postgres:5432/dbname")
-        return 1
+        return 2  # 2 = config ERROR (no DB URL), distinct from 1 = violations
 
     policy_mode, policy_source = resolve_policy_mode(args)
     policy_path = resolve_policy_path(policy_mode)

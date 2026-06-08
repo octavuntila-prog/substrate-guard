@@ -122,7 +122,14 @@ install_host() {
         || warn "z3-solver install failed — Layer 3 will be disabled"
     
     pip3 install pytest --break-system-packages -q 2>/dev/null
-    
+
+    # psycopg2 — required for the cron audit to reach PostgreSQL. Without it the audit
+    # cannot connect; the cron job now reports that as an ERROR (exit 2), not a false
+    # "VIOLATIONS DETECTED" alert -- but the audit still needs the driver.
+    pip3 install psycopg2-binary --break-system-packages -q 2>/dev/null \
+        && ok "psycopg2-binary installed" \
+        || warn "psycopg2-binary install failed — cron audit cannot reach PostgreSQL"
+
     # Copy project
     mkdir -p "$INSTALL_DIR"
     cp -r "$PROJECT_DIR/substrate_guard" "$INSTALL_DIR/"

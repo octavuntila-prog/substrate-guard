@@ -43,13 +43,13 @@ mkdir -p "$LOG_DIR"
         echo "FATAL: HMAC key file missing at $HMAC_KEY_FILE"
         echo "       Set up via: openssl rand -hex 32 > $HMAC_KEY_FILE && chmod 600 $HMAC_KEY_FILE"
         echo "       See docs/releases/v13.4.0.md for ops procedure."
-        exit 1
+        exit 2  # 2 = setup ERROR (not a policy violation)
     fi
     PERMS=$(stat -c %a "$HMAC_KEY_FILE" 2>/dev/null)
     if [ "$PERMS" != "600" ] && [ "$PERMS" != "400" ]; then
         echo "FATAL: HMAC key file has insecure permissions ($PERMS), must be 600 or 400"
         echo "       Fix via: chmod 600 $HMAC_KEY_FILE"
-        exit 1
+        exit 2  # 2 = setup ERROR (not a policy violation)
     fi
     export SUBSTRATE_GUARD_HMAC_SECRET=$(cat "$HMAC_KEY_FILE")
 
@@ -67,28 +67,37 @@ mkdir -p "$LOG_DIR"
         --output "$LOG_DIR" 2>&1
     
     EXIT_CODE=$?
-    
-    if [ $EXIT_CODE -ne 0 ]; then
-        echo "VIOLATIONS DETECTED — sending alert"
-        # Use existing Telegram bot (same as watchdog.sh and disk-monitor.sh)
+
+    # Audit exit-code contract (substrate_guard.audit): 0 = clean, 1 = policy
+    # violations, 2 = audit ERROR (DB/config). A DB outage is an ERROR, NOT a
+    # violation, so it must not fire the "VIOLATIONS DETECTED" alert.
+    _send_telegram() {
         if [ -f "$APP_DIR/.env" ]; then
             export $(grep -E '^(TELEGRAM_BOT_TOKEN|TELEGRAM_CHAT_ID|TELEGRAM_ADMIN_ID)=' "$APP_DIR/.env" | xargs)
-            # Use TELEGRAM_CHAT_ID if present, otherwise fall back to TELEGRAM_ADMIN_ID
             TELEGRAM_TARGET="${TELEGRAM_CHAT_ID:-${TELEGRAM_ADMIN_ID:-}}"
             if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "$TELEGRAM_TARGET" ]; then
-                LATEST_REPORT=$(ls -t "$LOG_DIR"/audit_*.json 2>/dev/null | head -1)
-                if [ -n "$LATEST_REPORT" ]; then
-                    VIOLATIONS=$(python3 -c "import json; d=json.load(open('$LATEST_REPORT')); print(d['evaluation']['violations'])")
-                    EVENTS=$(python3 -c "import json; d=json.load(open('$LATEST_REPORT')); print(d['events_generated'])")
-                    MSG="⚠️ substrate-guard: ${VIOLATIONS} violations in ${EVENTS} events (last 24h). Check $LATEST_REPORT"
-                else
-                    MSG="⚠️ substrate-guard: Violations detected but no report file found"
-                fi
                 curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-                    -d "chat_id=${TELEGRAM_TARGET}" \
-                    -d "text=${MSG}" > /dev/null 2>&1 || true
+                    -d "chat_id=${TELEGRAM_TARGET}" -d "text=$1" > /dev/null 2>&1 || true
             fi
         fi
+    }
+
+    if [ $EXIT_CODE -eq 0 ]; then
+        echo "Audit clean — no violations"
+    elif [ $EXIT_CODE -eq 1 ]; then
+        echo "VIOLATIONS DETECTED — sending alert"
+        LATEST_REPORT=$(ls -t "$LOG_DIR"/audit_*.json 2>/dev/null | head -1)
+        if [ -n "$LATEST_REPORT" ]; then
+            VIOLATIONS=$(python3 -c "import json; d=json.load(open('$LATEST_REPORT')); print(d['evaluation']['violations'])")
+            EVENTS=$(python3 -c "import json; d=json.load(open('$LATEST_REPORT')); print(d['events_generated'])")
+            MSG="⚠️ substrate-guard: ${VIOLATIONS} violations in ${EVENTS} events (last 24h). Check $LATEST_REPORT"
+        else
+            MSG="⚠️ substrate-guard: Violations detected but no report file found"
+        fi
+        _send_telegram "$MSG"
+    else
+        echo "AUDIT ERROR (exit $EXIT_CODE) — DB/config failure, NOT a violation"
+        _send_telegram "🔧 substrate-guard: audit FAILED to run (exit ${EXIT_CODE}) — DB/config error, NOT a policy violation. Check $LOG_FILE"
     fi
     
     echo "=== Done: $(date) ==="
