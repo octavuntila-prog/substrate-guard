@@ -270,6 +270,15 @@ class PolicyEngine:
         """Evaluate using built-in Python rules (no OPA dependency)."""
         deny_reasons = []
 
+        # Fail-safe on a non-dict container (evaluate("x") / a JSON string or array);
+        # input_data.get() would otherwise raise AttributeError.
+        if not isinstance(input_data, dict):
+            return PolicyDecision(
+                allowed=False,
+                reasons=["malformed policy input (expected a JSON object)"],
+                policy_file="builtin",
+            )
+
         # Defensive: malformed-but-valid JSON can make these non-dicts (e.g. a string
         # `action`); coerce so the rules' .get() / string ops do not crash.
         action = input_data.get("action", {})
@@ -281,6 +290,17 @@ class PolicyEngine:
             agent = {}
         if not isinstance(context, dict):
             context = {}
+
+        # Fail-safe on TYPE CONFUSION: the rules gate and substring-match these fields,
+        # so a structured/mistyped value (type=["file_write"], command=["rm","-rf","/"],
+        # type=null) would slip past every `x in (...)` check and be silently ALLOWED.
+        # A present-but-non-string value here is evasive -> deny, never auto-allow.
+        for fld in ("type", "path", "command", "target_path", "file_path",
+                    "url", "host", "target"):
+            if fld in action and not isinstance(action[fld], str):
+                deny_reasons.append(
+                    f"malformed action.{fld} (expected string, got {type(action[fld]).__name__})"
+                )
 
         for rule in self._builtin_rules:
             try:

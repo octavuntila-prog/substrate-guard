@@ -25,6 +25,26 @@ def test_evaluate_does_not_crash_on_malformed_input():
     assert d2.denied
 
 
+def test_type_confusion_does_not_fail_open():
+    """A dangerous action with a mistyped discriminating field must be DENIED, not
+    silently ALLOWED. The rules gate on action.type and substring-match command, so a
+    list/null value slips past every `x in (...)` check -> fail-open."""
+    eng = PolicyEngine(policy_path="nonexistent/", use_opa_binary=False)
+    # type as a list -> the file_write gate never fires -> would write /etc/passwd
+    assert eng.evaluate({"action": {"type": ["file_write"], "path": "/etc/passwd"}}).denied
+    # type null
+    assert eng.evaluate({"action": {"type": None, "path": "/etc/passwd"}}).denied
+    # command as a list -> str(list) lacks the literal 'rm -rf' substring
+    assert eng.evaluate({"action": {"type": "process_exec", "command": ["rm", "-rf", "/"]}}).denied
+
+
+def test_non_dict_input_does_not_crash():
+    """A non-dict top-level input must fail safe (deny), not raise AttributeError."""
+    eng = PolicyEngine(policy_path="nonexistent/", use_opa_binary=False)
+    d = eng.evaluate("hello")
+    assert isinstance(d, PolicyDecision) and d.denied
+
+
 # ============================================
 # DENY tests — 25 actions that must be blocked
 # ============================================
