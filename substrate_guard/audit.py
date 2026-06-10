@@ -202,7 +202,12 @@ def query_db(db_url: str, query: str, params: tuple = ()) -> list[dict]:
         except ImportError:
             logger.error("Neither psycopg2 nor psycopg3 installed.")
             logger.error("Install: pip install psycopg2-binary --break-system-packages")
-            return []
+            # Fail LOUD, not empty. Returning [] made fetch_table_counts read 0 (not -1),
+            # bypassing the connect-guard, so the cron reported "clean" on ZERO records
+            # forever with no alert (H-C). Raising -> counts become -1 -> guard fires -> exit 2.
+            raise RuntimeError(
+                "No PostgreSQL driver (psycopg2/psycopg) installed -- cannot run the audit"
+            )
 
     conn = psycopg2.connect(db_url)
     try:
@@ -639,14 +644,23 @@ def main():
         f"(source: {policy_source}, path: {policy_path})"
     )
 
-    return run_audit(
-        db_url,
-        hours=args.hours,
-        output_dir=args.output,
-        policy_path=policy_path,
-        policy_mode=policy_mode,
-        policy_source=policy_source,
-    )
+    try:
+        return run_audit(
+            db_url,
+            hours=args.hours,
+            output_dir=args.output,
+            policy_path=policy_path,
+            policy_mode=policy_mode,
+            policy_source=policy_source,
+        )
+    except Exception:
+        # Any unexpected error (transient DB drop mid-SELECT, schema drift, a bug in
+        # event conversion / report) MUST map to the audit-ERROR exit code 2 -- never an
+        # uncaught traceback (exit 1), which cron-audit.sh maps to a FALSE "VIOLATIONS
+        # DETECTED" page quoting a stale prior-run report (H-B).
+        logger.exception("Audit aborted by an unexpected error")
+        print(f"{C.RED}  ✗ Audit ERROR (unexpected — see log){C.RESET}; exiting 2, not a violation")
+        return 2
 
 
 if __name__ == "__main__":

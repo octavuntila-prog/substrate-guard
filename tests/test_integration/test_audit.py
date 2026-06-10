@@ -471,3 +471,40 @@ class TestPolicyEngineWiring:
         expected = V13216_REQUIRED_KEYS | M12_NEW_KEYS | M13_NEW_KEYS
         extra = summary.keys() - expected
         assert not extra, f"Unexpected fields in summary: {extra}"
+
+
+def test_query_db_raises_when_no_psycopg_driver(monkeypatch):
+    """H-C: with NO psycopg driver installed, query_db must RAISE (not return []), so
+    fetch_table_counts reads -1 and the connect-guard fires (exit 2) instead of the cron
+    reporting 'clean' on ZERO records forever with no alert."""
+    import builtins
+    import substrate_guard.audit as audit_mod
+
+    real_import = builtins.__import__
+
+    def blocked(name, *args, **kwargs):
+        if name == "psycopg2" or name.startswith("psycopg2.") or name == "psycopg" or name.startswith("psycopg."):
+            raise ImportError(f"blocked {name}")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", blocked)
+    with pytest.raises(RuntimeError, match="No PostgreSQL driver"):
+        audit_mod.query_db("postgresql://stub@localhost/db", "SELECT 1")
+    # consequence: fetch_table_counts yields -1 (not 0), which fires the connect-guard
+    counts = audit_mod.fetch_table_counts("postgresql://stub@localhost/db")
+    assert counts and all(v == -1 for v in counts.values())
+
+
+def test_main_maps_unexpected_exception_to_exit_2(monkeypatch):
+    """H-B: an unexpected exception escaping run_audit must become exit 2 (audit ERROR),
+    never an uncaught exit 1 -- which cron-audit.sh maps to a FALSE 'VIOLATIONS DETECTED'
+    page quoting a stale prior-run report."""
+    import sys
+    import substrate_guard.audit as audit_mod
+
+    def boom(*args, **kwargs):
+        raise RuntimeError("transient DB drop mid-SELECT")
+
+    monkeypatch.setattr(audit_mod, "run_audit", boom)
+    monkeypatch.setattr(sys, "argv", ["audit", "--db-url", "postgresql://stub@localhost/db"])
+    assert audit_mod.main() == 2
