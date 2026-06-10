@@ -125,7 +125,7 @@ class ComplianceExporter:
                 },
                 "CC4.1_monitoring_controls": {
                     "description": "The entity monitors the effectiveness of controls",
-                    "control": "HMAC-SHA256 tamper-evident audit chain ensures no event can be modified, deleted, or inserted without detection",
+                    "control": "HMAC-SHA256 tamper-evident audit chain: modification, reordering, or insertion of any event is detected on re-verification; deletion from the end (tail-truncation) is detected against an out-of-band expected count/head or an external timestamp anchor, not by the chain alone",
                     "evidence": self._chain.summary(),
                 },
             },

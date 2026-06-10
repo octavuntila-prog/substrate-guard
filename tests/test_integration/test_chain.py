@@ -473,6 +473,13 @@ class TestComplianceExport:
             assert "CC7.2_system_monitoring" in data["trust_service_criteria"]
             assert "CC8.1_change_management" in data["trust_service_criteria"]
             assert "CC4.1_monitoring_controls" in data["trust_service_criteria"]
+            # M-d: the CC4.1 control must NOT over-claim deletion-detection -- tail-truncation
+            # is detected only out-of-band (H1). This auditor-facing string must stay honest.
+            cc41 = data["trust_service_criteria"]["CC4.1_monitoring_controls"]["control"].lower()
+            assert "tail-truncation" in cc41 and "out-of-band" in cc41, \
+                "CC4.1 control lost its honest tail-truncation scoping"
+            assert "deleted, or inserted without detection" not in cc41, \
+                "CC4.1 regressed to the unqualified deletion-detection over-claim"
             assert data["chain_integrity"]["status"] == "VERIFIED"
         finally:
             os.unlink(path)

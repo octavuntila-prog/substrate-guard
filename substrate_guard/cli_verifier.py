@@ -1,7 +1,10 @@
-"""Z3 CLI Command Verifier — proves shell commands are safe.
+"""CLI Command Safety Checker — regex/pattern denylist for shell commands.
 
-Verifies that AI-suggested shell commands don't contain dangerous patterns.
-Uses Z3 to formally model command structure and check against forbidden patterns.
+Flags AI-suggested shell commands that match known-dangerous patterns. This is a
+DENYLIST, not a proof: it imports no Z3 and makes no formal guarantee. A command it
+passes is "not matched by any known-bad pattern", NOT "proven safe" -- an unlisted
+dangerous construct passes. (The decorative Z3 wrapper was removed; this module header
+previously still claimed "Z3 ... proves shell commands are safe".)
 """
 
 import re
