@@ -6,7 +6,13 @@ buggy 2-way `EXIT_CODE -ne 0 -> VIOLATIONS DETECTED` branch) and deploy.sh never
 scripts/ to /opt, so the good script was unreachable on a real host. These tests fail if
 any of that regresses.
 """
+import os
+import shutil
+import subprocess
+import sys
 from pathlib import Path
+
+import pytest
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 
@@ -45,3 +51,47 @@ def test_deploy_install_host_copies_scripts_dir():
     src = (SCRIPTS / "deploy.sh").read_text(encoding="utf-8")
     assert 'cp -r "$PROJECT_DIR/scripts" "$INSTALL_DIR/"' in src, \
         "deploy.sh install_host does not copy scripts/ to /opt -- cron-audit.sh never reaches the host"
+
+
+# ── M-g: EXECUTE the cron script (not grep) and assert real exit codes ──────────────
+_CRON = SCRIPTS / "cron-audit.sh"
+_NO_BASH = sys.platform == "win32" or shutil.which("bash") is None
+
+
+def _run_cron(tmp_path, setup_key):
+    """Execute cron-audit.sh with all host paths redirected into tmp (env-overridable);
+    setup_key prepares or omits the HMAC key. Returns (exit_code, log_text)."""
+    log_dir = tmp_path / "log"
+    key = tmp_path / "hmac.key"
+    setup_key(key)
+    env = dict(
+        os.environ,
+        LOG_DIR=str(log_dir),
+        APP_DIR=str(tmp_path / "noapp"),    # no .env -> credential/telegram sourcing skipped
+        GUARD_DIR=str(tmp_path / "noguard"),
+        HMAC_KEY_FILE=str(key),
+    )
+    r = subprocess.run(["bash", str(_CRON)], env=env, capture_output=True, timeout=60)
+    logs = list(log_dir.glob("cron_*.log"))
+    log_text = logs[0].read_text(errors="replace") if logs else ""
+    return r.returncode, log_text
+
+
+@pytest.mark.skipif(_NO_BASH, reason="needs a POSIX bash to execute the cron script")
+def test_cron_audit_missing_key_exits_2(tmp_path):
+    """M-g (executes the script, not grep): a missing HMAC key -> exit 2 + FATAL log."""
+    code, log = _run_cron(tmp_path, setup_key=lambda k: None)  # key absent
+    assert code == 2, f"missing key did not exit 2 (got {code})"
+    assert "FATAL: HMAC key file missing" in log
+
+
+@pytest.mark.skipif(_NO_BASH, reason="needs a POSIX bash to execute the cron script")
+def test_cron_audit_insecure_perms_exits_2(tmp_path):
+    """M-g: a world-readable HMAC key (0644) -> exit 2 + insecure-perms FATAL."""
+    def setup(k):
+        k.write_text("deadbeef")
+        os.chmod(k, 0o644)
+
+    code, log = _run_cron(tmp_path, setup_key=setup)
+    assert code == 2, f"insecure-perms key did not exit 2 (got {code})"
+    assert "insecure permissions" in log

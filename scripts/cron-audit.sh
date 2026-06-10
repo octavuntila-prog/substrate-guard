@@ -2,9 +2,12 @@
 # substrate-guard daily audit — called by cron
 # Runs after db-backup.sh (03:00), before disk-monitor.sh cycle
 
-LOG_DIR="/var/log/substrate-guard"
+# Paths are env-overridable (same production defaults) so the exit-code logic can be
+# exercised by tests without touching /etc or /opt (M-g).
+LOG_DIR="${LOG_DIR:-/var/log/substrate-guard}"
 LOG_FILE="$LOG_DIR/cron_$(date +%Y%m%d).log"
-APP_DIR="/opt/ai-research-agency"
+APP_DIR="${APP_DIR:-/opt/ai-research-agency}"
+GUARD_DIR="${GUARD_DIR:-/opt/substrate-guard}"
 
 mkdir -p "$LOG_DIR"
 
@@ -52,7 +55,7 @@ mkdir -p "$LOG_DIR"
     # Production deployments MUST have /etc/substrate-guard/hmac.key configured
     # with a stable secret (chmod 600). Random fallback would lose cross-run
     # chain verifiability, so we abort here if missing or insecure.
-    HMAC_KEY_FILE="/etc/substrate-guard/hmac.key"
+    HMAC_KEY_FILE="${HMAC_KEY_FILE:-/etc/substrate-guard/hmac.key}"
     if [ ! -f "$HMAC_KEY_FILE" ]; then
         echo "FATAL: HMAC key file missing at $HMAC_KEY_FILE"
         echo "       Set up via: openssl rand -hex 32 > $HMAC_KEY_FILE && chmod 600 $HMAC_KEY_FILE"
@@ -76,8 +79,8 @@ mkdir -p "$LOG_DIR"
     #   python3 -m substrate_guard.audit --policy rego [...]
 
     # Run audit for last 24 hours
-    cd /opt/substrate-guard
-    PYTHONPATH=/opt/substrate-guard python3 -m substrate_guard.audit \
+    cd "$GUARD_DIR"
+    PYTHONPATH="$GUARD_DIR" python3 -m substrate_guard.audit \
         --db-url "$DB_URL" \
         --hours 24 \
         --output "$LOG_DIR" 2>&1
