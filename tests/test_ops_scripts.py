@@ -25,6 +25,16 @@ def test_cron_audit_keeps_hmac_and_distinct_exit_codes():
         "cron-audit.sh lost its distinct violation(1)/error(2) exit-code branches"
 
 
+def test_cron_audit_alerts_on_hmac_fatal_not_silent():
+    """M2: a missing/insecure HMAC key must PAGE, not be a silent daily no-op -- the
+    telegram helper is defined before the FATAL exits and called on them."""
+    src = (SCRIPTS / "cron-audit.sh").read_text(encoding="utf-8")
+    helper = src.find("_send_telegram() {")
+    first_fatal = src.find("exit 2")
+    assert 0 <= helper < first_fatal, "telegram helper defined AFTER the HMAC FATAL exit -- alert is silent"
+    assert "_send_telegram \"" in src, "the FATAL paths do not call the telegram helper"
+
+
 def test_deploy_install_host_copies_scripts_dir():
     src = (SCRIPTS / "deploy.sh").read_text(encoding="utf-8")
     assert 'cp -r "$PROJECT_DIR/scripts" "$INSTALL_DIR/"' in src, \

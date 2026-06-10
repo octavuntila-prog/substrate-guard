@@ -34,6 +34,20 @@ mkdir -p "$LOG_DIR"
         DB_URL=$(echo "$DB_URL" | sed "s|@postgres:|@${PG_IP}:|")
     fi
 
+    # Telegram alert helper -- defined HERE, BEFORE the HMAC checks, so the most-likely
+    # first-deploy failure (a missing/insecure key) actually pages instead of being a
+    # silent daily no-op. (It used to be defined only after the audit ran.)
+    _send_telegram() {
+        if [ -f "$APP_DIR/.env" ]; then
+            export $(grep -E '^(TELEGRAM_BOT_TOKEN|TELEGRAM_CHAT_ID|TELEGRAM_ADMIN_ID)=' "$APP_DIR/.env" | xargs)
+            TELEGRAM_TARGET="${TELEGRAM_CHAT_ID:-${TELEGRAM_ADMIN_ID:-}}"
+            if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "$TELEGRAM_TARGET" ]; then
+                curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+                    -d "chat_id=${TELEGRAM_TARGET}" -d "text=$1" > /dev/null 2>&1 || true
+            fi
+        fi
+    }
+
     # HMAC secret for tamper-evident chain (v13.4.0 — Decision 1: fail-loud).
     # Production deployments MUST have /etc/substrate-guard/hmac.key configured
     # with a stable secret (chmod 600). Random fallback would lose cross-run
@@ -43,12 +57,14 @@ mkdir -p "$LOG_DIR"
         echo "FATAL: HMAC key file missing at $HMAC_KEY_FILE"
         echo "       Set up via: openssl rand -hex 32 > $HMAC_KEY_FILE && chmod 600 $HMAC_KEY_FILE"
         echo "       See docs/releases/v13.4.0.md for ops procedure."
+        _send_telegram "🔧 substrate-guard cron: HMAC key MISSING at $HMAC_KEY_FILE — audit did NOT run (exit 2). Create it (chmod 600)."
         exit 2  # 2 = setup ERROR (not a policy violation)
     fi
     PERMS=$(stat -c %a "$HMAC_KEY_FILE" 2>/dev/null)
     if [ "$PERMS" != "600" ] && [ "$PERMS" != "400" ]; then
         echo "FATAL: HMAC key file has insecure permissions ($PERMS), must be 600 or 400"
         echo "       Fix via: chmod 600 $HMAC_KEY_FILE"
+        _send_telegram "🔧 substrate-guard cron: HMAC key has INSECURE perms ($PERMS) — audit did NOT run (exit 2). chmod 600 $HMAC_KEY_FILE."
         exit 2  # 2 = setup ERROR (not a policy violation)
     fi
     export SUBSTRATE_GUARD_HMAC_SECRET=$(cat "$HMAC_KEY_FILE")
@@ -71,17 +87,6 @@ mkdir -p "$LOG_DIR"
     # Audit exit-code contract (substrate_guard.audit): 0 = clean, 1 = policy
     # violations, 2 = audit ERROR (DB/config). A DB outage is an ERROR, NOT a
     # violation, so it must not fire the "VIOLATIONS DETECTED" alert.
-    _send_telegram() {
-        if [ -f "$APP_DIR/.env" ]; then
-            export $(grep -E '^(TELEGRAM_BOT_TOKEN|TELEGRAM_CHAT_ID|TELEGRAM_ADMIN_ID)=' "$APP_DIR/.env" | xargs)
-            TELEGRAM_TARGET="${TELEGRAM_CHAT_ID:-${TELEGRAM_ADMIN_ID:-}}"
-            if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "$TELEGRAM_TARGET" ]; then
-                curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-                    -d "chat_id=${TELEGRAM_TARGET}" -d "text=$1" > /dev/null 2>&1 || true
-            fi
-        fi
-    }
-
     if [ $EXIT_CODE -eq 0 ]; then
         echo "Audit clean — no violations"
     elif [ $EXIT_CODE -eq 1 ]; then
