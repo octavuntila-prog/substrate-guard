@@ -40,6 +40,9 @@ services:
       PYTHONPATH: /app
       GUARD_MODE: mock
       GUARD_LOG_LEVEL: INFO
+      # Pass the operator's HMAC secret through (no insecure default). If unset, the
+      # audit exits cleanly with code 2 + a remediation message instead of crashing.
+      SUBSTRATE_GUARD_HMAC_SECRET: ${SUBSTRATE_GUARD_HMAC_SECRET:-}
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
       POSTGRES_USER: guard

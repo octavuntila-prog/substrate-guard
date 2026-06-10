@@ -21,6 +21,18 @@ SECRET = "test-secret-key-for-chain"
 # AuditChain core tests
 # ============================================
 
+
+def test_resolves_substrate_guard_hmac_secret_env(monkeypatch):
+    """AuditChain accepts the operational SUBSTRATE_GUARD_HMAC_SECRET env name (the one
+    the cron exports from /etc/substrate-guard/hmac.key), preferring it over the legacy
+    GUARD_HMAC_SECRET -- unifies the audit.py/chain.py env divergence (H2)."""
+    monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+    monkeypatch.setenv("SUBSTRATE_GUARD_HMAC_SECRET", "env-secret-k")
+    c = AuditChain()  # no secret= param -> must resolve from the env (no ChainConfigError)
+    c.append({"type": "t", "agent_id": "a"})
+    ok, idx = c.verify()
+    assert ok and idx is None
+
 class TestAuditChain:
     def test_empty_chain(self):
         chain = AuditChain(secret=SECRET)

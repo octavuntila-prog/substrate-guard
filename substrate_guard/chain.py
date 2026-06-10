@@ -97,20 +97,26 @@ class AuditChain:
         secret: Optional[str] = None,
         allow_random_fallback: bool = False,
     ):
-        resolved_secret = secret or os.environ.get("GUARD_HMAC_SECRET", "")
+        # Accept SUBSTRATE_GUARD_HMAC_SECRET (the operational/cron name, set from
+        # /etc/substrate-guard/hmac.key) first, then the legacy GUARD_HMAC_SECRET.
+        resolved_secret = (
+            secret
+            or os.environ.get("SUBSTRATE_GUARD_HMAC_SECRET")
+            or os.environ.get("GUARD_HMAC_SECRET", "")
+        )
 
         if not resolved_secret:
             if not allow_random_fallback:
                 raise ChainConfigError(
-                    "AuditChain requires HMAC secret. Pass secret=, set "
-                    "GUARD_HMAC_SECRET env, or pass allow_random_fallback=True "
-                    "(testing only — chain not verifiable across runs)."
+                    "AuditChain requires an HMAC secret. Pass secret=, set "
+                    "SUBSTRATE_GUARD_HMAC_SECRET (or GUARD_HMAC_SECRET) env, or pass "
+                    "allow_random_fallback=True (testing only — not verifiable across runs)."
                 )
             resolved_secret_bytes = os.urandom(32)
             import logging
             logging.getLogger("substrate_guard.chain").warning(
                 "Using random HMAC secret — chain not verifiable across runs. "
-                "Set GUARD_HMAC_SECRET env or pass secret= for production."
+                "Set SUBSTRATE_GUARD_HMAC_SECRET env or pass secret= for production."
             )
         else:
             resolved_secret_bytes = resolved_secret.encode()

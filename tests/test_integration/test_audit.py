@@ -358,6 +358,22 @@ class TestPolicyEngineWiring:
         assert summary['policy_engine'] == 'builtin'
         assert summary['policy_engine_source'] == 'default'
 
+    def test_missing_hmac_secret_exits_2_not_traceback(self, tmp_path, mock_audit_db, monkeypatch):
+        """H2: a missing HMAC secret must exit cleanly with code 2 (config error), not
+        crash with an uncaught ChainConfigError -- the documented docker-stack
+        first-deploy path on an empty DB."""
+        monkeypatch.delenv("SUBSTRATE_GUARD_HMAC_SECRET", raising=False)
+        monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+        code = run_audit(
+            "postgresql://stub",
+            hours=None,
+            output_dir=str(tmp_path),
+            policy_path=BUILTIN_POLICY_PATH,
+            policy_mode='builtin',
+            policy_source='default',
+        )
+        assert code == 2
+
     def test_cli_policy_in_summary(self, tmp_path, mock_audit_db):
         """policy_source='cli' propagates as label (as if --policy passed)."""
         run_audit(

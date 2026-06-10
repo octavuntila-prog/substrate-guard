@@ -39,6 +39,7 @@ from substrate_guard.constants import (
 from pathlib import Path
 from typing import Optional
 
+from .chain import ChainConfigError
 from .guard import Guard, SessionReport
 from .integrations.vendor_bridge import VendorBridge, PipelineTraceAdapter, AgentRunAdapter
 
@@ -384,14 +385,22 @@ def run_audit(
     print(f"{C.CYAN}[4/5]{C.RESET} Running Guard pipeline (observe → policy → verify)...")
 
     hmac_secret = os.environ.get("SUBSTRATE_GUARD_HMAC_SECRET")
-    guard = Guard(
-        observe=True,
-        policy=policy_path,
-        verify=True,
-        use_mock=True,
-        chain=True,
-        hmac_secret=hmac_secret,
-    )
+    try:
+        guard = Guard(
+            observe=True,
+            policy=policy_path,
+            verify=True,
+            use_mock=True,
+            chain=True,
+            hmac_secret=hmac_secret,
+        )
+    except ChainConfigError as e:
+        # Fail GRACEFUL, not a traceback: a missing secret is a config error, not a
+        # crash. (This is the documented stack first-deploy path on an empty DB.)
+        print(f"{C.RED}  ✗ Tamper-evident chain not configured:{C.RESET} {e}")
+        print("  Set SUBSTRATE_GUARD_HMAC_SECRET to a stable secret "
+              "(e.g. `openssl rand -hex 32`) to enable the audit chain, then re-run.")
+        return 2  # 2 = config ERROR (distinct from 1 = violations); clean exit
     
     violations = []
     allowed = 0
