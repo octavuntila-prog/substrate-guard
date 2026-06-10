@@ -634,8 +634,8 @@ def main():
     for _stream in (sys.stdout, sys.stderr):
         try:
             _stream.reconfigure(errors="replace")
-        except (AttributeError, ValueError):
-            pass  # stream replaced (tests) or detached -- best effort
+        except (AttributeError, ValueError, OSError):
+            pass  # stream replaced (tests), detached, or closed fd -- best effort
 
     # Wrap the WHOLE body (not just run_audit): a corrupt/unreadable --env file raises in
     # resolve_db_url before run_audit, and any unexpected error (transient DB drop
@@ -670,9 +670,13 @@ def main():
         )
     except Exception:
         logger.exception("Audit aborted by an unexpected error")
-        # ASCII-only here: the recovery path must not itself raise UnicodeEncodeError
-        # under a restricted locale (belt-and-suspenders alongside the reconfigure above).
-        print("  [X] Audit ERROR (unexpected -- see log); exiting 2, not a violation")
+        # ASCII-only AND wrapped: the recovery path must not itself raise (a closed/broken
+        # stdout would re-escape main() as exit 1 = the false VIOLATIONS page we prevent).
+        # Belt-and-suspenders alongside the reconfigure above.
+        try:
+            print("  [X] Audit ERROR (unexpected -- see log); exiting 2, not a violation")
+        except (OSError, ValueError):
+            pass  # closed/broken stdout (OSError) or I/O-on-closed/encoding (ValueError)
         return 2
 
 

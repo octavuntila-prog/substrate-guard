@@ -532,3 +532,13 @@ def test_audit_under_ascii_locale_exits_clean_not_crash():
         f"expected clean exit 2 under ascii locale, got {r.returncode}; "
         f"stderr tail: {r.stderr.decode('ascii', 'replace')[-400:]}"
     )
+    # Pin the reconfigure specifically (not only the ASCII recovery print): the audit must
+    # PROCEED past its non-ASCII banner (em-dash/arrow) to the DB step. Without reconfigure
+    # the banner crashes BEFORE "Connecting" prints and only the recovery path runs, so
+    # this marker would be absent -- which would make the test pass on the recovery print
+    # alone and silently lose the blanket protection for every other non-ASCII print.
+    combined = r.stdout + r.stderr
+    assert b"Connecting" in combined, (
+        "audit crashed on its non-ASCII banner before the DB step under ascii locale -- "
+        "reconfigure is not protecting the banner; only the recovery print saved the code"
+    )
