@@ -421,11 +421,18 @@ def _check_network_exfiltration(action, agent, context) -> Optional[str]:
     port = action.get("remote_port", 0)
     ip = action.get("remote_ip", "")
 
-    # Cloud metadata endpoint — a classic SSRF / credential-exfil target. (Previously
-    # remote_ip was read but never used, so the IP half of this policy was silently
-    # absent; this makes it load-bearing.)
-    if isinstance(ip, str) and (ip.startswith("169.254.169.254") or ip == "fd00:ec2::254"):
-        return f"Connection to cloud metadata IP {ip} denied"
+    # Cloud metadata endpoint — a classic SSRF / credential-exfil target. NORMALIZE via
+    # ipaddress so textually-different forms of the SAME address (IPv6 expanded /
+    # uppercase / zero-padded, leading/trailing whitespace) cannot bypass a string match.
+    if isinstance(ip, str) and ip.strip():
+        try:
+            import ipaddress
+            _meta = {ipaddress.ip_address("169.254.169.254"),
+                     ipaddress.ip_address("fd00:ec2::254")}
+            if ipaddress.ip_address(ip.strip()) in _meta:
+                return f"Connection to cloud metadata IP {ip.strip()} denied"
+        except ValueError:
+            pass  # not a parseable IP literal -> the port checks below still apply
 
     suspicious_ports = {4444, 5555, 6666, 8888, 31337, 12345, 9001}
     if port in suspicious_ports:

@@ -73,15 +73,19 @@ class LocalStore:
 
         Raises:
             ChainConfigError: If no key is available (neither parameter nor
-                ``GUARD_HMAC_SECRET`` env) and ``allow_insecure_default`` is
+                ``SUBSTRATE_GUARD_HMAC_SECRET`` / ``GUARD_HMAC_SECRET`` env) and ``allow_insecure_default`` is
                 False (the default).
         """
-        raw = hmac_key or os.environ.get("GUARD_HMAC_SECRET", "")
+        # Accept SUBSTRATE_GUARD_HMAC_SECRET (the operational/cron name) first, then the
+        # legacy GUARD_HMAC_SECRET -- same resolution order as AuditChain, so an operator
+        # who sets only the documented name gets a working offline store too.
+        raw = (hmac_key or os.environ.get("SUBSTRATE_GUARD_HMAC_SECRET")
+               or os.environ.get("GUARD_HMAC_SECRET", ""))
         if not raw:
             if not allow_insecure_default:
                 raise ChainConfigError(
                     "LocalStore requires an HMAC key. Pass hmac_key=, set the "
-                    "GUARD_HMAC_SECRET environment variable, or pass "
+                    "SUBSTRATE_GUARD_HMAC_SECRET (or GUARD_HMAC_SECRET) environment variable, or pass "
                     "allow_insecure_default=True (demo/testing only — uses a "
                     "publicly-known key that provides no tamper resistance)."
                 )

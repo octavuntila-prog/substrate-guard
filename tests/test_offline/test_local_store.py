@@ -152,6 +152,18 @@ def test_concurrent_store_event_no_fork(tmp_path):
     s.close()
 
 
+def test_resolves_substrate_guard_hmac_secret_env(tmp_path, monkeypatch):
+    """H2 residual: LocalStore must accept SUBSTRATE_GUARD_HMAC_SECRET (the operational
+    name), not only the legacy GUARD_HMAC_SECRET -- else offline mode raises for an
+    operator who set only the documented name (the AuditChain unify missed this sibling)."""
+    monkeypatch.delenv("GUARD_HMAC_SECRET", raising=False)
+    monkeypatch.setenv("SUBSTRATE_GUARD_HMAC_SECRET", "env-k")
+    s = LocalStore(tmp_path / "x.db")  # no hmac_key= -> resolves from env, no ChainConfigError
+    s.store_event("audit", "L", {"n": 1})
+    assert s.verify_chain()["valid"]
+    s.close()
+
+
 def test_hmac_distinguishes_none_and_empty_agent_id(tmp_path):
     """agent_id=None and agent_id="" must produce DIFFERENT HMACs -- None must not
     collapse to "" (a DB-write attacker could otherwise flip between them undetected)."""

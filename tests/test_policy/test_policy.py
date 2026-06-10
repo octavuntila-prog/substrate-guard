@@ -56,13 +56,15 @@ def test_critical_file_read_bypass_is_canonicalized():
 
 
 def test_cloud_metadata_ip_connection_denied():
-    """M7: connections to the cloud metadata IP (a classic SSRF/exfil target) must be
-    denied -- the remote_ip half of the network policy was previously dead code."""
+    """M7: the cloud metadata IP must be denied across textually-different forms of the
+    SAME address -- a naive string match was bypassable by IPv6 expanded/uppercase/
+    zero-padded forms and leading whitespace. port 80 + domain => only the IP check fires."""
     eng = PolicyEngine(policy_path="nonexistent/", use_opa_binary=False)
-    # port 80 + a domain => the port checks do NOT fire; only the IP check can deny it
-    d = eng.evaluate({"action": {"type": "network_connect", "remote_ip": "169.254.169.254",
-                                 "remote_port": 80, "domain": "ok.example"}})
-    assert d.denied
+    for ip in ("169.254.169.254", " 169.254.169.254", "fd00:ec2::254",
+               "FD00:EC2::254", "fd00:ec2:0:0:0:0:0:254", "fd00:0ec2::0254"):
+        d = eng.evaluate({"action": {"type": "network_connect", "remote_ip": ip,
+                                     "remote_port": 80, "domain": "ok.example"}})
+        assert d.denied, ip
 
 
 # ============================================
