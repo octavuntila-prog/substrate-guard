@@ -164,6 +164,21 @@ def test_hmac_distinguishes_none_and_empty_agent_id(tmp_path):
     s.close()
 
 
+def test_verify_chain_detects_truncation_with_expected_count(tmp_path):
+    """H1: a tail-truncated store verifies as a valid prefix; expected_count catches it."""
+    s = LocalStore(tmp_path / "x.db", hmac_key="k")
+    for i in range(5):
+        s.store_event("audit", "L", {"i": i})
+    assert s.verify_chain(expected_count=5)["valid"]
+    s.conn.execute(
+        "DELETE FROM events WHERE rowid IN "
+        "(SELECT rowid FROM events ORDER BY rowid DESC LIMIT 2)"
+    )
+    assert s.verify_chain()["valid"]                          # prefix still verifies
+    assert s.verify_chain(expected_count=5)["valid"] is False  # caught by expected_count
+    s.close()
+
+
 def test_hmac_no_delimiter_injection(tmp_path):
     """Distinct (layer, data) tuples that the old "\\x1f".join collided (content
     rebalanced across the field boundary) must now hash differently -- json field

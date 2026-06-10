@@ -215,12 +215,18 @@ class LocalStore:
             )
             self.conn.commit()
 
-    def verify_chain(self) -> dict[str, Any]:
+    def verify_chain(self, expected_count: int | None = None) -> dict[str, Any]:
+        """Walk the HMAC chain. Like AuditChain.verify, a valid PREFIX verifies, so a
+        TAIL-TRUNCATED store still reports valid; pass expected_count (held out-of-band)
+        to detect it."""
         with self._lock:
             rows = self.conn.execute(
                 "SELECT id, timestamp, event_type, agent_id, layer, data, "
                 "hmac_hash, prev_hash FROM events ORDER BY rowid ASC"
             ).fetchall()
+        if expected_count is not None and len(rows) != expected_count:
+            return {"valid": False, "events": len(rows),
+                    "reason": f"row count {len(rows)} != expected {expected_count} (possible truncation)"}
         if not rows:
             return {"valid": True, "events": 0}
         expected_prev = GENESIS_PREV

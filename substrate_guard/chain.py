@@ -1,7 +1,9 @@
 """Tamper-Evident Chain — HMAC-SHA256 audit chain on every event.
 
-Each event is hashed with the previous hash, creating an unbreakable chain.
-If any event is modified, deleted, or inserted, the chain breaks.
+Each event is hashed with the previous hash, creating a tamper-evident chain.
+Mid-chain modification, reordering, or insertion breaks it. (Tail-truncation -- a
+valid prefix is itself a valid chain -- is NOT caught by verify() alone: pass
+expected_count/expected_head, or anchor the head externally.)
 
 This is the "black box" integrity layer — like a flight recorder's
 crash-survivable storage, but for AI agent actions.
@@ -76,8 +78,11 @@ class AuditChain:
     - A secret key (HMAC)
     - The event's position in the chain (index)
     
-    Modifying, deleting, or inserting any event breaks the chain.
-    
+    Modifying, reordering, or inserting any event breaks the chain. NOTE: a valid
+    PREFIX of the chain is itself a valid chain, so deleting events from the END
+    (tail-truncation) is NOT detected by verify() alone -- pass expected_count /
+    expected_head (held out-of-band) or anchor the head externally to catch it.
+
     Args:
         secret: HMAC secret key. If None, reads from ``GUARD_HMAC_SECRET``
                 environment variable. If still None, raises
@@ -176,12 +181,19 @@ class AuditChain:
 
         return entry
 
-    def verify(self) -> tuple[bool, Optional[int]]:
+    def verify(self, expected_count: Optional[int] = None,
+               expected_head: Optional[str] = None) -> tuple[bool, Optional[int]]:
         """Verify the entire chain integrity.
-        
-        Returns:
-            (True, None) if chain is intact
-            (False, index) if chain breaks at given index
+
+        Returns (True, None) if intact, (False, index) if it breaks at ``index``.
+
+        Detects mid-chain modification, reordering, insertion, and any edit by a party
+        WITHOUT the secret. It does NOT by itself detect TAIL-TRUNCATION: a valid prefix
+        of an HMAC chain is itself a valid chain. To catch a shortened chain, pass
+        ``expected_count`` / ``expected_head`` held OUT-OF-BAND (a value the entity that
+        could truncate the store cannot also rewrite -- a monitoring counter, a
+        separately-anchored head, an external timestamp). Without them, truncation by a
+        secret-holder is invisible here -- anchor the head externally (e.g. OpenTimestamps).
         """
         with self._lock:
             entries = list(self._entries)  # consistent snapshot; no lock held during walk
@@ -209,6 +221,12 @@ class AuditChain:
 
             prev_hash = entry.hash
 
+        # Out-of-band anchors: a valid PREFIX verifies, so enforce the expected length /
+        # head when the caller can supply one -- this is what closes tail-truncation.
+        if expected_count is not None and len(entries) != expected_count:
+            return False, len(entries)
+        if expected_head is not None and prev_hash != expected_head:
+            return False, len(entries)
         return True, None
 
     def export(self, path: str) -> str:
@@ -241,12 +259,15 @@ class AuditChain:
         return path
 
     @classmethod
-    def verify_export(cls, path: str, secret: str) -> tuple[bool, Optional[str]]:
+    def verify_export(cls, path: str, secret: str, expected_count: Optional[int] = None,
+                      expected_head: Optional[str] = None) -> tuple[bool, Optional[str]]:
         """Verify an exported chain file.
-        
-        Returns:
-            (True, None) if valid
-            (False, reason) if invalid
+
+        Returns (True, None) if valid, (False, reason) if invalid.
+
+        The chain_signature binds head+count, but BOTH are recomputed from the file, so a
+        secret-holder could truncate-and-re-sign undetected. Pass ``expected_count`` /
+        ``expected_head`` held out-of-band to detect tail-truncation.
         """
         try:
             data = json.loads(Path(path).read_text())
@@ -305,6 +326,13 @@ class AuditChain:
         
         if data.get("chain_signature") != expected_sig:
             return False, "Chain signature mismatch — file may be tampered"
+
+        # Tail-truncation: the signature is recomputed from the file, so enforce an
+        # out-of-band expected count/head when the caller can supply one.
+        if expected_count is not None and len(entries) != expected_count:
+            return False, f"Entry count {len(entries)} != expected {expected_count} (possible truncation)"
+        if expected_head is not None and chain._head_hash != expected_head:
+            return False, "Head mismatch vs expected (possible truncation)"
 
         return True, None
 

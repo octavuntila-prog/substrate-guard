@@ -33,6 +33,46 @@ def test_resolves_substrate_guard_hmac_secret_env(monkeypatch):
     ok, idx = c.verify()
     assert ok and idx is None
 
+
+def test_verify_detects_tail_truncation_with_expected_count():
+    """H1: a valid PREFIX verifies on its own; an out-of-band expected_count/head
+    catches a shortened chain (tail-truncation)."""
+    c = AuditChain(secret=SECRET)
+    for i in range(5):
+        c.append({"type": "t", "agent_id": "a", "i": i})
+    assert c.verify(expected_count=5) == (True, None)
+    # tail-truncate: drop the last 2 entries + reset the head (what a rewriter does)
+    c._entries = c._entries[:3]
+    c._head_hash = c._entries[-1].hash
+    assert c.verify() == (True, None)             # the prefix is self-consistent
+    assert c.verify(expected_count=5)[0] is False  # caught by the out-of-band count
+    assert c.verify(expected_head="deadbeef")[0] is False  # caught by the out-of-band head
+
+
+def test_verify_export_detects_truncation_with_expected_count(tmp_path):
+    """H1: verify_export recomputes head+count from the file, so a re-signed truncation
+    verifies -- only an out-of-band expected_count catches it."""
+    import hashlib as _h
+    import hmac as _hm
+    c = AuditChain(secret=SECRET)
+    for i in range(5):
+        c.append({"type": "t", "agent_id": "a", "i": i})
+    p = tmp_path / "chain.json"
+    c.export(str(p))
+    assert AuditChain.verify_export(str(p), SECRET, expected_count=5)[0] is True
+    # secret-holder truncation: keep 3 entries, re-sign the (head,count)
+    data = json.loads(p.read_text())
+    data["entries"] = data["entries"][:3]
+    data["head_hash"] = data["entries"][-1]["hash"]
+    data["entries_count"] = 3
+    data["chain_signature"] = _hm.new(
+        SECRET.encode(), f"chain:{data['head_hash']}:3".encode(), _h.sha256
+    ).hexdigest()
+    p.write_text(json.dumps(data))
+    assert AuditChain.verify_export(str(p), SECRET)[0] is True       # re-signed prefix verifies
+    ok, reason = AuditChain.verify_export(str(p), SECRET, expected_count=5)
+    assert ok is False and "truncation" in reason.lower()           # caught
+
 class TestAuditChain:
     def test_empty_chain(self):
         chain = AuditChain(secret=SECRET)
