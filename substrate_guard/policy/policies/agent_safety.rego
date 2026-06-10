@@ -4,6 +4,19 @@
 # Evaluates AI agent actions against safety rules.
 # Input: {"agent": {...}, "action": {...}, "context": {...}}
 # Output: {"allow": bool, "deny": set[str]}
+#
+# PARITY CAVEAT (REGULA 0): the production-hardened reference is the BUILT-IN Python
+# engine (substrate_guard/policy/engine.py). This Rego bundle is a best-effort port and
+# does NOT carry all of the builtin's hardening. Known gaps in this revision:
+#   - No path CANONICALIZATION: critical_file is exact-match, so `//etc/passwd`,
+#     `/etc/../etc/passwd`, or a trailing-space variant can bypass it (the builtin
+#     normalizes via posixpath before matching).
+#   - IP matching is exact-string: it does NOT normalize IPv6 alternate forms of the
+#     metadata address (the builtin folds ::ffff: / :: forms via the ipaddress module).
+#   - No type-confusion fail-safe or pipe-to-shell regex detection.
+# These rules were hand-reviewed against rego.v1 but are NOT exercised by the test suite
+# (which runs the builtin via use_opa_binary=False) nor by CI (no OPA). An OPA deployment
+# MUST `opa test` + validate parity before relying on `--policy rego`.
 
 package substrate_guard.agent_policy
 
@@ -88,6 +101,15 @@ deny contains msg if {
     msg := sprintf("Connection to suspicious port %d denied", [input.action.remote_port])
 }
 
+# Deny connections to cloud-metadata endpoints (SSRF / credential exfil).
+# NOTE: exact-string match only -- see the IP-normalization gap in the header caveat;
+# the builtin Python engine additionally normalizes IPv6 alternate forms.
+deny contains msg if {
+    input.action.type in {"network_connect", "network_send"}
+    metadata_ip(input.action.remote_ip)
+    msg := sprintf("Connection to cloud metadata IP denied: %s", [input.action.remote_ip])
+}
+
 # Deny when budget is exhausted
 deny contains msg if {
     input.context.budget_remaining <= 0
@@ -145,6 +167,12 @@ suspicious_port(8888)
 suspicious_port(31337)
 suspicious_port(12345)
 suspicious_port(9001)
+
+metadata_ip("169.254.169.254")   # AWS/GCP/Azure IMDS
+metadata_ip("169.254.170.2")     # AWS ECS task-credentials
+metadata_ip("100.100.100.200")   # Alibaba Cloud
+metadata_ip("192.0.0.192")       # Oracle OCI
+metadata_ip("fd00:ec2::254")     # AWS IPv6 IMDS
 
 dangerous_executable(path) if contains(path, "sudo")
 dangerous_executable(path) if contains(path, "su")

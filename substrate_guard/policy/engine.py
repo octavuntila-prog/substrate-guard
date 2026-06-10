@@ -437,10 +437,18 @@ def _check_network_exfiltration(action, agent, context) -> Optional[str]:
                     addr = addr.ipv4_mapped
                 elif 0 < int(addr) <= 0xFFFFFFFF:
                     addr = ipaddress.ip_address(int(addr))
-            _meta = {ipaddress.ip_address("169.254.169.254"),
-                     ipaddress.ip_address("fd00:ec2::254")}
-            if addr in _meta:
-                return f"Connection to cloud metadata IP {ip.strip()} denied"
+            _meta = {
+                ipaddress.ip_address("169.254.169.254"),  # AWS/GCP/Azure IMDS
+                ipaddress.ip_address("169.254.170.2"),     # AWS ECS task-credentials
+                ipaddress.ip_address("100.100.100.200"),   # Alibaba Cloud
+                ipaddress.ip_address("192.0.0.192"),       # Oracle OCI
+                ipaddress.ip_address("fd00:ec2::254"),     # AWS IPv6 IMDS
+            }
+            # Explicit metadata endpoints OR the whole IPv4 link-local range
+            # (169.254.0.0/16) -- the AWS/GCP/Azure/ECS family lives there and link-local
+            # egress is almost never legitimate for an agent (classic SSRF/exfil vector).
+            if addr in _meta or (addr.version == 4 and addr.is_link_local):
+                return f"Connection to cloud metadata / link-local IP {ip.strip()} denied"
         except ValueError:
             pass  # not a parseable IP literal -> the port checks below still apply
 

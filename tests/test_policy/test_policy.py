@@ -56,17 +56,28 @@ def test_critical_file_read_bypass_is_canonicalized():
 
 
 def test_cloud_metadata_ip_connection_denied():
-    """M7: the cloud metadata IP must be denied across textually-different forms of the
-    SAME address -- a naive string match was bypassable by IPv6 expanded/uppercase/
-    zero-padded forms and leading whitespace. port 80 + domain => only the IP check fires."""
+    """M7/M-b: cloud-metadata + IPv4 link-local IPs must be denied across textually-
+    different forms of the SAME address (string match was bypassable). port 80 + domain
+    => only the IP check fires. Covers AWS/GCP/Azure/ECS/Alibaba/Oracle endpoints."""
     eng = PolicyEngine(policy_path="nonexistent/", use_opa_binary=False)
-    for ip in ("169.254.169.254", " 169.254.169.254", "fd00:ec2::254",
-               "FD00:EC2::254", "fd00:ec2:0:0:0:0:0:254", "fd00:0ec2::0254",
-               "::ffff:169.254.169.254", "::ffff:a9fe:a9fe", "[fd00:ec2::254]",
-               "::169.254.169.254"):
+    denied = (
+        "169.254.169.254", " 169.254.169.254", "fd00:ec2::254", "FD00:EC2::254",
+        "fd00:ec2:0:0:0:0:0:254", "fd00:0ec2::0254", "::ffff:169.254.169.254",
+        "::ffff:a9fe:a9fe", "[fd00:ec2::254]", "::169.254.169.254",
+        "169.254.170.2",        # AWS ECS task-credentials (M-b)
+        "100.100.100.200",      # Alibaba (M-b)
+        "192.0.0.192",          # Oracle (M-b)
+        "169.254.1.1",          # other IPv4 link-local, 169.254.0.0/16 (M-b)
+    )
+    for ip in denied:
         d = eng.evaluate({"action": {"type": "network_connect", "remote_ip": ip,
                                      "remote_port": 80, "domain": "ok.example"}})
         assert d.denied, ip
+    # no over-block: ordinary public IPs on a standard port + domain are NOT denied
+    for ip in ("8.8.8.8", "1.1.1.1", "140.82.121.4"):
+        d = eng.evaluate({"action": {"type": "network_connect", "remote_ip": ip,
+                                     "remote_port": 443, "domain": "github.com"}})
+        assert not d.denied, ip
 
 
 # ============================================
