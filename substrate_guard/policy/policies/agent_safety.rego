@@ -9,6 +9,9 @@ package substrate_guard.agent_policy
 
 import rego.v1
 
+# Deny-by-default -- the fail-safe foundation. An action matching NO allow rule
+# (including malformed / type-confused input) is denied. A custom bundle that REPLACES
+# this file MUST keep its own `default allow := false`, or it fails OPEN.
 default allow := false
 
 # ============================================

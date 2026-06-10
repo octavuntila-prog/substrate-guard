@@ -222,7 +222,17 @@ class PolicyEngine:
     # --- OPA binary evaluation ---
 
     def _evaluate_opa(self, input_data: dict) -> PolicyDecision:
-        """Evaluate using OPA binary subprocess."""
+        """Evaluate using the OPA binary subprocess.
+
+        FAIL-SAFE CAVEAT: the deny-by-default guarantee lives in the loaded policy
+        BUNDLE, not in this code. The shipped ``policies/agent_safety.rego`` declares
+        ``default allow := false`` -- a malformed / type-confused input matches no allow
+        rule and is denied. A CUSTOM bundle loaded via ``--policy`` that omits its own
+        ``default allow := false`` would fail OPEN on such input. (This engine still
+        defaults ``allow`` to False if OPA returns no ``allow`` key, and falls back to
+        the hardened built-in evaluator on any OPA error/timeout -- itself
+        deny-by-default -- but the Rego default is the operator's responsibility.)
+        """
         try:
             # Write input to temp file
             input_json = json.dumps({"input": input_data})
