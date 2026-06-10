@@ -178,3 +178,12 @@ def test_function_falling_off_the_end_does_not_verify():
     )
     r = verify_code(src, Spec(postconditions=["__return__ >= 100"]))
     assert not r.verified, f"fall-off-the-end function wrongly VERIFIED ({r.status})"
+
+
+def test_bitwise_op_abstains_not_crashes():
+    """M5: bitwise ops on Z3 Ints (x & 1) previously raised an UNCAUGHT TypeError out of
+    verify(); they are outside the modeled subset, so they must ABSTAIN (UNKNOWN), never
+    crash and never falsely VERIFY."""
+    src = "def f(x: int) -> int:\n    return x & 1\n"
+    r = verify_code(src, Spec(preconditions=["x >= 0"], postconditions=["__return__ >= 0"]))
+    assert not r.verified, f"bitwise op wrongly VERIFIED ({r.status})"

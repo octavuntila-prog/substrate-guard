@@ -470,12 +470,12 @@ class ASTTranslator:
             if isinstance(right, int) or (hasattr(right, "as_long") and right.is_int()):
                 return left ** right
             raise TranslationError(None, "Only integer exponents supported for **")
-        elif isinstance(op, ast.BitAnd):
-            return left & right
-        elif isinstance(op, ast.BitOr):
-            return left | right
-        elif isinstance(op, ast.BitXor):
-            return left ^ right
+        elif isinstance(op, (ast.BitAnd, ast.BitOr, ast.BitXor)):
+            # Bitwise ops on Z3 Int-sorted values raise an UNCAUGHT TypeError (Z3 Ints
+            # have no &/|/^), which previously escaped CodeVerifier.verify() on attacker
+            # code. They are outside the modeled integer-arithmetic subset, so flag
+            # unsupported -> verify() ABSTAINS (sound) instead of crashing.
+            raise TranslationError(None, f"bitwise op {type(op).__name__} not modeled")
         raise TranslationError(None, f"Unsupported binary op: {type(op).__name__}")
 
     def _translate_unaryop(self, op: ast.unaryop, operand: Any) -> Any:

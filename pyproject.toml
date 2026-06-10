@@ -54,6 +54,15 @@ ai-blackbox = "substrate_guard.cli:main"
 [tool.setuptools.packages.find]
 include = ["substrate_guard*"]
 
+# Non-Python data files that MUST ship in the wheel. Without this a non-editable install
+# silently drops the Rego policy (--policy rego degrades to builtin) and the eBPF source.
+# CI/Docker use `pip install -e .`, so the gap was invisible.
+[tool.setuptools.package-data]
+substrate_guard = [
+    "policy/policies/*.rego",
+    "observe/bpf_programs/*.c",
+]
+
 # Only collect test_*.py (exclude tests/smoke_test.py — manual runner, not pytest)
 [tool.pytest.ini_options]
 testpaths = ["tests"]
