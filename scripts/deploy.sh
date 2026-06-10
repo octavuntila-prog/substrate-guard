@@ -134,6 +134,7 @@ install_host() {
     mkdir -p "$INSTALL_DIR"
     cp -r "$PROJECT_DIR/substrate_guard" "$INSTALL_DIR/"
     cp -r "$PROJECT_DIR/tests" "$INSTALL_DIR/"
+    cp -r "$PROJECT_DIR/scripts" "$INSTALL_DIR/"   # cron-audit.sh etc. must reach /opt (H3)
     
     # Config for this server
     mkdir -p "$INSTALL_DIR/config"
