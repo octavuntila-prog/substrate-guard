@@ -187,3 +187,22 @@ def test_bitwise_op_abstains_not_crashes():
     src = "def f(x: int) -> int:\n    return x & 1\n"
     r = verify_code(src, Spec(preconditions=["x >= 0"], postconditions=["__return__ >= 0"]))
     assert not r.verified, f"bitwise op wrongly VERIFIED ({r.status})"
+
+
+def test_malformed_spec_is_translation_error_not_crash():
+    """M-e: a malformed spec expression (ast.parse SyntaxError) previously escaped verify()
+    and crashed the public verify_code(). It must now fail closed as TRANSLATION_ERROR
+    (abstain), never crash and never VERIFY."""
+    from substrate_guard.code_verifier import VerificationStatus
+
+    # "x +" is a genuine SyntaxError (trailing binary operator); note "x +++ 1" would
+    # NOT be -- Python parses it as x + (+(+1)).
+    r = verify_code("def f(x: int) -> int:\n    return x\n", Spec(postconditions=["x +"]))
+    assert r.status == VerificationStatus.TRANSLATION_ERROR, f"malformed spec not TRANSLATION_ERROR ({r.status})"
+    assert not r.verified
+
+
+def test_malformed_source_does_not_crash():
+    """M-e: a source with a syntax error must abstain (not crash, not VERIFY)."""
+    r = verify_code("def f(x: int) -> in", Spec(postconditions=["__return__ >= 0"]))
+    assert not r.verified

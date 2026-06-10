@@ -398,6 +398,20 @@ class HardwareVerifier:
                 time_ms=(time.time() - t0) * 1000,
             )
 
+        # Validate spec register names upfront: an unknown register (e.g. "x99") makes
+        # _reg_idx raise, which previously escaped verify() and crashed the public
+        # verify_hardware(). Fail closed as PARSE_ERROR (M-e).
+        try:
+            for _reg in list(spec.preconditions) + list(spec.postconditions):
+                sim._reg_idx(_reg)
+        except (ValueError, KeyError, IndexError) as e:
+            return HWVerifyResult(
+                status=HWVerifyStatus.PARSE_ERROR,
+                property_name=spec.description,
+                error=f"Invalid spec register: {e}",
+                time_ms=(time.time() - t0) * 1000,
+            )
+
         solver = Solver()
         solver.set("timeout", self.timeout_ms)
 

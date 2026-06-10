@@ -256,12 +256,16 @@ class CodeVerifier:
                     ],
                 )
 
-        except TranslationError as e:
+        except (TranslationError, SyntaxError, ValueError) as e:
+            # M-e: a malformed spec expression (ast.parse SyntaxError) or an untranslatable
+            # value (ValueError) previously escaped verify() and crashed the public
+            # verify_code(). Treat any of these as a TRANSLATION_ERROR -> abstain (sound:
+            # never a false VERIFIED), like a TranslationError.
             return VerificationResult(
                 status=VerificationStatus.TRANSLATION_ERROR,
                 function_name=func_name,
                 spec_description=spec.description,
-                error=str(e),
+                error=f"{type(e).__name__}: {e}",
                 time_ms=(time.time() - t0) * 1000,
             )
 

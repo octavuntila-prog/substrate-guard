@@ -37,6 +37,15 @@ def test_clean_straightline_still_verifies():
     assert r.status == HWVerifyStatus.VERIFIED, f"clean program failed to VERIFY ({r.status})"
 
 
+def test_unknown_spec_register_is_parse_error_not_crash():
+    """M-e: a spec referencing a non-existent register (x99) made _reg_idx raise, which
+    escaped verify() and crashed the public API. It must now fail closed as PARSE_ERROR."""
+    asm = "addi a0, zero, 7\n"
+    spec = HWSpec(postconditions={"x99": ("==", 7)}, description="bad register")
+    r = HardwareVerifier().verify(asm, spec)
+    assert r.status == HWVerifyStatus.PARSE_ERROR, f"bad register not PARSE_ERROR ({r.status})"
+
+
 def test_itype_shift_masks_shamt():
     """RV32I I-type shifts use only imm[4:0]; `srli x1,x10,32` masks shamt to 0, so
     x1 == x10 (unchanged) and 'x1 == 0' must NOT be VERIFIED. The R-type path already
