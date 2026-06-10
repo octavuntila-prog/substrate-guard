@@ -508,3 +508,27 @@ def test_main_maps_unexpected_exception_to_exit_2(monkeypatch):
     monkeypatch.setattr(audit_mod, "run_audit", boom)
     monkeypatch.setattr(sys, "argv", ["audit", "--db-url", "postgresql://stub@localhost/db"])
     assert audit_mod.main() == 2
+
+
+def test_audit_under_ascii_locale_exits_clean_not_crash():
+    """H-B residual: under PYTHONIOENCODING=ascii (the LANG=C cron locale), the audit's
+    non-ASCII banner/marks (✓ ✗ → —) must NOT raise UnicodeEncodeError and re-escape as
+    exit 1 (a false 'VIOLATIONS DETECTED' page). With the stdout reconfigure + ASCII
+    recovery print, the process exits with the audit's own code (2: unreachable DB),
+    never a traceback. Faithful subprocess repro."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parents[2]
+    env = dict(os.environ, PYTHONIOENCODING="ascii", SUBSTRATE_GUARD_HMAC_SECRET="x" * 40)
+    r = subprocess.run(
+        [sys.executable, "-m", "substrate_guard.audit",
+         "--db-url", "postgresql://stub:stub@127.0.0.1:1/db", "--hours", "1"],
+        capture_output=True, env=env, cwd=str(repo), timeout=120,
+    )
+    assert r.returncode == 2, (
+        f"expected clean exit 2 under ascii locale, got {r.returncode}; "
+        f"stderr tail: {r.stderr.decode('ascii', 'replace')[-400:]}"
+    )

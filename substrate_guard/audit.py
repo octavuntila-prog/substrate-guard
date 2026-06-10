@@ -627,24 +627,39 @@ def main():
 
     args = parser.parse_args()
 
-    db_url = resolve_db_url(args.db_url, args.env)
-    if not db_url:
-        print(f"{C.RED}Error:{C.RESET} No database URL found.")
-        print(f"Tried .env at: {args.env}, then process environment (POSTGRES_* / DATABASE_URL).")
-        print(f"Use --db-url or set credentials in .env / environment.")
-        print(f"\nExample:")
-        print(f"  python3 -m substrate_guard.audit --db-url postgresql://user:pass@postgres:5432/dbname")
-        return 2  # 2 = config ERROR (no DB URL), distinct from 1 = violations
+    # Output hardening: under a non-UTF-8 cron locale (LANG=C / PYTHONIOENCODING=ascii)
+    # printing the banner/status marks (✓ ✗ → —) would raise UnicodeEncodeError and crash
+    # the audit -> exit 1 -> a FALSE "VIOLATIONS DETECTED" cron page. Degrade unencodable
+    # chars to '?' instead of crashing (H-B residual).
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(errors="replace")
+        except (AttributeError, ValueError):
+            pass  # stream replaced (tests) or detached -- best effort
 
-    policy_mode, policy_source = resolve_policy_mode(args)
-    policy_path = resolve_policy_path(policy_mode)
-
-    logger.info(
-        f"Policy engine: {policy_mode} "
-        f"(source: {policy_source}, path: {policy_path})"
-    )
-
+    # Wrap the WHOLE body (not just run_audit): a corrupt/unreadable --env file raises in
+    # resolve_db_url before run_audit, and any unexpected error (transient DB drop
+    # mid-SELECT, schema drift, an event-conversion bug) MUST map to the audit-ERROR exit
+    # code 2 -- never an uncaught traceback (exit 1), which cron-audit.sh maps to a FALSE
+    # "VIOLATIONS DETECTED" page quoting a stale prior-run report (H-B).
     try:
+        db_url = resolve_db_url(args.db_url, args.env)
+        if not db_url:
+            print(f"{C.RED}Error:{C.RESET} No database URL found.")
+            print(f"Tried .env at: {args.env}, then process environment (POSTGRES_* / DATABASE_URL).")
+            print(f"Use --db-url or set credentials in .env / environment.")
+            print(f"\nExample:")
+            print(f"  python3 -m substrate_guard.audit --db-url postgresql://user:pass@postgres:5432/dbname")
+            return 2  # 2 = config ERROR (no DB URL), distinct from 1 = violations
+
+        policy_mode, policy_source = resolve_policy_mode(args)
+        policy_path = resolve_policy_path(policy_mode)
+
+        logger.info(
+            f"Policy engine: {policy_mode} "
+            f"(source: {policy_source}, path: {policy_path})"
+        )
+
         return run_audit(
             db_url,
             hours=args.hours,
@@ -654,12 +669,10 @@ def main():
             policy_source=policy_source,
         )
     except Exception:
-        # Any unexpected error (transient DB drop mid-SELECT, schema drift, a bug in
-        # event conversion / report) MUST map to the audit-ERROR exit code 2 -- never an
-        # uncaught traceback (exit 1), which cron-audit.sh maps to a FALSE "VIOLATIONS
-        # DETECTED" page quoting a stale prior-run report (H-B).
         logger.exception("Audit aborted by an unexpected error")
-        print(f"{C.RED}  ✗ Audit ERROR (unexpected — see log){C.RESET}; exiting 2, not a violation")
+        # ASCII-only here: the recovery path must not itself raise UnicodeEncodeError
+        # under a restricted locale (belt-and-suspenders alongside the reconfigure above).
+        print("  [X] Audit ERROR (unexpected -- see log); exiting 2, not a violation")
         return 2
 
 
