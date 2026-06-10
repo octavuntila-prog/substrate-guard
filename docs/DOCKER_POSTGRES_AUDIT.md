@@ -5,7 +5,7 @@ Pașii de mai jos pornesc un **Postgres 16** local, aplică schema minimă din `
 ## 0. Prerequisite
 
 - Docker + Docker Compose v2  
-- Repo clonat, terminal în rădăcina proiectului (`Z3-PAPER` / `substrate-guard`)
+- Repo clonat, terminal în rădăcina proiectului (`substrate-guard`)
 
 ## 1. Variabile de mediu
 

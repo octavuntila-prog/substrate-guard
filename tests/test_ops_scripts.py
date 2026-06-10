@@ -25,14 +25,20 @@ def test_cron_audit_keeps_hmac_and_distinct_exit_codes():
         "cron-audit.sh lost its distinct violation(1)/error(2) exit-code branches"
 
 
-def test_cron_audit_alerts_on_hmac_fatal_not_silent():
-    """M2: a missing/insecure HMAC key must PAGE, not be a silent daily no-op -- the
-    telegram helper is defined before the FATAL exits and called on them."""
+def test_cron_audit_alerts_on_each_hmac_fatal():
+    """M2/M-f: the telegram helper is defined before the FATAL exits, AND EACH HMAC-key
+    FATAL path (missing key, insecure perms) calls it before its OWN exit 2 -- not merely
+    has a call somewhere in the file. The prior assertion passed even if the missing-key
+    block's call was deleted (a sibling call elsewhere satisfied it)."""
     src = (SCRIPTS / "cron-audit.sh").read_text(encoding="utf-8")
     helper = src.find("_send_telegram() {")
     first_fatal = src.find("exit 2")
     assert 0 <= helper < first_fatal, "telegram helper defined AFTER the HMAC FATAL exit -- alert is silent"
-    assert "_send_telegram \"" in src, "the FATAL paths do not call the telegram helper"
+    for marker in ("FATAL: HMAC key file missing", "FATAL: HMAC key file has insecure"):
+        i = src.find(marker)
+        assert i >= 0, f"FATAL marker missing: {marker}"
+        block = src[i:src.find("exit 2", i)]  # from this FATAL echo to its own exit 2
+        assert '_send_telegram "' in block, f"no telegram alert before exit 2 in the '{marker}' block"
 
 
 def test_deploy_install_host_copies_scripts_dir():

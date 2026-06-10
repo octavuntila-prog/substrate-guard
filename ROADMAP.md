@@ -4,7 +4,7 @@ Fiecare fază se închide doar când **toate testele** trec și criteriul de dov
 
 ## Faza 0 — Baseline (în lucru continuu)
 
-- **Cod:** `Z3-PAPER/substrate_guard/` (L1–L3 + chain + compliance + audit).
+- **Cod:** `substrate_guard/` (L1–L3 + chain + compliance + audit).
 - **Dovadă:** `pip install -e ".[dev]"` apoi `pytest` (doar `test_*.py`).
 - **Manual:** `python tests/smoke_test.py` — verificator cod Z3 (benchmark funcții).
 

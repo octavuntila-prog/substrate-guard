@@ -158,22 +158,20 @@ substrate-guard/
 ├── attest/           # L5 — Ed25519 cryptographic attestation
 ├── offline/          # L6 — SQLite + CRDT offline verification
 ├── guard.py          # main guard pipeline (observe → policy → verify → chain)
-├── audit.py          # 440 LOC — automated audit and reporting
-├── combo_cli.py      # 478 LOC — CLI for all layers
-├── integrations/     # 404 LOC — SUBSTRATE ecosystem connectors
+├── audit.py          # automated audit and reporting (cron entry point)
+├── combo_cli.py      # CLI for all layers
+├── integrations/     # SUBSTRATE ecosystem connectors
 ├── chain.py          # HMAC-SHA256 tamper-evident chain
 ├── compliance.py     # SOC2 / ISO 27001 / ISO 42001 exports
-└── tests/            # 493 tests collected (incl. adversarial + fuzz + agent CLI suite)
-    ├── test_policy.py     # 541 LOC — L2 policy decisions
-    ├── test_substrate.py  # 438 LOC — integration tests
-    ├── test_comply.py     # 347 LOC — L4 ZK compliance
-    ├── test_chain.py      # 325 LOC — HMAC chain integrity
-    ├── test_vendor.py     # 309 LOC — vendor integrations
-    ├── test_offline.py    # 295 LOC — L6 offline sync
-    ├── test_attest.py     # 248 LOC — L5 attestation
-    ├── test_audit.py      # 234 LOC — audit pipeline
-    ├── test_guard.py      # 227 LOC — guard pipeline
-    └── test_observe.py    # 195 LOC — L1 observation
+└── tests/            # 493 tests collected, organized by layer (incl. adversarial + fuzz)
+    ├── test_policy/       # L2 policy decisions
+    ├── test_verify/       # L3 verifier soundness (code / cli / hw / distill)
+    ├── test_integration/  # chain, audit, compliance, docs-drift guard
+    ├── test_attest/       # L5 attestation
+    ├── test_comply/       # L4 compliance / ZK-SNM
+    ├── test_offline/      # L6 offline store + sync
+    ├── test_observe/      # L1 observation
+    └── test_adversarial/  # adversarial + extreme-input suites
 ```
 
 **This repo: 16,509 LOC** (10,135 source in `substrate_guard/` + 6,374 tests; per `wc -l`, 2026-06-10).

@@ -90,6 +90,23 @@ substrate-guard audit --env /path/to/.env --hours 24
 
 `Dockerfile` include **`psycopg2-binary`** ca să poți rula audit în container fără pas suplimentar.
 
+## 8. Audit zilnic programat (host cron)
+
+Pe un host (nu în container), auditul rulează zilnic la 04:00 printr-un cron. **Prerechizit obligatoriu** — cheia HMAC pentru lanțul tamper-evident; fără ea auditul iese cu **cod 2** (eroare de config) și paginează, în loc să verifice tăcut nimic:
+
+```bash
+# 1. Generează cheia HMAC stabilă (o singură dată; pierderea ei rupe verificarea cross-run)
+sudo mkdir -p /etc/substrate-guard
+openssl rand -hex 32 | sudo tee /etc/substrate-guard/hmac.key > /dev/null
+sudo chmod 600 /etc/substrate-guard/hmac.key    # 600 sau 400; alte permisiuni => audit iese 2
+
+# 2. Copiază proiectul in /opt si instaleaza cron-ul canonic (din radacina repo-ului)
+sudo ./scripts/deploy.sh install     # copiaza substrate_guard/ + scripts/ in /opt/substrate-guard
+sudo ./scripts/setup-cron.sh         # instaleaza cron-audit.sh canonic + adauga cron 0 4 * * *
+```
+
+`cron-audit.sh` exportă `SUBSTRATE_GUARD_HMAC_SECRET` din `/etc/substrate-guard/hmac.key`, rulează auditul pe ultimele 24h, și **paginează prin Telegram** dacă: cheia lipsește/are permisiuni greșite (cod 2), apar violări (cod 1), sau orice eroare neașteptată (cod 2 — niciodată un fals „VIOLATIONS DETECTED"). Loguri: `/var/log/substrate-guard/`.
+
 ---
 
 **Dacă ceva nu se conectează:** verifică firewall-ul, numele serviciului (`db` vs `postgres`), și că parola din URL este URL-encoded dacă conține caractere speciale.
