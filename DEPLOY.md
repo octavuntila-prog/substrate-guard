@@ -28,7 +28,7 @@ Vezi și `build_db_url()` în `substrate_guard/audit.py`.
 Fișier: **`docker-compose.stack.yml`** — pornește **Postgres 16** + container **substrate-guard** pe aceeași rețea, cu tabele minime din **`scripts/sql/001_audit_tables.sql`**.
 
 ```bash
-cd Z3-PAPER
+cd substrate-guard
 copy .env.example .env
 # Editează POSTGRES_PASSWORD=... (Windows) sau export în Linux/macOS
 

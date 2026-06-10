@@ -10,7 +10,7 @@ Acest document descrie pașii pentru a rula **aceleași verificări** ca workflo
 ## Instalare (mediu curat)
 
 ```bash
-cd Z3-PAPER
+cd substrate-guard
 python -m venv .venv
 # Windows PowerShell:
 # .\.venv\Scripts\Activate.ps1
