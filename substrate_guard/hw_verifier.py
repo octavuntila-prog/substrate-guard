@@ -29,20 +29,13 @@ from enum import Enum
 from typing import Any
 
 from z3 import (
-    And,
     BitVec,
     BitVecVal,
-    Bool,
-    BoolVal,
-    Extract,
     If,
     Not,
     Or,
     Solver,
-    UDiv,
     ULT,
-    URem,
-    ZeroExt,
     sat,
     unsat,
 )

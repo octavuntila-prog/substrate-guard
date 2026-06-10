@@ -7,9 +7,9 @@ import tempfile
 
 from substrate_guard.chain import AuditChain, ChainConfigError, ChainEntry, GENESIS_HASH
 from substrate_guard.compliance import ComplianceExporter
-from substrate_guard.guard import Guard, SessionReport
+from substrate_guard.guard import Guard
 from substrate_guard.observe.events import (
-    EventType, FileEvent, NetworkEvent, ProcessEvent,
+    EventType, FileEvent, NetworkEvent,
 )
 from substrate_guard.observe.tracer import MockScenario
 

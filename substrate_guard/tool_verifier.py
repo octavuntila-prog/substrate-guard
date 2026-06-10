@@ -21,7 +21,6 @@ Matching is substring containment, not a full command-grammar parse.
 The intended contribution is applying SMT to tool-API safety (Gap #1 in the paper).
 """
 
-import json
 import re
 import time
 from dataclasses import dataclass, field
@@ -29,17 +28,12 @@ from enum import Enum
 from typing import Any
 
 from z3 import (
-    And,
     Bool,
-    BoolVal,
     Concat,
     Contains,
     If,
     Int,
     IntToStr,
-    IntVal,
-    Length,
-    Not,
     Or,
     Solver,
     String,

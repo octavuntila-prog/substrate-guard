@@ -32,7 +32,6 @@ from datetime import datetime, timedelta, timezone
 from substrate_guard import __version__ as substrate_guard_version
 from substrate_guard.constants import (
     BUILTIN_POLICY_PATH,
-    DEFAULT_REGO_POLICIES_SUBDIR,
     VALID_POLICY_MODES,
     POLICY_ENV_VAR,
 )
@@ -40,8 +39,8 @@ from pathlib import Path
 from typing import Optional
 
 from .chain import ChainConfigError
-from .guard import Guard, SessionReport
-from .integrations.vendor_bridge import VendorBridge, PipelineTraceAdapter, AgentRunAdapter
+from .guard import Guard
+from .integrations.vendor_bridge import PipelineTraceAdapter, AgentRunAdapter
 
 logging.basicConfig(
     level=logging.INFO,
@@ -428,7 +427,7 @@ def run_audit(
     eval_elapsed = (time.perf_counter() - eval_start) * 1000
     per_event = eval_elapsed / max(len(all_events), 1)
 
-    report = session.report()
+    session.report()  # finalize the session (side effect); return value unused here
 
     print(f"  Evaluated: {len(all_events)} events in {eval_elapsed:.0f}ms ({per_event:.2f}ms/event)")
     print(f"  Allowed:   {C.GREEN}{allowed}{C.RESET}")
@@ -647,9 +646,9 @@ def main():
         if not db_url:
             print(f"{C.RED}Error:{C.RESET} No database URL found.")
             print(f"Tried .env at: {args.env}, then process environment (POSTGRES_* / DATABASE_URL).")
-            print(f"Use --db-url or set credentials in .env / environment.")
-            print(f"\nExample:")
-            print(f"  python3 -m substrate_guard.audit --db-url postgresql://user:pass@postgres:5432/dbname")
+            print("Use --db-url or set credentials in .env / environment.")
+            print("\nExample:")
+            print("  python3 -m substrate_guard.audit --db-url postgresql://user:pass@postgres:5432/dbname")
             return 2  # 2 = config ERROR (no DB URL), distinct from 1 = violations
 
         policy_mode, policy_source = resolve_policy_mode(args)

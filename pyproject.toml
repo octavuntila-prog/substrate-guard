@@ -63,6 +63,16 @@ substrate_guard = [
     "observe/bpf_programs/*.c",
 ]
 
+# Lint gate (M-j): pyflakes (F) only -- unused imports/vars, redefinitions, undefined
+# names. Style rules (E/W) are intentionally NOT gated yet, to keep the gate meaningful
+# and low-noise. CI runs `ruff check substrate_guard tests`; the F-set is clean at HEAD.
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["F"]
+
 # Only collect test_*.py (exclude tests/smoke_test.py — manual runner, not pytest)
 [tool.pytest.ini_options]
 testpaths = ["tests"]

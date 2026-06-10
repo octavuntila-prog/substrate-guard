@@ -17,7 +17,6 @@ Usage:
 from __future__ import annotations
 
 import json
-import os
 import logging
 import shutil
 import subprocess
@@ -25,7 +24,6 @@ import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
-from fnmatch import fnmatch
 
 from substrate_guard.constants import BUILTIN_POLICY_PATH
 
@@ -153,7 +151,7 @@ class PolicyEngine:
         
         Converts Event to OPA input format automatically.
         """
-        from ..observe.events import Event, FileEvent, NetworkEvent, ProcessEvent
+        from ..observe.events import FileEvent, NetworkEvent, ProcessEvent
 
         meta = getattr(event, "metadata", None) or {}
         input_data = {

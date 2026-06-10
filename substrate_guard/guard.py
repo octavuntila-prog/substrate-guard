@@ -23,11 +23,11 @@ import logging
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Generator, Optional, Tuple
+from typing import Any, Optional, Tuple
 from pathlib import Path
 
 from .observe.tracer import AgentTracer
-from .observe.events import Event, EventType, ProcessEvent, Severity, EventStream
+from .observe.events import Event, ProcessEvent
 from .policy.engine import PolicyEngine, PolicyDecision
 
 logger = logging.getLogger("substrate_guard")
@@ -269,7 +269,7 @@ class Guard:
         self._z3_available = False
         if verify:
             try:
-                import z3
+                import z3  # noqa: F401  (availability probe -- the import IS the check)
                 self._z3_available = True
             except ImportError:
                 logger.warning("z3-solver not installed — Layer 3 disabled")

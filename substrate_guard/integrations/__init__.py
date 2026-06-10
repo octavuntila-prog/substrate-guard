@@ -21,7 +21,6 @@ from __future__ import annotations
 import json
 import logging
 import time
-import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -30,11 +29,9 @@ from datetime import datetime
 from ..guard import Guard, SessionReport
 from ..runtime_env import resolve_verify_process_cli
 from ..observe.events import (
-    Event, EventType, Severity,
-    FileEvent, NetworkEvent, ProcessEvent, SyscallEvent,
+    Event, EventType,
+    FileEvent, NetworkEvent, ProcessEvent,
 )
-from ..observe.tracer import AgentTracer
-from ..policy.engine import PolicyEngine
 
 logger = logging.getLogger("substrate_guard.substrate")
 

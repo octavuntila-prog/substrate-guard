@@ -32,14 +32,8 @@ from typing import Any
 
 import sympy
 from sympy import (
-    Eq,
-    Integer,
-    Rational,
-    Symbol,
     simplify,
-    solve,
     sympify,
-    symbols,
 )
 from sympy.parsing.sympy_parser import (
     convert_xor,
@@ -48,12 +42,9 @@ from sympy.parsing.sympy_parser import (
     standard_transformations,
 )
 from z3 import (
-    And,
     ArithRef,
-    Int,
     IntVal,
     Not,
-    Or,
     Real,
     RealVal,
     Solver,
@@ -435,7 +426,7 @@ class DistillationVerifier:
             return StepVerification(
                 step_number=step_num,
                 status=StepStatus.UNPARSEABLE,
-                error=f"Cannot parse transformation components",
+                error="Cannot parse transformation components",
             )
 
         # Build equations
@@ -489,7 +480,7 @@ class DistillationVerifier:
             return StepVerification(
                 step_number=step_num,
                 status=StepStatus.UNPARSEABLE,
-                error=f"Cannot parse expression/value",
+                error="Cannot parse expression/value",
             )
 
         # If expression is purely numeric, just check equality

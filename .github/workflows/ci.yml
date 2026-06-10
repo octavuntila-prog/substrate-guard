@@ -36,6 +36,21 @@ jobs:
       - name: Manual code-verifier smoke (exit code enforced)
         run: python tests/smoke_test.py
 
+  # Lint gate (M-j): pyflakes (F) -- unused imports/vars, redefinitions, undefined names.
+  # Config in pyproject.toml [tool.ruff.lint]. A `# noqa: F401` directive now actually
+  # matters (e.g. the z3/bcc availability probes).
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: pip install "ruff>=0.15"
+      - name: Ruff (pyflakes gate)
+        run: ruff check substrate_guard/ tests/
+
   # Real PostgreSQL — schema + audit path (complements unit tests; no matrix to save minutes)
   postgres-ci:
     runs-on: ubuntu-latest

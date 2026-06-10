@@ -1,11 +1,9 @@
 """Tests for Layer 1: eBPF Observe — events and tracer."""
 
 import json
-import time
-import pytest
 from substrate_guard.observe.events import (
     Event, EventType, Severity, EventStream,
-    SyscallEvent, FileEvent, NetworkEvent, ProcessEvent, TLSEvent, MemoryEvent,
+    FileEvent, NetworkEvent, ProcessEvent, TLSEvent,
 )
 from substrate_guard.observe.tracer import AgentTracer, MockScenario
 

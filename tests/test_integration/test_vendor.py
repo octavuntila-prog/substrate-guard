@@ -13,7 +13,7 @@ import pytest
 from substrate_guard.integrations.vendor_bridge import (
     VendorBridge, VendorPaths, PipelineTraceAdapter, AgentRunAdapter,
 )
-from substrate_guard.observe.events import EventType, NetworkEvent, ProcessEvent, FileEvent
+from substrate_guard.observe.events import NetworkEvent, ProcessEvent, FileEvent
 
 
 # ============================================

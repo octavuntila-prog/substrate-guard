@@ -33,7 +33,7 @@ import json
 import threading
 import time
 import os
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict
 from typing import Optional
 from pathlib import Path
 

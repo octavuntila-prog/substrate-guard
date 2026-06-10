@@ -5,7 +5,7 @@ from substrate_guard.integrations import (
     SubstrateGuard, SubstrateConfig,
     SessionTraceAdapter, MarketJudgeAdapter, MirrorReporter,
 )
-from substrate_guard.observe.events import EventType, NetworkEvent, FileEvent, ProcessEvent
+from substrate_guard.observe.events import EventType, NetworkEvent, FileEvent
 
 
 # ============================================

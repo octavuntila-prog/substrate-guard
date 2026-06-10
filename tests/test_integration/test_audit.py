@@ -3,12 +3,10 @@
 import json
 import pytest
 from substrate_guard.audit import (
-    parse_env_file, build_db_url, parse_json_field, _event_detail,
-    run_audit, resolve_policy_path,
+    build_db_url, parse_json_field, run_audit, resolve_policy_path,
 )
 from substrate_guard.constants import BUILTIN_POLICY_PATH
 from substrate_guard.integrations.vendor_bridge import PipelineTraceAdapter, AgentRunAdapter
-from substrate_guard.observe.events import EventType
 
 
 # Test-only deterministic mock secret (32+ chars for forward-compat with any

@@ -20,7 +20,6 @@ from typing import Any
 from z3 import (
     And,
     ArithRef,
-    BitVec,
     Bool,
     BoolRef,
     If,

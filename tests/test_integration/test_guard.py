@@ -1,8 +1,7 @@
 """Integration tests — eBPF observe → OPA decide → Z3 verify pipeline."""
 
 import pytest
-import time
-from substrate_guard.guard import Guard, GuardSession, SessionReport
+from substrate_guard.guard import Guard
 from substrate_guard.observe.events import (
     EventType, FileEvent, NetworkEvent, ProcessEvent,
 )

@@ -11,7 +11,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import sys
 import time
 import logging
 
@@ -20,10 +19,7 @@ from .runtime_env import (
     monitor_verify_process_cli,
     pipeline_verify_process_cli,
 )
-from .observe.events import (
-    Event, EventType, FileEvent, NetworkEvent, ProcessEvent,
-)
-from .observe.tracer import AgentTracer, MockScenario
+from .observe.tracer import MockScenario
 from .policy.engine import PolicyEngine
 from .constants import BUILTIN_POLICY_PATH
 
@@ -266,7 +262,7 @@ def cmd_monitor(args):
     _mvpc = monitor_verify_process_cli(args)
     if _mvpc:
         print(f"  {C.info('CLI verify on ProcessEvent:')} enabled (regex, same as verify --type cli)")
-    print(f"  Press Ctrl+C to stop\n")
+    print("  Press Ctrl+C to stop\n")
 
     guard = Guard(
         observe=True,
@@ -289,12 +285,12 @@ def cmd_monitor(args):
             else:
                 # Mock mode — wait for Ctrl+C
                 print(f"  {C.warn('Mock mode')} - no real eBPF. Use --live for real tracing.")
-                print(f"  Use 'substrate-guard demo' to see the pipeline in action.\n")
+                print("  Use 'substrate-guard demo' to see the pipeline in action.\n")
                 while True:
                     time.sleep(1)
 
     except KeyboardInterrupt:
-        print(f"\n  Stopped.")
+        print("\n  Stopped.")
         report = session.report()
         print_report(report)
     
@@ -305,7 +301,7 @@ def cmd_pipeline_benchmark(args):
     """Run full-pipeline benchmark across all mock scenarios (observe -> policy -> Z3)."""
     print_banner()
     print(f"  {C.bold('Benchmark: Full Pipeline')}")
-    print(f"  Running all scenarios through eBPF(mock) -> OPA(builtin) -> Z3\n")
+    print("  Running all scenarios through eBPF(mock) -> OPA(builtin) -> Z3\n")
 
     scenarios = {
         "safe_web": ("Safe Web Agent", MockScenario.safe_web_agent),
@@ -378,7 +374,6 @@ def cmd_export(args):
     print()
 
     # Run scenario with chain enabled
-    from .chain import AuditChain
     from .compliance import ComplianceExporter
 
     guard = Guard(

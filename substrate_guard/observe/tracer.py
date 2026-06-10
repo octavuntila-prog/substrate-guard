@@ -25,11 +25,11 @@ import threading
 import time
 from pathlib import Path
 from queue import Queue, Empty, Full
-from typing import Optional, Generator, Set
+from typing import Optional, Generator
 
 from .events import (
-    Event, EventType, Severity, EventStream,
-    SyscallEvent, FileEvent, NetworkEvent, ProcessEvent, TLSEvent,
+    Event, EventType, EventStream,
+    FileEvent, NetworkEvent, ProcessEvent, TLSEvent,
 )
 
 logger = logging.getLogger("substrate_guard.observe")
