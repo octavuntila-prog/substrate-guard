@@ -340,12 +340,17 @@ class PolicyEngine:
 def _check_dangerous_paths(action, agent, context) -> Optional[str]:
     """Deny writes to system directories and reads of critical files."""
     action_type = action.get("type", "")
-    path = action.get("path", "")
-    
+    raw_path = action.get("path", "")
+    # Canonicalize so `//etc/passwd`, `/etc/../etc/passwd`, or a trailing space cannot
+    # bypass the exact-string / prefix matches below. POSIX-deterministic, no FS access.
+    import posixpath
+    import re as _re
+    path = posixpath.normpath(_re.sub(r"/{2,}", "/", (raw_path or "").strip()))
+
     # Specific critical files — deny ALL access (read, write, open)
-    critical = ["/etc/passwd", "/etc/shadow", "/etc/sudoers", "/etc/crontab"]
+    critical = {"/etc/passwd", "/etc/shadow", "/etc/sudoers", "/etc/crontab"}
     if path in critical and action_type in ("file_write", "file_read", "file_open"):
-        return f"Access to critical file {path} denied"
+        return f"Access to critical file {raw_path} denied"
     
     # System directories — deny writes
     if action_type not in ("file_write", "file_open"):
@@ -415,7 +420,13 @@ def _check_network_exfiltration(action, agent, context) -> Optional[str]:
     
     port = action.get("remote_port", 0)
     ip = action.get("remote_ip", "")
-    
+
+    # Cloud metadata endpoint — a classic SSRF / credential-exfil target. (Previously
+    # remote_ip was read but never used, so the IP half of this policy was silently
+    # absent; this makes it load-bearing.)
+    if isinstance(ip, str) and (ip.startswith("169.254.169.254") or ip == "fd00:ec2::254"):
+        return f"Connection to cloud metadata IP {ip} denied"
+
     suspicious_ports = {4444, 5555, 6666, 8888, 31337, 12345, 9001}
     if port in suspicious_ports:
         return f"Connection to suspicious port {port} denied"

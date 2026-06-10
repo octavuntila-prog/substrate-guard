@@ -47,6 +47,24 @@ def test_non_dict_input_does_not_crash():
     assert isinstance(d, PolicyDecision) and d.denied
 
 
+def test_critical_file_read_bypass_is_canonicalized():
+    """M3: //etc/passwd, /etc/../etc/passwd, /etc//passwd, trailing-space must all be
+    denied, not just the exact /etc/passwd -- path canonicalization closes the bypass."""
+    eng = PolicyEngine(policy_path="nonexistent/", use_opa_binary=False)
+    for p in ("//etc/passwd", "/etc/../etc/passwd", "/etc//passwd", "/etc/passwd ", "/etc/passwd"):
+        assert eng.evaluate({"action": {"type": "file_read", "path": p}}).denied, p
+
+
+def test_cloud_metadata_ip_connection_denied():
+    """M7: connections to the cloud metadata IP (a classic SSRF/exfil target) must be
+    denied -- the remote_ip half of the network policy was previously dead code."""
+    eng = PolicyEngine(policy_path="nonexistent/", use_opa_binary=False)
+    # port 80 + a domain => the port checks do NOT fire; only the IP check can deny it
+    d = eng.evaluate({"action": {"type": "network_connect", "remote_ip": "169.254.169.254",
+                                 "remote_port": 80, "domain": "ok.example"}})
+    assert d.denied
+
+
 # ============================================
 # DENY tests — 25 actions that must be blocked
 # ============================================

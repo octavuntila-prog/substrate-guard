@@ -256,6 +256,10 @@ class AuditChain:
         }
 
         Path(path).write_text(json.dumps(chain_data, indent=2, default=str))
+        try:
+            os.chmod(path, 0o600)  # the export embeds pipeline I/O -- not world-readable
+        except OSError:
+            pass
         return path
 
     @classmethod

@@ -523,6 +523,10 @@ def run_audit(
     report_path = f"{output_dir}/audit_{ts}.json"
     try:
         Path(report_path).write_text(json.dumps(summary, indent=2, default=str))
+        try:
+            os.chmod(report_path, 0o600)  # report embeds pipeline I/O -- not world-readable
+        except OSError:
+            pass
         print(f"  {C.GREEN}Report saved:{C.RESET} {report_path}")
     except Exception as e:
         print(f"  {C.YELLOW}Could not save report: {e}{C.RESET}")
