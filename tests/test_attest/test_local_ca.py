@@ -19,6 +19,33 @@ def test_issue_and_verify_cert(tmp_path):
     assert lca.verify_cert(dict(cur))
 
 
+def test_verify_cert_rejects_expired(tmp_path):
+    """M1: an EXPIRED but correctly-signed cert must be rejected (short-lived cert
+    semantics -- a leaked/old cert must stop verifying). verify_cert ignored expiry."""
+    from datetime import datetime, timedelta, timezone
+
+    dk = DeviceKey(key_dir=tmp_path / "k")
+    lca = LocalCA(dk, ca_dir=tmp_path / "c")
+    base = {
+        "version": 1,
+        "device_id": dk.device_id,
+        "public_key": dk.public_key_hex,
+        "issued_at": (datetime.now(timezone.utc) - timedelta(hours=25)).isoformat(),
+        "issuer": "substrate-guard-local-ca",
+        "serial": "deadbeefdeadbeef",
+    }
+
+    def _signed(cert_data):
+        sig = dk.sign(json.dumps(cert_data, sort_keys=True).encode())
+        return {**cert_data, "signature": sig.hex()}
+
+    expired = _signed({**base, "expires_at": (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()})
+    assert lca.verify_cert(expired) is False  # rejected: expired (even though signed)
+    # control: identical shape with a FUTURE expiry verifies -> proves it is the expiry
+    fresh = _signed({**base, "expires_at": (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()})
+    assert lca.verify_cert(fresh) is True
+
+
 def test_attestation_bundle(tmp_path):
     keys = tmp_path / "k"
     ca = tmp_path / "c"

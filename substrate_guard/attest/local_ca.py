@@ -104,7 +104,18 @@ class LocalCA:
         if c.get("device_id") != expected_id:
             return False
         payload = json.dumps(c, sort_keys=True).encode()
-        return DeviceKey.verify_with_public_key(pk_hex, payload, bytes.fromhex(sig_hex))
+        if not DeviceKey.verify_with_public_key(pk_hex, payload, bytes.fromhex(sig_hex)):
+            return False
+        # Reject an EXPIRED cert even when correctly signed: the whole point of the
+        # short-lived (24h) cert is that a leaked/old one stops verifying. verify_cert
+        # previously checked only signature + identity binding, so an expired cert
+        # verified forever. expires_at is inside the signed payload, so it is authentic.
+        try:
+            if datetime.now(timezone.utc) >= datetime.fromisoformat(c["expires_at"]):
+                return False
+        except (KeyError, ValueError, TypeError):
+            return False  # missing / malformed expiry -> fail closed
+        return True
 
     def attestation(self) -> dict[str, Any]:
         cert = self.current
