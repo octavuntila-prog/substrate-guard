@@ -51,6 +51,17 @@ def test_boolean_collapsed_equation_does_not_crash():
     assert r is not None  # returned a verdict instead of raising
 
 
+def test_symbolic_modulo_does_not_crash():
+    """H-A: a step with a symbolic modulo (x % 3) maps free symbols to Z3 Real operands,
+    and z3's `%` (Int-sorted only) raised an UNCAUGHT Z3Exception that escaped the
+    verifier (callers caught only ValueError). It must now ABSTAIN -- the step is
+    UNPARSEABLE -- returning a verdict instead of crashing, and never reporting all_valid."""
+    v = DistillationVerifier()
+    r = v.verify_trace("t", [{"expression": "x % 3", "value": "0"}])
+    assert r is not None          # returned a verdict, did not raise Z3Exception
+    assert not r.all_valid        # the modulo step abstained -> not a clean all-valid trace
+
+
 def test_power_tower_does_not_dos():
     """A power-tower expression must be rejected quickly, not computed (CPU/memory DoS
     + a 4300-digit int->str ValueError)."""

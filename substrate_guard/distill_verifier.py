@@ -57,6 +57,7 @@ from z3 import (
     Real,
     RealVal,
     Solver,
+    Z3Exception,
     sat,
     unsat,
 )
@@ -251,7 +252,16 @@ def sympy_to_z3(expr: sympy.Expr, var_map: dict[str, Any]) -> Any:
     if isinstance(expr, sympy.Mod):
         a = sympy_to_z3(expr.args[0], var_map)
         b = sympy_to_z3(expr.args[1], var_map)
-        return a % b
+        # z3's `%` is defined ONLY on Int-sorted operands, but free symbols map to Real
+        # (above), so `a % b` typically raised an uncaught Z3Exception that escaped the
+        # callers (they caught only ValueError). Only emit it when BOTH operands are
+        # Int-sorted; otherwise mark the step UNPARSEABLE via ValueError, mirroring the
+        # Pow-out-of-range guard above.
+        a_int = hasattr(a, "is_int") and a.is_int()
+        b_int = hasattr(b, "is_int") and b.is_int()
+        if a_int and b_int:
+            return a % b
+        raise ValueError("modulo modeled only for integer-sorted operands")
 
     # Numbers that SymPy wraps
     if isinstance(expr, sympy.core.numbers.One):
@@ -501,7 +511,7 @@ class DistillationVerifier:
         var_map = {}
         try:
             z3_eq = self._sympy_eq_to_z3(eq, var_map)
-        except ValueError as e:
+        except (ValueError, Z3Exception) as e:
             return StepVerification(
                 step_number=step_num, status=StepStatus.UNPARSEABLE,
                 error=f"Z3 conversion failed: {e}",
@@ -550,7 +560,7 @@ class DistillationVerifier:
         try:
             z3_before = self._sympy_eq_to_z3(before, var_map)
             z3_after = self._sympy_eq_to_z3(after, var_map)
-        except ValueError as e:
+        except (ValueError, Z3Exception) as e:
             return StepVerification(
                 step_number=step_num,
                 status=StepStatus.UNPARSEABLE,
