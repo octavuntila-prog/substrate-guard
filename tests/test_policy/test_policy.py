@@ -61,7 +61,9 @@ def test_cloud_metadata_ip_connection_denied():
     zero-padded forms and leading whitespace. port 80 + domain => only the IP check fires."""
     eng = PolicyEngine(policy_path="nonexistent/", use_opa_binary=False)
     for ip in ("169.254.169.254", " 169.254.169.254", "fd00:ec2::254",
-               "FD00:EC2::254", "fd00:ec2:0:0:0:0:0:254", "fd00:0ec2::0254"):
+               "FD00:EC2::254", "fd00:ec2:0:0:0:0:0:254", "fd00:0ec2::0254",
+               "::ffff:169.254.169.254", "::ffff:a9fe:a9fe", "[fd00:ec2::254]",
+               "::169.254.169.254"):
         d = eng.evaluate({"action": {"type": "network_connect", "remote_ip": ip,
                                      "remote_port": 80, "domain": "ok.example"}})
         assert d.denied, ip

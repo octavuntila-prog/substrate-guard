@@ -427,9 +427,19 @@ def _check_network_exfiltration(action, agent, context) -> Optional[str]:
     if isinstance(ip, str) and ip.strip():
         try:
             import ipaddress
+            addr = ipaddress.ip_address(ip.strip().strip("[]"))
+            # Fold an IPv6 transition encoding of an IPv4 host to its IPv4 -- the SAME
+            # host must not bypass the metadata deny: IPv4-mapped (::ffff:a.b.c.d, what a
+            # dual-stack getpeername() returns) and IPv4-compatible (::a.b.c.d, high 96
+            # bits zero).
+            if addr.version == 6:
+                if addr.ipv4_mapped is not None:
+                    addr = addr.ipv4_mapped
+                elif 0 < int(addr) <= 0xFFFFFFFF:
+                    addr = ipaddress.ip_address(int(addr))
             _meta = {ipaddress.ip_address("169.254.169.254"),
                      ipaddress.ip_address("fd00:ec2::254")}
-            if ipaddress.ip_address(ip.strip()) in _meta:
+            if addr in _meta:
                 return f"Connection to cloud metadata IP {ip.strip()} denied"
         except ValueError:
             pass  # not a parseable IP literal -> the port checks below still apply
