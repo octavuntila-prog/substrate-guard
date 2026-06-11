@@ -480,6 +480,22 @@ class TestComplianceExport:
                 "CC4.1 control lost its honest tail-truncation scoping"
             assert "deleted, or inserted without detection" not in cc41, \
                 "CC4.1 regressed to the unqualified deletion-detection over-claim"
+            # M-c follow-up: CC8.1 must NOT attribute CLI checking to Z3 SMT. The CLI
+            # verifier imports no Z3 -- it is a regex/AST denylist (cli_verifier.py,
+            # commit 32ab634). This auditor-facing string must stay honest.
+            cc81 = data["trust_service_criteria"]["CC8.1_change_management"]
+            cc81_control = cc81["control"].lower()
+            assert "regex" in cc81_control or "denylist" in cc81_control, \
+                "CC8.1 control lost its honest CLI regex/AST denylist attribution"
+            assert "z3 smt verification checks" not in cc81_control, \
+                "CC8.1 regressed to attributing CLI checking to Z3 SMT"
+            by_domain = cc81["evidence"]["verification_engine_by_domain"]
+            cli_engine = by_domain["cli"].lower()
+            assert "denylist" in cli_engine and "no z3" in cli_engine, \
+                "CC8.1 verification_engine_by_domain[cli] must attribute CLI to a " \
+                "non-Z3 regex/AST denylist, not Z3 SMT"
+            assert "z3" in by_domain["code"].lower(), \
+                "CC8.1 code domain should still be attributed to Z3 SMT"
             assert data["chain_integrity"]["status"] == "VERIFIED"
         finally:
             os.unlink(path)

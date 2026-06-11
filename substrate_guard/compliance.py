@@ -113,13 +113,20 @@ class ComplianceExporter:
                 },
                 "CC8.1_change_management": {
                     "description": "The entity authorizes, designs, develops, configures, documents, tests, approves, and implements changes",
-                    "control": "Z3 SMT verification checks AI-generated code, tool APIs, CLI commands, hardware assembly, and distilled models against safety specifications within a bounded modeled fragment (sound on each verifier's declared subset; Z3 available but NOT exercised per-event in the batch cron audit — #38b)",
+                    "control": "Pre-change verification checks AI-generated code, tool APIs, CLI commands, hardware assembly, and distilled models against safety specifications within a bounded modeled fragment. Code, tool-API, hardware-assembly, and distillation use Z3 SMT (sound on each verifier's declared subset; Z3 available but NOT exercised per-event in the batch cron audit — #38b); the CLI verifier is a regex/pattern + AST structural denylist with no Z3/SMT — a command it passes is 'not matched by any known-bad pattern', NOT proven safe (see cli_verifier.py, M-c)",
                     "evidence": {
-                        "verification_engine": "Z3 SMT Solver",
+                        "verification_engine": "Z3 SMT (code, tool_api, hardware_riscv, distillation) + regex/AST structural denylist (cli — no Z3/SMT)",
+                        "verification_engine_by_domain": {
+                            "code": "Z3 SMT",
+                            "tool_api": "Z3 SMT",
+                            "cli": "regex/AST structural denylist (no Z3/SMT)",
+                            "hardware_riscv": "Z3 SMT",
+                            "distillation": "Z3 SMT",
+                        },
                         "domains_covered": ["code", "tool_api", "cli", "hardware_riscv", "distillation"],
                         "benchmark_scenarios": 5,
                         "benchmark_accuracy": "100% on the 5-scenario benchmark suite (design target, not a measured per-event control on this evidence set)",
-                        "scope_note": "Sound only within each verifier's modeled fragment; out-of-subset constructs are not exercised per-event in the batch cron (#38b). The CLI verifier maintains a documented known-gap inventory; false-positive/false-negative rates are not measured on this evidence set.",
+                        "scope_note": "Sound only within each verifier's modeled fragment; out-of-subset constructs are not exercised per-event in the batch cron (#38b). The CLI verifier is a regex/AST denylist (no SMT proof) and maintains a documented known-gap inventory; false-positive/false-negative rates are not measured on this evidence set.",
                     },
                 },
                 "CC4.1_monitoring_controls": {
