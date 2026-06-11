@@ -29,7 +29,7 @@ Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://a
 | HMAC-SHA256 chain | Wired in v13.4.0 (cron path); per-run chain export, cryptographic verify_export |
 | Cron audits | M0.7 baseline window: 7/7 verified (May 19–25, 2026) |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
-| Tests | **486** passing (**493** collected), 7 skipped optional (1 SBERT + 6 Postgres CI); 100% accuracy on 5 benchmark scenarios |
+| Tests | **494** passing (**503** collected), 9 skipped (1 SBERT + 6 Postgres CI + 2 POSIX-only ops-exec); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
 
 ### Release v13.3.0 (April 24, 2026) — configurable policy engine
@@ -163,7 +163,7 @@ substrate-guard/
 ├── integrations/     # SUBSTRATE ecosystem connectors
 ├── chain.py          # HMAC-SHA256 tamper-evident chain
 ├── compliance.py     # SOC2 / ISO 27001 / ISO 42001 exports
-└── tests/            # 493 tests collected, organized by layer (incl. adversarial + fuzz)
+└── tests/            # 503 tests collected, organized by layer (incl. adversarial + fuzz)
     ├── test_policy/       # L2 policy decisions
     ├── test_verify/       # L3 verifier soundness (code / cli / hw / distill)
     ├── test_integration/  # chain, audit, compliance, docs-drift guard
@@ -182,7 +182,7 @@ This repository (substrate-guard) is deployed on the **Research server** (89.167
 
 The broader SUBSTRATE ecosystem includes a separate production stack on the **CPX52 server** (substrate-v2 core + ecosystem judges + V2.0 single-file guard daemon) — see [Related Projects](#related-projects) below. That stack is outside this repository's scope.
 
-**Tests: 493** collected (**486** passed in a local run on 2026-06-10; 7 skipped optional: 1 SBERT, 6 Postgres CI). See [Related Projects](#related-projects) for the separate CPX52 V2.0 stack scope.
+**Tests: 503** collected (**494** passed in a local run on 2026-06-11; 9 skipped: 1 SBERT, 6 Postgres CI, 2 POSIX-only ops-exec). See [Related Projects](#related-projects) for the separate CPX52 V2.0 stack scope.
 
 ## Benchmark Results
 
