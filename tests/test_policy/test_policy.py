@@ -80,6 +80,41 @@ def test_cloud_metadata_ip_connection_denied():
         assert not d.denied, ip
 
 
+def test_opa_input_not_double_wrapped(monkeypatch):
+    """OPA-path regression: `opa eval -I` ALREADY wraps stdin as `input`, so _evaluate_opa
+    must pass input_data RAW, not {"input": input_data}. The double-wrap made every rego
+    rule see input.input.* -> matched nothing -> allow=false/deny=[] for EVERY action,
+    silently over-blocking the entire --policy rego path (verified with a real OPA binary:
+    a legit /workspace write got allow=false). No OPA needed here: the subprocess is
+    mocked and we assert the input SHAPE sent to it."""
+    from pathlib import Path
+    from substrate_guard.policy import engine as eng_mod
+
+    rego = str(Path(__file__).resolve().parents[2] / "substrate_guard" / "policy" / "policies")
+    eng = PolicyEngine(policy_path=rego, use_opa_binary=True, opa_binary="opa")
+    assert eng._opa_bin and eng._policies, "OPA path not active for the test"
+
+    captured = {}
+
+    class _Proc:
+        returncode = 0
+        stdout = '{"allow": true, "deny": []}'
+        stderr = ""
+
+    def _fake_run(*a, **k):
+        captured["input"] = k.get("input")
+        return _Proc()
+
+    monkeypatch.setattr(eng_mod.subprocess, "run", _fake_run)
+    eng.evaluate({"agent": {"role": "user"},
+                  "action": {"type": "file_write", "path": "/workspace/x"},
+                  "context": {}})
+    import json as _json
+    sent = _json.loads(captured["input"])
+    assert sent.get("action", {}).get("path") == "/workspace/x", \
+        f"OPA input is double-wrapped (rego sees input.input.*): {sent}"
+
+
 # ============================================
 # DENY tests — 25 actions that must be blocked
 # ============================================

@@ -11,8 +11,9 @@
 #   - No path CANONICALIZATION: critical_file is exact-match, so `//etc/passwd`,
 #     `/etc/../etc/passwd`, or a trailing-space variant can bypass it (the builtin
 #     normalizes via posixpath before matching).
-#   - IP matching is exact-string: it does NOT normalize IPv6 alternate forms of the
-#     metadata address (the builtin folds ::ffff: / :: forms via the ipaddress module).
+#   - IP matching covers the 5 named metadata IPs + the 169.254.0.0/16 link-local range
+#     (net.cidr_contains), but does NOT normalize IPv6 alternate forms of the metadata
+#     address (the builtin folds ::ffff: / :: forms via the ipaddress module).
 #   - No type-confusion fail-safe or pipe-to-shell regex detection.
 # These rules were hand-reviewed against rego.v1 but are NOT exercised by the test suite
 # (which runs the builtin via use_opa_binary=False) nor by CI (no OPA). An OPA deployment
@@ -102,12 +103,22 @@ deny contains msg if {
 }
 
 # Deny connections to cloud-metadata endpoints (SSRF / credential exfil).
-# NOTE: exact-string match only -- see the IP-normalization gap in the header caveat;
-# the builtin Python engine additionally normalizes IPv6 alternate forms.
+# NOTE: exact-string for the named metadata IPs + a CIDR check for the link-local range
+# below. The builtin Python engine additionally normalizes IPv6 alternate forms (caveat).
 deny contains msg if {
     input.action.type in {"network_connect", "network_send"}
     metadata_ip(input.action.remote_ip)
     msg := sprintf("Connection to cloud metadata IP denied: %s", [input.action.remote_ip])
+}
+
+# Deny the whole IPv4 link-local range (169.254.0.0/16) -- the AWS/GCP/Azure/ECS metadata
+# family lives there and link-local egress is almost never legitimate for an agent. Now
+# at parity with the builtin's is_link_local check. net.cidr_contains is undefined (no
+# deny, no crash) on a non-IP remote_ip.
+deny contains msg if {
+    input.action.type in {"network_connect", "network_send"}
+    net.cidr_contains("169.254.0.0/16", input.action.remote_ip)
+    msg := sprintf("Connection to link-local IP denied: %s", [input.action.remote_ip])
 }
 
 # Deny when budget is exhausted

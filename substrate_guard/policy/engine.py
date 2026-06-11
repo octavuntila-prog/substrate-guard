@@ -232,8 +232,13 @@ class PolicyEngine:
         deny-by-default -- but the Rego default is the operator's responsibility.)
         """
         try:
-            # Write input to temp file
-            input_json = json.dumps({"input": input_data})
+            # `opa eval -I` ALREADY wraps stdin as the `input` document, so passing
+            # {"input": input_data} double-wrapped it -> every rule saw `input.input.*`,
+            # matched nothing -> allow=false / deny=[] for EVERY action (the whole
+            # --policy rego path silently over-blocked, denying even legitimate
+            # /workspace writes). Pass input_data raw. (Pre-existing; surfaced by the M-a
+            # re-verification with a real OPA binary.)
+            input_json = json.dumps(input_data)
             
             # Combine all policy files
             policy_args = []
