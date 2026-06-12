@@ -5,19 +5,26 @@
 # Input: {"agent": {...}, "action": {...}, "context": {...}}
 # Output: {"allow": bool, "deny": set[str]}
 #
-# PARITY CAVEAT (REGULA 0): the production-hardened reference is the BUILT-IN Python
-# engine (substrate_guard/policy/engine.py). This Rego bundle is a best-effort port and
-# does NOT carry all of the builtin's hardening. Known gaps in this revision:
-#   - No path CANONICALIZATION: critical_file is exact-match, so `//etc/passwd`,
-#     `/etc/../etc/passwd`, or a trailing-space variant can bypass it (the builtin
-#     normalizes via posixpath before matching).
-#   - IP matching covers the 5 named metadata IPs + the 169.254.0.0/16 link-local range
-#     (net.cidr_contains), but does NOT normalize IPv6 alternate forms of the metadata
-#     address (the builtin folds ::ffff: / :: forms via the ipaddress module).
-#   - No type-confusion fail-safe or pipe-to-shell regex detection.
-# These rules were hand-reviewed against rego.v1 but are NOT exercised by the test suite
-# (which runs the builtin via use_opa_binary=False) nor by CI (no OPA). An OPA deployment
-# MUST `opa test` + validate parity before relying on `--policy rego`.
+# PARITY CAVEAT (REGULA 0): the production-hardened reference is the BUILT-IN Python engine
+# (substrate_guard/policy/engine.py). This Rego bundle is a best-effort port; its decisions
+# DIVERGE from the builtin and it is NOT a drop-in replacement. Known divergences:
+#   UNDER-blocks (Rego is LESS SAFE -- ALLOWS what the builtin DENIES):
+#     - No PII/secret detection: a /workspace write whose CONTENT contains an SSN/secret is
+#       ALLOWED by the Rego but DENIED by the builtin's pii rule.
+#     - No path CANONICALIZATION: //etc/passwd, /etc/../etc/passwd, or a trailing-space
+#       variant bypass the exact-match critical_file (the builtin normalizes via posixpath).
+#     - No IPv6-alternate-form IP normalization (::ffff:169.254.169.254): the builtin folds
+#       it via ipaddress. (Both engines miss IPv6 link-local fe80:: symmetrically.)
+#     - No type-confusion fail-safe or pipe-to-shell regex detection.
+#   Behaves DIFFERENTLY (stricter / odd, not necessarily less safe):
+#     - Network is a strict ALLOWLIST (known_safe_domain on 443 + DNS 53) vs the builtin's
+#       denylist -- the Rego DENIES connections to unknown domains the builtin allows.
+#     - net.cidr_contains denies a CIDR-string remote_ip ("169.254.1.1/24"); the builtin
+#       rejects that as a non-IP and allows it (fail-closed, unrealistic input).
+#   process_exec is allowed-unless-a-deny-fires (mirrors the builtin), since this revision.
+# These rules are NOT exercised by the test suite (runs the builtin via use_opa_binary=
+# False) nor by CI (no OPA). An OPA deployment MUST `opa test` + validate parity before
+# relying on `--policy rego`.
 
 package substrate_guard.agent_policy
 
@@ -55,6 +62,15 @@ allow if {
 allow if {
     input.action.type == "network_connect"
     input.action.remote_port == 53
+}
+
+# Allow process execution by default; the deny rules below (dangerous command patterns,
+# dangerous executables, sudo-escalation) override (deny wins over allow in the engine).
+# Mirrors the builtin's allow-unless-dangerous posture for commands -- without this rule
+# the Rego had NO process_exec allow, so default-deny blocked EVERY command (an agent
+# could run nothing). Surfaced once the OPA path actually executed (the double-wrap unfix).
+allow if {
+    input.action.type == "process_exec"
 }
 
 # Admin role can do anything (except what deny catches)
