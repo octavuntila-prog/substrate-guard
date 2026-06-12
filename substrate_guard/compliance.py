@@ -82,7 +82,7 @@ class ComplianceExporter:
         Maps to SOC 2 Trust Service Criteria:
         - CC6.1: Logical access security → OPA policy decisions
         - CC7.2: System monitoring → eBPF observation
-        - CC8.1: Change management → Z3 formal verification
+        - CC8.1: Change management → formal/structural verification (Z3 + CLI denylist)
         - CC4.1: Monitoring of controls → Audit chain integrity
         """
         evidence = {
@@ -168,12 +168,12 @@ class ComplianceExporter:
                 },
                 "A.8.16_monitoring": {
                     "description": "Networks, systems and applications shall be monitored for anomalous behaviour",
-                    "implementation": "Three-layer monitoring: eBPF kernel observation, OPA policy evaluation, Z3 formal verification",
+                    "implementation": "Three-layer monitoring: eBPF kernel observation, OPA policy evaluation, and formal/structural artifact verification (Z3 SMT for code/tool-API/hardware/distillation; the CLI domain is a regex/AST denylist, no Z3)",
                     "evidence": {
                         "layers": {
                             "L1_observe": "DB-batch ingestion (mock tracer); eBPF implemented, not wired (#38b)",
                             "L2_decide": "Built-in Python engine, 7 rules (Rego/OPA available, not default)",
-                            "L3_prove": "Z3 SMT solver; 5 adversarial benchmark scenarios, 100%; not exercised per-event in batch audit",
+                            "L3_prove": "Z3 SMT for code/tool-API/hardware/distillation; the CLI domain is a regex/AST denylist (no Z3/proof); 5 adversarial benchmark scenarios (100%, design target); not exercised per-event in batch audit",
                         },
                     },
                 },
@@ -204,7 +204,7 @@ class ComplianceExporter:
             "controls": {
                 "risk_assessment": {
                     "description": "AI risk identification and treatment",
-                    "implementation": "Three-layer stack identifies risks at observe (eBPF impl., mock in cron — #38b), policy (built-in Python), and formal (Z3) levels",
+                    "implementation": "Three-layer stack identifies risks at observe (eBPF impl., mock in cron — #38b), policy (built-in Python), and formal/structural verify (Z3 on 4 domains; CLI is a regex/AST denylist) levels",
                     "risk_categories_covered": [
                         "unauthorized_file_access",
                         "dangerous_command_execution",
@@ -258,11 +258,11 @@ class ComplianceExporter:
             "verification_stack": {
                 "Layer_1_observe": "Mock tracer (DB-batch ingestion via adapters); eBPF kernel hooks implemented, NOT wired in production cron (#38b)",
                 "Layer_2_policy": "Active — built-in Python engine, 7 rules (Rego/OPA available via --policy rego, not cron default)",
-                "Layer_3_verify": "Z3 available — formal artifact verification via CLI/benchmark (5 adversarial scenarios, 100%); NOT exercised per-event in batch audit",
+                "Layer_3_verify": "Z3 SMT for code/tool-API/hardware/distillation; the CLI domain is a regex/AST denylist (no Z3/proof); 5 adversarial benchmark scenarios (100%, design target); NOT exercised per-event in batch audit",
                 "Audit_Chain": f"{'INTACT' if chain_ok else 'BROKEN'} ({self._chain.length} entries)",
             },
             **self._session_data(),
-            "differentiator": "Others record what AI does. We prove it was correct.",
+            "differentiator": "Others record what AI does. We add tamper-evident provenance + bounded formal checks (Z3 on code/tool-API/hardware/distillation, within each verifier's modeled subset) — not a universal proof of correctness, and the CLI domain is a regex/AST denylist, not a proof.",
         }
 
         Path(path).write_text(json.dumps(summary, indent=2, default=str))

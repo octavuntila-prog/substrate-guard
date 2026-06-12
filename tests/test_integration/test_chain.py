@@ -510,6 +510,12 @@ class TestComplianceExport:
             data = json.loads(open(path).read())
             assert data["framework"] == "ISO 27001:2022"
             assert "A.8.15_logging" in data["annex_a_controls"]
+            # honesty (M-c follow-up): A.8.16 L3 must NOT fold the CLI domain under Z3 SMT
+            # (the CLI verifier is a regex/AST denylist, no Z3) -- same overclaim class as
+            # SOC2 CC8.1, which the re-verification found surviving here.
+            l3 = data["annex_a_controls"]["A.8.16_monitoring"]["evidence"]["layers"]["L3_prove"].lower()
+            assert "denylist" in l3 and "cli" in l3, \
+                "ISO27001 L3_prove folds the CLI verifier under Z3 SMT (overclaim)"
         finally:
             os.unlink(path)
 
@@ -536,6 +542,12 @@ class TestComplianceExport:
             data = json.loads(open(path).read())
             assert data["compliance_status"]["SOC_2_Type_II"] == "EVIDENCE_AVAILABLE"
             assert "differentiator" in data
+            # honesty: no unqualified "we prove it was correct" (false for the non-Z3 CLI
+            # denylist + the not-per-event L3), and Layer_3_verify must carve out the CLI.
+            assert "prove it was correct" not in data["differentiator"].lower(), \
+                "summary differentiator regressed to the unqualified 'prove it was correct' overclaim"
+            assert "denylist" in data["verification_stack"]["Layer_3_verify"].lower(), \
+                "summary Layer_3_verify folds the CLI verifier under Z3 (overclaim)"
         finally:
             os.unlink(path)
 
