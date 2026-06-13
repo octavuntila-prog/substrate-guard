@@ -217,7 +217,7 @@ class ComplianceExporter:
                 },
                 "ai_system_lifecycle": {
                     "description": "Management of AI system throughout its lifecycle",
-                    "implementation": "Daily batch cron audit (04:00 UTC) over platform-DB records; per-event built-in policy evaluation; Z3 formal verification available but not exercised per-event in the batch path (#38b)",
+                    "implementation": "Daily batch cron audit (04:00 UTC) over platform-DB records; per-event built-in policy evaluation; formal/structural verification (Z3 on code/tool-API/hardware/distillation; the CLI is a regex/AST denylist) available but not exercised per-event in the batch path (#38b)",
                     "evidence": {
                         "monitoring_frequency": "continuous + daily audit",
                         "total_events_evaluated": self._chain.length,
@@ -226,10 +226,10 @@ class ComplianceExporter:
                 },
                 "transparency": {
                     "description": "AI system decisions shall be explainable",
-                    "implementation": "Every policy decision includes human-readable reasons. Every Z3 verification includes proof or counterexample",
+                    "implementation": "Every policy decision includes human-readable reasons. Z3 verifications (code/tool-API/hardware/distillation) include a counterexample on failure; the CLI check reports the matched dangerous patterns, not a proof",
                     "evidence": {
                         "decision_format": "allow/deny + list of reasons",
-                        "verification_format": "verified/unsafe + counterexample",
+                        "verification_format": "Z3 domains: verified/unsafe + counterexample; CLI: safe/unsafe + matched patterns (no proof)",
                     },
                 },
                 "audit_trail": {

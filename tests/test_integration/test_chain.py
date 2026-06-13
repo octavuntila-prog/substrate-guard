@@ -529,6 +529,14 @@ class TestComplianceExport:
             data = json.loads(open(path).read())
             assert data["framework"] == "ISO/IEC 42001:2023"
             assert "audit_trail" in data["controls"]
+            # honesty (M-c sweep): transparency + lifecycle L3 must NOT attribute the CLI
+            # verifier to Z3/proof (it is a regex/AST denylist) -- the same overclaim class.
+            trans = data["controls"]["transparency"]["implementation"].lower()
+            assert "not a proof" in trans or "denylist" in trans, \
+                "ISO42001 transparency claims proof for the non-Z3 CLI path (overclaim)"
+            life = data["controls"]["ai_system_lifecycle"]["implementation"].lower()
+            assert "denylist" in life, \
+                "ISO42001 lifecycle folds the CLI under Z3 formal verification (overclaim)"
         finally:
             os.unlink(path)
 

