@@ -1,0 +1,3591 @@
+{
+  "version": "1.0",
+  "format": "substrate-guard-audit-chain",
+  "created_at": 1781420833.1225998,
+  "entries_count": 108,
+  "genesis_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "head_hash": "5855cbc05bd2e131cd275e39e6a9f976a4a10b9de23249dd5b85891d4967825f",
+  "chain_signature": "4d76688e961500a6419d8d87084f72f1f7ffeec1e7677bb903614439ac971a0e",
+  "entries": [
+    {
+      "index": 0,
+      "timestamp": 1781420832.6216938,
+      "event_type": "network_connect",
+      "agent_id": "Validation Survey#34",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360765.167517,
+        "agent_id": "Validation Survey#34",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-haiku-4-5",
+          "cost_usd": 0.237505,
+          "tokens_in": 13524,
+          "tokens_out": 15554,
+          "pipeline_run_id": 1709,
+          "trace_id": "ce01100d-17b6-49f9-81f5-a5f67fc0507f"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "3dae8ff22a384a8b09ede2c066680e367a6e34b1b1eb3f7321bcf4044061ad43"
+    },
+    {
+      "index": 1,
+      "timestamp": 1781420832.621849,
+      "event_type": "network_connect",
+      "agent_id": "Validation Survey#34",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360764.284427,
+        "agent_id": "Validation Survey#34",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-haiku-4-5",
+          "cost_usd": 0.233179,
+          "tokens_in": 10166,
+          "tokens_out": 15144,
+          "pipeline_run_id": 1713,
+          "trace_id": "cecc6a40-e694-410b-92cb-fe0948c48edb"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "3dae8ff22a384a8b09ede2c066680e367a6e34b1b1eb3f7321bcf4044061ad43",
+      "hash": "e855a125aba4b577212cdbd74434fdd3cd76936df962a4f656a889691f84ed19"
+    },
+    {
+      "index": 2,
+      "timestamp": 1781420832.6219327,
+      "event_type": "network_connect",
+      "agent_id": "Validation Survey#34",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360761.226087,
+        "agent_id": "Validation Survey#34",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-haiku-4-5",
+          "cost_usd": 0.120774,
+          "tokens_in": 5231,
+          "tokens_out": 7804,
+          "pipeline_run_id": 1712,
+          "trace_id": "f09f60a8-baee-44da-b270-a9e81325274b"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "e855a125aba4b577212cdbd74434fdd3cd76936df962a4f656a889691f84ed19",
+      "hash": "9801b1d5a670f2fa997880e862b2fe453237c01eb967cd87978525228cbb2bff"
+    },
+    {
+      "index": 3,
+      "timestamp": 1781420832.6220164,
+      "event_type": "network_connect",
+      "agent_id": "Validation Survey#34",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360727.717064,
+        "agent_id": "Validation Survey#34",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-haiku-4-5",
+          "cost_usd": 0.307306,
+          "tokens_in": 16311,
+          "tokens_out": 19650,
+          "pipeline_run_id": 1707,
+          "trace_id": "db9c9807-167d-443a-8e0e-21d5fc4a6635"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9801b1d5a670f2fa997880e862b2fe453237c01eb967cd87978525228cbb2bff",
+      "hash": "9e0978dd7395f3df91519af4f082d26923e550e81e2dd36343d1c19da0197634"
+    },
+    {
+      "index": 4,
+      "timestamp": 1781420832.6220882,
+      "event_type": "network_connect",
+      "agent_id": "Social Posts#31",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360633.342345,
+        "agent_id": "Social Posts#31",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-sonnet-4-5",
+          "cost_usd": 0.109873,
+          "tokens_in": 12237,
+          "tokens_out": 7300,
+          "pipeline_run_id": 1714,
+          "trace_id": "79632bff-8b91-4e16-a16d-1625d7bb46aa"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9e0978dd7395f3df91519af4f082d26923e550e81e2dd36343d1c19da0197634",
+      "hash": "10d5ccd577925222195d7089453f12f2885b4b7a0ff81548cdf0f9344d5f88ac"
+    },
+    {
+      "index": 5,
+      "timestamp": 1781420832.62216,
+      "event_type": "network_connect",
+      "agent_id": "Social Posts#31",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360628.58784,
+        "agent_id": "Social Posts#31",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-sonnet-4-5",
+          "cost_usd": 0.048345,
+          "tokens_in": 5693,
+          "tokens_out": 3223,
+          "pipeline_run_id": 1708,
+          "trace_id": "96e34555-c7e6-4a6f-8933-c4634ed062d7"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "10d5ccd577925222195d7089453f12f2885b4b7a0ff81548cdf0f9344d5f88ac",
+      "hash": "09427b14af9e3503f45c3f4b9f98d384fb59a8965edde165062ea22a525aa169"
+    },
+    {
+      "index": 6,
+      "timestamp": 1781420832.6222274,
+      "event_type": "network_connect",
+      "agent_id": "Social Posts#31",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360621.36965,
+        "agent_id": "Social Posts#31",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-sonnet-4-5",
+          "cost_usd": 0.048345,
+          "tokens_in": 5693,
+          "tokens_out": 3223,
+          "pipeline_run_id": 1710,
+          "trace_id": "555d3d48-6864-4815-87b7-63bfb0ff7dcc"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "09427b14af9e3503f45c3f4b9f98d384fb59a8965edde165062ea22a525aa169",
+      "hash": "a99829fd9eb32a43950439c1751e0a3e44d794be4a087e2dbead416901d7c5ed"
+    },
+    {
+      "index": 7,
+      "timestamp": 1781420832.6222908,
+      "event_type": "network_connect",
+      "agent_id": "Social Posts#31",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360621.209632,
+        "agent_id": "Social Posts#31",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-sonnet-4-5",
+          "cost_usd": 0.106496,
+          "tokens_in": 10106,
+          "tokens_out": 6882,
+          "pipeline_run_id": 1711,
+          "trace_id": "5c9ce879-3d9d-4ef4-b324-2310a3f11e39"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "a99829fd9eb32a43950439c1751e0a3e44d794be4a087e2dbead416901d7c5ed",
+      "hash": "05257efaddf365347c55d5b214593833e5bafa6094578f64bb851140d559d208"
+    },
+    {
+      "index": 8,
+      "timestamp": 1781420832.6223795,
+      "event_type": "network_connect",
+      "agent_id": "Landing Page#30",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360572.880375,
+        "agent_id": "Landing Page#30",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-sonnet-4-5",
+          "cost_usd": 0.232241,
+          "tokens_in": 17497,
+          "tokens_out": 15038,
+          "pipeline_run_id": 1714,
+          "trace_id": "79632bff-8b91-4e16-a16d-1625d7bb46aa"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "05257efaddf365347c55d5b214593833e5bafa6094578f64bb851140d559d208",
+      "hash": "41202cc113c44a3c45ed896d698b3455fe96b048f6072523a5e8c6901589ce34"
+    },
+    {
+      "index": 9,
+      "timestamp": 1781420832.6224852,
+      "event_type": "network_connect",
+      "agent_id": "Interview Script#35",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360572.8367,
+        "agent_id": "Interview Script#35",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-haiku-4-5",
+          "cost_usd": 0.526239,
+          "tokens_in": 25596,
+          "tokens_out": 32339,
+          "pipeline_run_id": 1713,
+          "trace_id": "cecc6a40-e694-410b-92cb-fe0948c48edb"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "41202cc113c44a3c45ed896d698b3455fe96b048f6072523a5e8c6901589ce34",
+      "hash": "680155f24e28b089373ffcd6134e93e8e79a38895a810da617b270cc7a8c637e"
+    },
+    {
+      "index": 10,
+      "timestamp": 1781420832.6225693,
+      "event_type": "network_connect",
+      "agent_id": "Landing Page#30",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360572.737792,
+        "agent_id": "Landing Page#30",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-sonnet-4-5",
+          "cost_usd": 0.106312,
+          "tokens_in": 8675,
+          "tokens_out": 6841,
+          "pipeline_run_id": 1711,
+          "trace_id": "5c9ce879-3d9d-4ef4-b324-2310a3f11e39"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "680155f24e28b089373ffcd6134e93e8e79a38895a810da617b270cc7a8c637e",
+      "hash": "80195e8ba14c1891158ff446bac474327536b6f378d18ad6d569f944ce6bf922"
+    },
+    {
+      "index": 11,
+      "timestamp": 1781420832.6226447,
+      "event_type": "network_connect",
+      "agent_id": "Interview Script#35",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360572.73524,
+        "agent_id": "Interview Script#35",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-haiku-4-5",
+          "cost_usd": 0.530926,
+          "tokens_in": 28930,
+          "tokens_out": 32844,
+          "pipeline_run_id": 1709,
+          "trace_id": "ce01100d-17b6-49f9-81f5-a5f67fc0507f"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "80195e8ba14c1891158ff446bac474327536b6f378d18ad6d569f944ce6bf922",
+      "hash": "8df52b3ee5c720a701584f8d7364ece1d6e1e2f04a15afcddc5d4c43648c0571"
+    },
+    {
+      "index": 12,
+      "timestamp": 1781420832.6227143,
+      "event_type": "network_connect",
+      "agent_id": "Interview Script#35",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360572.735233,
+        "agent_id": "Interview Script#35",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-haiku-4-5",
+          "cost_usd": 0.315393,
+          "tokens_in": 10380,
+          "tokens_out": 19750,
+          "pipeline_run_id": 1707,
+          "trace_id": "db9c9807-167d-443a-8e0e-21d5fc4a6635"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "8df52b3ee5c720a701584f8d7364ece1d6e1e2f04a15afcddc5d4c43648c0571",
+      "hash": "2cfb3d34e4d3235b3c719943a825e2f45cc3dbc0528c109488b5a35d7d92ab4e"
+    },
+    {
+      "index": 13,
+      "timestamp": 1781420832.6227763,
+      "event_type": "network_connect",
+      "agent_id": "Landing Page#30",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360572.734029,
+        "agent_id": "Landing Page#30",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-sonnet-4-5",
+          "cost_usd": 0.106312,
+          "tokens_in": 8675,
+          "tokens_out": 6841,
+          "pipeline_run_id": 1710,
+          "trace_id": "555d3d48-6864-4815-87b7-63bfb0ff7dcc"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "2cfb3d34e4d3235b3c719943a825e2f45cc3dbc0528c109488b5a35d7d92ab4e",
+      "hash": "b4bf4dcd1d5c05943aef023d5fa8ea18f7249e8bfaf3c29bbf1af0b9cc93f88d"
+    },
+    {
+      "index": 14,
+      "timestamp": 1781420832.622835,
+      "event_type": "network_connect",
+      "agent_id": "Interview Script#35",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360572.733911,
+        "agent_id": "Interview Script#35",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-haiku-4-5",
+          "cost_usd": 0.522016,
+          "tokens_in": 22377,
+          "tokens_out": 31927,
+          "pipeline_run_id": 1712,
+          "trace_id": "f09f60a8-baee-44da-b270-a9e81325274b"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "b4bf4dcd1d5c05943aef023d5fa8ea18f7249e8bfaf3c29bbf1af0b9cc93f88d",
+      "hash": "fc0b068ee26aa90d334100cf4ccfdfabe2ad28c0dd24c930ce9e51e0ff2ef759"
+    },
+    {
+      "index": 15,
+      "timestamp": 1781420832.6228933,
+      "event_type": "network_connect",
+      "agent_id": "Landing Page#30",
+      "event_data": {
+        "type": "network_connect",
+        "timestamp": 1781360572.732805,
+        "agent_id": "Landing Page#30",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "model": "claude-sonnet-4-5",
+          "cost_usd": 0.228089,
+          "tokens_in": 14347,
+          "tokens_out": 14630,
+          "pipeline_run_id": 1708,
+          "trace_id": "96e34555-c7e6-4a6f-8933-c4634ed062d7"
+        },
+        "remote_ip": "",
+        "remote_port": 443,
+        "local_port": 0,
+        "protocol": "tcp",
+        "bytes_count": 0,
+        "domain": "api.anthropic.com",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "fc0b068ee26aa90d334100cf4ccfdfabe2ad28c0dd24c930ce9e51e0ff2ef759",
+      "hash": "85a5f72d796cb12d1da8fffddfab7466351707ba6874abb8c95d048cad1ea584"
+    },
+    {
+      "index": 16,
+      "timestamp": 1781420832.6231587,
+      "event_type": "process_exec",
+      "agent_id": "Cache Optimizer#119",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402674.939121,
+        "agent_id": "Cache Optimizer#119",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 28429,
+          "confidence": 1.0,
+          "run_id": "5718",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Cache Optimizer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "85a5f72d796cb12d1da8fffddfab7466351707ba6874abb8c95d048cad1ea584",
+      "hash": "9e6a4b56720a73a9d132783c2fc2cae287441438cf4367ba6fcf0a56b29b7e3c"
+    },
+    {
+      "index": 17,
+      "timestamp": 1781420832.6232421,
+      "event_type": "process_exec",
+      "agent_id": "Market Entry Strategist#107",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402646.23303,
+        "agent_id": "Market Entry Strategist#107",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 379,
+          "confidence": 0.304,
+          "run_id": "5717",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Market Entry Strategist",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9e6a4b56720a73a9d132783c2fc2cae287441438cf4367ba6fcf0a56b29b7e3c",
+      "hash": "bf3263626a10dee0745286501bb7f4ae3607ad7652aff90842a6920287a96111"
+    },
+    {
+      "index": 18,
+      "timestamp": 1781420832.6233125,
+      "event_type": "process_exec",
+      "agent_id": "Market Entry Strategist#107",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402643.021238,
+        "agent_id": "Market Entry Strategist#107",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 328,
+          "confidence": 0.31,
+          "run_id": "5716",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Market Entry Strategist",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "bf3263626a10dee0745286501bb7f4ae3607ad7652aff90842a6920287a96111",
+      "hash": "ba983b80fc1efa4a24e68a3586d1912a2948137df58e40fb0b963c7a54161c38"
+    },
+    {
+      "index": 19,
+      "timestamp": 1781420832.6233807,
+      "event_type": "process_exec",
+      "agent_id": "Subscription Designer#71",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402638.868248,
+        "agent_id": "Subscription Designer#71",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 8221,
+          "confidence": 0.0,
+          "run_id": "5715",
+          "trace_id": null,
+          "error": "LLM call refused: daily_limit cap reached ($2.53 of $2.55). Adjust via Redis `settings:overrides.budget.*` or wait for period reset."
+        },
+        "filename": "agent:Subscription Designer",
+        "args": [
+          "error"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "ba983b80fc1efa4a24e68a3586d1912a2948137df58e40fb0b963c7a54161c38",
+      "hash": "b956e3554f740c2eb8a543ddc0fb6d8e382ebac8333dea1f7eabb7219cc56d9d"
+    },
+    {
+      "index": 20,
+      "timestamp": 1781420832.623476,
+      "event_type": "process_exec",
+      "agent_id": "Social Proof Generator#31",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402630.498865,
+        "agent_id": "Social Proof Generator#31",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 390,
+          "confidence": 0.31,
+          "run_id": "5714",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Social Proof Generator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "b956e3554f740c2eb8a543ddc0fb6d8e382ebac8333dea1f7eabb7219cc56d9d",
+      "hash": "74aa410e58df2e81b9300711c762c89013ce80ad134dced7219fc1d04ee3403b"
+    },
+    {
+      "index": 21,
+      "timestamp": 1781420832.6235886,
+      "event_type": "process_exec",
+      "agent_id": "Social Proof Generator#31",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402626.202313,
+        "agent_id": "Social Proof Generator#31",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 1124,
+          "confidence": 0.29,
+          "run_id": "5713",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Social Proof Generator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "74aa410e58df2e81b9300711c762c89013ce80ad134dced7219fc1d04ee3403b",
+      "hash": "bd4b6924224701a5e7e69c2b83c9eb6eda9344795861dfd7ad00f65170fef2ee"
+    },
+    {
+      "index": 22,
+      "timestamp": 1781420832.62366,
+      "event_type": "process_exec",
+      "agent_id": "Market Sizer#12",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402620.91358,
+        "agent_id": "Market Sizer#12",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 31885,
+          "confidence": 0.23,
+          "run_id": "5712",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Market Sizer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "bd4b6924224701a5e7e69c2b83c9eb6eda9344795861dfd7ad00f65170fef2ee",
+      "hash": "0817ce17a015de5e5c95d3dd8a6c3d26e92b963382324d2f1815282503e8bce9"
+    },
+    {
+      "index": 23,
+      "timestamp": 1781420832.6237218,
+      "event_type": "process_exec",
+      "agent_id": "Market Sizer#12",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402584.358871,
+        "agent_id": "Market Sizer#12",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 5175,
+          "confidence": 0.23,
+          "run_id": "5711",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Market Sizer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0817ce17a015de5e5c95d3dd8a6c3d26e92b963382324d2f1815282503e8bce9",
+      "hash": "1be2d5636e0e3c0c8c50572b2555df7dedbef6261b2545eee65a8531ed8c64c6"
+    },
+    {
+      "index": 24,
+      "timestamp": 1781420832.6237814,
+      "event_type": "process_exec",
+      "agent_id": "Pricing Engine#72",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402575.490839,
+        "agent_id": "Pricing Engine#72",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 300,
+          "confidence": 0.23,
+          "run_id": "5710",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Pricing Engine",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "1be2d5636e0e3c0c8c50572b2555df7dedbef6261b2545eee65a8531ed8c64c6",
+      "hash": "ad0679a9fc6fdf1dd0396251551b7fdbae838c0133e86f7dab77b48ada7ada24"
+    },
+    {
+      "index": 25,
+      "timestamp": 1781420832.623853,
+      "event_type": "process_exec",
+      "agent_id": "Test Generator#121",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402571.563769,
+        "agent_id": "Test Generator#121",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 1381,
+          "confidence": 0.0,
+          "run_id": "5709",
+          "trace_id": null,
+          "error": "LLM call refused: daily_limit cap reached ($2.52 of $2.55). Adjust via Redis `settings:overrides.budget.*` or wait for period reset."
+        },
+        "filename": "agent:Test Generator",
+        "args": [
+          "error"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "ad0679a9fc6fdf1dd0396251551b7fdbae838c0133e86f7dab77b48ada7ada24",
+      "hash": "23f50ce4a64b338ed6187ddc68eba14a48088790001a4626d27985c5a3b10ea3"
+    },
+    {
+      "index": 26,
+      "timestamp": 1781420832.6239164,
+      "event_type": "process_exec",
+      "agent_id": "Investor Report#97",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402569.768567,
+        "agent_id": "Investor Report#97",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 62,
+          "confidence": 0.0,
+          "run_id": "5708",
+          "trace_id": null,
+          "error": "LLM call refused: daily_limit cap reached ($2.52 of $2.55). Adjust via Redis `settings:overrides.budget.*` or wait for period reset."
+        },
+        "filename": "agent:Investor Report",
+        "args": [
+          "error"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "23f50ce4a64b338ed6187ddc68eba14a48088790001a4626d27985c5a3b10ea3",
+      "hash": "7c982a1751901288ef29ffc9998f4057976f57c9d778d2a653b3f9af5c6b1c10"
+    },
+    {
+      "index": 27,
+      "timestamp": 1781420832.6239767,
+      "event_type": "process_exec",
+      "agent_id": "Investor Report#97",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402569.656177,
+        "agent_id": "Investor Report#97",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 103,
+          "confidence": 0.0,
+          "run_id": "5707",
+          "trace_id": null,
+          "error": "LLM call refused: daily_limit cap reached ($2.52 of $2.55). Adjust via Redis `settings:overrides.budget.*` or wait for period reset."
+        },
+        "filename": "agent:Investor Report",
+        "args": [
+          "error"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "7c982a1751901288ef29ffc9998f4057976f57c9d778d2a653b3f9af5c6b1c10",
+      "hash": "849c938c31cbf54f0ed5fffdc32cfba8c476ef4530a702ecedfc70b27138c55f"
+    },
+    {
+      "index": 28,
+      "timestamp": 1781420832.6240358,
+      "event_type": "process_exec",
+      "agent_id": "Case Study Writer#48",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402568.931323,
+        "agent_id": "Case Study Writer#48",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 91631,
+          "confidence": 0.53,
+          "run_id": "5706",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Case Study Writer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "849c938c31cbf54f0ed5fffdc32cfba8c476ef4530a702ecedfc70b27138c55f",
+      "hash": "412e3a81fb5be111e7c0eeaed7f6994ab3bb10b0986828fbd261c30c2adad56e"
+    },
+    {
+      "index": 29,
+      "timestamp": 1781420832.6240947,
+      "event_type": "process_exec",
+      "agent_id": "Valuation Calculator#54",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402351.022593,
+        "agent_id": "Valuation Calculator#54",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 30378,
+          "confidence": 0.41,
+          "run_id": "5705",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Valuation Calculator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "412e3a81fb5be111e7c0eeaed7f6994ab3bb10b0986828fbd261c30c2adad56e",
+      "hash": "bafa80fa85673e9f958a63c0c1ae71880f8a125986a6d397fe19b5b9ede809f1"
+    },
+    {
+      "index": 30,
+      "timestamp": 1781420832.6241581,
+      "event_type": "process_exec",
+      "agent_id": "GitHub Trending Scanner#5",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402192.715603,
+        "agent_id": "GitHub Trending Scanner#5",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 19603,
+          "confidence": 0.484,
+          "run_id": "5704",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:GitHub Trending Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "bafa80fa85673e9f958a63c0c1ae71880f8a125986a6d397fe19b5b9ede809f1",
+      "hash": "51f0a3e261a2ef60d90544a9da2d66566f969a31b256ff352d6596fc6b7d8bbe"
+    },
+    {
+      "index": 31,
+      "timestamp": 1781420832.6242194,
+      "event_type": "process_exec",
+      "agent_id": "Podcast Scanner#131",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402047.557897,
+        "agent_id": "Podcast Scanner#131",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 10102,
+          "confidence": 0.3,
+          "run_id": "5703",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Podcast Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "51f0a3e261a2ef60d90544a9da2d66566f969a31b256ff352d6596fc6b7d8bbe",
+      "hash": "b09f315663d231fa8aab11f41fb3184831b3f65f59a3d6831c4f965a79843276"
+    },
+    {
+      "index": 32,
+      "timestamp": 1781420832.6242821,
+      "event_type": "process_exec",
+      "agent_id": "Podcast Scanner#131",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402032.546817,
+        "agent_id": "Podcast Scanner#131",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 12483,
+          "confidence": 0.48,
+          "run_id": "5702",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Podcast Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "b09f315663d231fa8aab11f41fb3184831b3f65f59a3d6831c4f965a79843276",
+      "hash": "1362dcc3a59fca988d16eda6a9f3cf27e125d63f47051bee935b84dd1b6993fd"
+    },
+    {
+      "index": 33,
+      "timestamp": 1781420832.6243417,
+      "event_type": "process_exec",
+      "agent_id": "Podcast Scanner#131",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781402013.698723,
+        "agent_id": "Podcast Scanner#131",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 15923,
+          "confidence": 0.36,
+          "run_id": "5701",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Podcast Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "1362dcc3a59fca988d16eda6a9f3cf27e125d63f47051bee935b84dd1b6993fd",
+      "hash": "556c499ddea66a76c1d2d1d7dffa0a10a55194065bed95a7e45ba58c82441ab7"
+    },
+    {
+      "index": 34,
+      "timestamp": 1781420832.6243997,
+      "event_type": "process_exec",
+      "agent_id": "Competitor Tracker#36",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781401751.023827,
+        "agent_id": "Competitor Tracker#36",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 70300,
+          "confidence": 0.416,
+          "run_id": "5700",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Competitor Tracker",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "556c499ddea66a76c1d2d1d7dffa0a10a55194065bed95a7e45ba58c82441ab7",
+      "hash": "e44c13c725e34744172c347b485eb3728b7bbebc7e58d1ed5b90032fe53849ff"
+    },
+    {
+      "index": 35,
+      "timestamp": 1781420832.6244848,
+      "event_type": "process_exec",
+      "agent_id": "Competitor Tracker#36",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781401672.240729,
+        "agent_id": "Competitor Tracker#36",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 59294,
+          "confidence": 0.44,
+          "run_id": "5699",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Competitor Tracker",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "e44c13c725e34744172c347b485eb3728b7bbebc7e58d1ed5b90032fe53849ff",
+      "hash": "0ebaa60958768fb5b08d43a8aa463ed053fd4eed149aa2df4ae552f38f74231e"
+    },
+    {
+      "index": 36,
+      "timestamp": 1781420832.624561,
+      "event_type": "process_exec",
+      "agent_id": "Skill Gap Analyzer#125",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781401602.963219,
+        "agent_id": "Skill Gap Analyzer#125",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 53537,
+          "confidence": 0.784,
+          "run_id": "5698",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Skill Gap Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0ebaa60958768fb5b08d43a8aa463ed053fd4eed149aa2df4ae552f38f74231e",
+      "hash": "29fcb34fb56d35590d4774a164a5e0d70b904b78b1dcf24c9f013d27b034643a"
+    },
+    {
+      "index": 37,
+      "timestamp": 1781420832.6246226,
+      "event_type": "process_exec",
+      "agent_id": "Skill Gap Analyzer#125",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781401542.763321,
+        "agent_id": "Skill Gap Analyzer#125",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 56099,
+          "confidence": 0.83,
+          "run_id": "5697",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Skill Gap Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "29fcb34fb56d35590d4774a164a5e0d70b904b78b1dcf24c9f013d27b034643a",
+      "hash": "a709ecd978634805ed04571e0628ba74a29993dfe7699a8a522f3c6fee294d23"
+    },
+    {
+      "index": 38,
+      "timestamp": 1781420832.6246872,
+      "event_type": "process_exec",
+      "agent_id": "YouTube Scanner#122",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781401480.819068,
+        "agent_id": "YouTube Scanner#122",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 48892,
+          "confidence": 0.34,
+          "run_id": "5696",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:YouTube Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "a709ecd978634805ed04571e0628ba74a29993dfe7699a8a522f3c6fee294d23",
+      "hash": "e9f07e5ca23702931fafdc2e4df59070c1b9af56a9738d45498b292cd9404984"
+    },
+    {
+      "index": 39,
+      "timestamp": 1781420832.624753,
+      "event_type": "process_exec",
+      "agent_id": "YouTube Scanner#122",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781401424.275367,
+        "agent_id": "YouTube Scanner#122",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 53360,
+          "confidence": 0.41,
+          "run_id": "5695",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:YouTube Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "e9f07e5ca23702931fafdc2e4df59070c1b9af56a9738d45498b292cd9404984",
+      "hash": "968189c3bdfab8804a706dec55152e05d710b2ef4e68cb63a9b71df2af4ffc30"
+    },
+    {
+      "index": 40,
+      "timestamp": 1781420832.6248145,
+      "event_type": "process_exec",
+      "agent_id": "YouTube Scanner#122",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781401360.834709,
+        "agent_id": "YouTube Scanner#122",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 50375,
+          "confidence": 0.53,
+          "run_id": "5694",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:YouTube Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "968189c3bdfab8804a706dec55152e05d710b2ef4e68cb63a9b71df2af4ffc30",
+      "hash": "81b52cfa2bc3e35e395904a5b0d34d97650fbf1c10707a85e68ac5c83521b9d6"
+    },
+    {
+      "index": 41,
+      "timestamp": 1781420832.6248732,
+      "event_type": "process_exec",
+      "agent_id": "Tech Stack Analyzer#18",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781401303.471909,
+        "agent_id": "Tech Stack Analyzer#18",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 80011,
+          "confidence": 0.816,
+          "run_id": "5693",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Tech Stack Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "81b52cfa2bc3e35e395904a5b0d34d97650fbf1c10707a85e68ac5c83521b9d6",
+      "hash": "05fe8faa5b6e9008085a7214494b94a750d36b74c2d00a74dd5482acac1be7ae"
+    },
+    {
+      "index": 42,
+      "timestamp": 1781420832.6249309,
+      "event_type": "process_exec",
+      "agent_id": "Tech Stack Analyzer#18",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781401216.788027,
+        "agent_id": "Tech Stack Analyzer#18",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 94143,
+          "confidence": 0.816,
+          "run_id": "5692",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Tech Stack Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "05fe8faa5b6e9008085a7214494b94a750d36b74c2d00a74dd5482acac1be7ae",
+      "hash": "73f5be2bcc24a172f0097c1bf185a3d095c1384eac467dbf80103684d42ac7d8"
+    },
+    {
+      "index": 43,
+      "timestamp": 1781420832.6249866,
+      "event_type": "process_exec",
+      "agent_id": "Ads Optimizer#23",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781400755.848638,
+        "agent_id": "Ads Optimizer#23",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 77026,
+          "confidence": 0.57,
+          "run_id": "5691",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Ads Optimizer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "73f5be2bcc24a172f0097c1bf185a3d095c1384eac467dbf80103684d42ac7d8",
+      "hash": "9f5b93221c8bfe4b7e8a1900ea308271709b3a8279913d150c88cfa543b94ffb"
+    },
+    {
+      "index": 44,
+      "timestamp": 1781420832.6250458,
+      "event_type": "process_exec",
+      "agent_id": "Ads Optimizer#23",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781400671.757887,
+        "agent_id": "Ads Optimizer#23",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 70047,
+          "confidence": 0.784,
+          "run_id": "5690",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Ads Optimizer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9f5b93221c8bfe4b7e8a1900ea308271709b3a8279913d150c88cfa543b94ffb",
+      "hash": "ed25dea35aad4f89a7d8448765a03e524e7d4419aa83095d8cbebeebbe9864c8"
+    },
+    {
+      "index": 45,
+      "timestamp": 1781420832.625105,
+      "event_type": "process_exec",
+      "agent_id": "Performance Monitor#82",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781400595.70908,
+        "agent_id": "Performance Monitor#82",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 107730,
+          "confidence": 0.53,
+          "run_id": "5689",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Performance Monitor",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "ed25dea35aad4f89a7d8448765a03e524e7d4419aa83095d8cbebeebbe9864c8",
+      "hash": "4d5a07d34042aa7f4550c4a92fc61cc176a3d9359a7349c586bd1ea3e41fe1ce"
+    },
+    {
+      "index": 46,
+      "timestamp": 1781420832.6251667,
+      "event_type": "process_exec",
+      "agent_id": "Performance Monitor#82",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781400480.80236,
+        "agent_id": "Performance Monitor#82",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 83698,
+          "confidence": 0.69,
+          "run_id": "5688",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Performance Monitor",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "4d5a07d34042aa7f4550c4a92fc61cc176a3d9359a7349c586bd1ea3e41fe1ce",
+      "hash": "9eb4796693891d9dd0b23c5e4471c4699efe91be7b7a00f232feb213bb2b4c8c"
+    },
+    {
+      "index": 47,
+      "timestamp": 1781420832.6252294,
+      "event_type": "process_exec",
+      "agent_id": "Competitive Moat Analyzer#106",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781400387.537032,
+        "agent_id": "Competitive Moat Analyzer#106",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 55642,
+          "confidence": 0.816,
+          "run_id": "5687",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Competitive Moat Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9eb4796693891d9dd0b23c5e4471c4699efe91be7b7a00f232feb213bb2b4c8c",
+      "hash": "3d574ca23124c913ccf67a5dfbfc7f175190314131c9804ec29669a573ef9e8c"
+    },
+    {
+      "index": 48,
+      "timestamp": 1781420832.6254003,
+      "event_type": "process_exec",
+      "agent_id": "Competitive Moat Analyzer#106",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781400324.497947,
+        "agent_id": "Competitive Moat Analyzer#106",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 54149,
+          "confidence": 0.816,
+          "run_id": "5686",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Competitive Moat Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "3d574ca23124c913ccf67a5dfbfc7f175190314131c9804ec29669a573ef9e8c",
+      "hash": "ebaddf1af57eccb594b9abc2993c581f678bf7798e10e7863a58dd7849b5c358"
+    },
+    {
+      "index": 49,
+      "timestamp": 1781420832.625549,
+      "event_type": "process_exec",
+      "agent_id": "Cron Scheduler Designer#114",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781400023.863427,
+        "agent_id": "Cron Scheduler Designer#114",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 58388,
+          "confidence": 0.0,
+          "run_id": "5685",
+          "trace_id": null,
+          "error": "list indices must be integers or slices, not str"
+        },
+        "filename": "agent:Cron Scheduler Designer",
+        "args": [
+          "error"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "ebaddf1af57eccb594b9abc2993c581f678bf7798e10e7863a58dd7849b5c358",
+      "hash": "73d9a1b9967ae9b6aecd57575fd076f3159fa683921f5b2a1cc18e1368ee48e0"
+    },
+    {
+      "index": 50,
+      "timestamp": 1781420832.6256287,
+      "event_type": "process_exec",
+      "agent_id": "Cron Scheduler Designer#114",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781399964.854255,
+        "agent_id": "Cron Scheduler Designer#114",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 96932,
+          "confidence": 0.816,
+          "run_id": "5684",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Cron Scheduler Designer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "73d9a1b9967ae9b6aecd57575fd076f3159fa683921f5b2a1cc18e1368ee48e0",
+      "hash": "949e799fd6fc20feea1880db6f24bef21bf369ac3d8c0f3556b7e056b14b6709"
+    },
+    {
+      "index": 51,
+      "timestamp": 1781420832.6257048,
+      "event_type": "process_exec",
+      "agent_id": "Content Scheduler#43",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781399382.199065,
+        "agent_id": "Content Scheduler#43",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 57757,
+          "confidence": 0.816,
+          "run_id": "5683",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Content Scheduler",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "949e799fd6fc20feea1880db6f24bef21bf369ac3d8c0f3556b7e056b14b6709",
+      "hash": "ec280c49d101fd7ec306fbc804af6a676c9e9d006c2e49a883764093e0374cb5"
+    },
+    {
+      "index": 52,
+      "timestamp": 1781420832.6257672,
+      "event_type": "process_exec",
+      "agent_id": "Content Scheduler#43",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781399317.958222,
+        "agent_id": "Content Scheduler#43",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 68530,
+          "confidence": 0.78,
+          "run_id": "5682",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Content Scheduler",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "ec280c49d101fd7ec306fbc804af6a676c9e9d006c2e49a883764093e0374cb5",
+      "hash": "f45fb8ac75396e9a6eaad7875618f36f2cf6b63681c471513cf8b5d9b4c8504b"
+    },
+    {
+      "index": 53,
+      "timestamp": 1781420832.625826,
+      "event_type": "process_exec",
+      "agent_id": "Idea Scorer#11",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781399243.781775,
+        "agent_id": "Idea Scorer#11",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 0,
+          "confidence": 0.65,
+          "run_id": "5681",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Idea Scorer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f45fb8ac75396e9a6eaad7875618f36f2cf6b63681c471513cf8b5d9b4c8504b",
+      "hash": "72157005490822f7310a79730a5570b565ba77b7f1c766c4d218f210e075d1da"
+    },
+    {
+      "index": 54,
+      "timestamp": 1781420832.6258874,
+      "event_type": "process_exec",
+      "agent_id": "Idea Scorer#11",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781399243.604565,
+        "agent_id": "Idea Scorer#11",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 0,
+          "confidence": 0.65,
+          "run_id": "5680",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Idea Scorer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "72157005490822f7310a79730a5570b565ba77b7f1c766c4d218f210e075d1da",
+      "hash": "d5063c307f1693e9f425314667fb1a3615fc756042ea0dd927444118a3990b87"
+    },
+    {
+      "index": 55,
+      "timestamp": 1781420832.625946,
+      "event_type": "process_exec",
+      "agent_id": "App Store Scanner#8",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781399243.35713,
+        "agent_id": "App Store Scanner#8",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 12021,
+          "confidence": 0.25,
+          "run_id": "5679",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:App Store Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d5063c307f1693e9f425314667fb1a3615fc756042ea0dd927444118a3990b87",
+      "hash": "a2f821410a37083a168e2cfae4a22722de316b40ff921aa3f2c3417ff4d71e1e"
+    },
+    {
+      "index": 56,
+      "timestamp": 1781420832.6260033,
+      "event_type": "process_exec",
+      "agent_id": "App Store Scanner#8",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781399226.362074,
+        "agent_id": "App Store Scanner#8",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 31714,
+          "confidence": 0.38,
+          "run_id": "5678",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:App Store Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "a2f821410a37083a168e2cfae4a22722de316b40ff921aa3f2c3417ff4d71e1e",
+      "hash": "92079426ff9f8b6e5fc7ca0a60c443bcb631d6e8525a75638a431f8974efde88"
+    },
+    {
+      "index": 57,
+      "timestamp": 1781420832.6260648,
+      "event_type": "process_exec",
+      "agent_id": "App Store Scanner#8",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781399187.457843,
+        "agent_id": "App Store Scanner#8",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 30532,
+          "confidence": 0.35,
+          "run_id": "5677",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:App Store Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "92079426ff9f8b6e5fc7ca0a60c443bcb631d6e8525a75638a431f8974efde88",
+      "hash": "10b69863497f399f176fcd553f8bf1b446d0b913e0e6acfff28b1e82443a036e"
+    },
+    {
+      "index": 58,
+      "timestamp": 1781420832.6261227,
+      "event_type": "process_exec",
+      "agent_id": "Idea Outreach Drafter#139",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781399147.99385,
+        "agent_id": "Idea Outreach Drafter#139",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 45457,
+          "confidence": 0.83,
+          "run_id": "5676",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Idea Outreach Drafter",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "10b69863497f399f176fcd553f8bf1b446d0b913e0e6acfff28b1e82443a036e",
+      "hash": "121346faeedb543e192d2ec53af3c8892c908334f49f126fc796e782ddf094b6"
+    },
+    {
+      "index": 59,
+      "timestamp": 1781420832.6261806,
+      "event_type": "process_exec",
+      "agent_id": "Idea Outreach Drafter#139",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781399097.252832,
+        "agent_id": "Idea Outreach Drafter#139",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 59147,
+          "confidence": 0.83,
+          "run_id": "5675",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Idea Outreach Drafter",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "121346faeedb543e192d2ec53af3c8892c908334f49f126fc796e782ddf094b6",
+      "hash": "fb69b9bd6cc6df958615a71f3d4a7e4f99b06be3e854c3a92033b24424b713c1"
+    },
+    {
+      "index": 60,
+      "timestamp": 1781420832.6262376,
+      "event_type": "process_exec",
+      "agent_id": "Growth Hacker#25",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781399031.591492,
+        "agent_id": "Growth Hacker#25",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 107892,
+          "confidence": 0.754,
+          "run_id": "5674",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Growth Hacker",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "fb69b9bd6cc6df958615a71f3d4a7e4f99b06be3e854c3a92033b24424b713c1",
+      "hash": "9eb4f792690ce2e78e0aa0f2273f7de040937074585c37c51c40b3b5e1f63a70"
+    },
+    {
+      "index": 61,
+      "timestamp": 1781420832.626304,
+      "event_type": "process_exec",
+      "agent_id": "Growth Hacker#25",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781398916.31572,
+        "agent_id": "Growth Hacker#25",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 110706,
+          "confidence": 0.496,
+          "run_id": "5673",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Growth Hacker",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9eb4f792690ce2e78e0aa0f2273f7de040937074585c37c51c40b3b5e1f63a70",
+      "hash": "dcc4c43aec8262ed4beb39dfa89a7737a16ee176bea72b791c410f84319d6eea"
+    },
+    {
+      "index": 62,
+      "timestamp": 1781420832.626363,
+      "event_type": "process_exec",
+      "agent_id": "Survey Creator#34",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360862.414432,
+        "agent_id": "Survey Creator#34",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 134550,
+          "confidence": 0.425,
+          "run_id": "5672",
+          "trace_id": "db9c9807-167d-443a-8e0e-21d5fc4a6635",
+          "error": null
+        },
+        "filename": "agent:Survey Creator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "dcc4c43aec8262ed4beb39dfa89a7737a16ee176bea72b791c410f84319d6eea",
+      "hash": "569eb10c82e7b2d94b3c31709459dca87165b69159203a599ab446cb459239f4"
+    },
+    {
+      "index": 63,
+      "timestamp": 1781420832.626458,
+      "event_type": "process_exec",
+      "agent_id": "Survey Creator#34",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360846.646316,
+        "agent_id": "Survey Creator#34",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 75749,
+          "confidence": 0.856,
+          "run_id": "5671",
+          "trace_id": "ce01100d-17b6-49f9-81f5-a5f67fc0507f",
+          "error": null
+        },
+        "filename": "agent:Survey Creator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "569eb10c82e7b2d94b3c31709459dca87165b69159203a599ab446cb459239f4",
+      "hash": "d4d585bdd75edc60b5ae4b68fc371b9bdf34c67dffbdba8bbb33c0a9a23041ab"
+    },
+    {
+      "index": 64,
+      "timestamp": 1781420832.6265461,
+      "event_type": "process_exec",
+      "agent_id": "Survey Creator#34",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360845.450113,
+        "agent_id": "Survey Creator#34",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 73206,
+          "confidence": 0.84,
+          "run_id": "5670",
+          "trace_id": "cecc6a40-e694-410b-92cb-fe0948c48edb",
+          "error": null
+        },
+        "filename": "agent:Survey Creator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d4d585bdd75edc60b5ae4b68fc371b9bdf34c67dffbdba8bbb33c0a9a23041ab",
+      "hash": "74a1f88c0c42db56f46280c3134f757a357526e123aa174dd039f7b734fe09ee"
+    },
+    {
+      "index": 65,
+      "timestamp": 1781420832.626613,
+      "event_type": "process_exec",
+      "agent_id": "Survey Creator#34",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360835.237324,
+        "agent_id": "Survey Creator#34",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 68213,
+          "confidence": 0.856,
+          "run_id": "5669",
+          "trace_id": "f09f60a8-baee-44da-b270-a9e81325274b",
+          "error": null
+        },
+        "filename": "agent:Survey Creator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "74a1f88c0c42db56f46280c3134f757a357526e123aa174dd039f7b734fe09ee",
+      "hash": "d340e03022f168890db889921987640389a4ae03c5c7e9e959bdec652fffb95e"
+    },
+    {
+      "index": 66,
+      "timestamp": 1781420832.6266754,
+      "event_type": "process_exec",
+      "agent_id": "User Interview Script#35",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360764.141134,
+        "agent_id": "User Interview Script#35",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 183555,
+          "confidence": 0.856,
+          "run_id": "5668",
+          "trace_id": "ce01100d-17b6-49f9-81f5-a5f67fc0507f",
+          "error": null
+        },
+        "filename": "agent:User Interview Script",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d340e03022f168890db889921987640389a4ae03c5c7e9e959bdec652fffb95e",
+      "hash": "91403daa9fa2c8aa1144cd058a5a3cbeeaf3640e231e1f56c0eb6dc08022ab9a"
+    },
+    {
+      "index": 67,
+      "timestamp": 1781420832.6267405,
+      "event_type": "process_exec",
+      "agent_id": "User Interview Script#35",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360763.023469,
+        "agent_id": "User Interview Script#35",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 184027,
+          "confidence": 0.45,
+          "run_id": "5667",
+          "trace_id": "cecc6a40-e694-410b-92cb-fe0948c48edb",
+          "error": null
+        },
+        "filename": "agent:User Interview Script",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "91403daa9fa2c8aa1144cd058a5a3cbeeaf3640e231e1f56c0eb6dc08022ab9a",
+      "hash": "1dc4c7ef8f514af2f2974b6e5cf7e4be3614030e4ba65560ceda59809d6c390e"
+    },
+    {
+      "index": 68,
+      "timestamp": 1781420832.626811,
+      "event_type": "process_exec",
+      "agent_id": "User Interview Script#35",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360760.415701,
+        "agent_id": "User Interview Script#35",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 181449,
+          "confidence": 0.856,
+          "run_id": "5666",
+          "trace_id": "f09f60a8-baee-44da-b270-a9e81325274b",
+          "error": null
+        },
+        "filename": "agent:User Interview Script",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "1dc4c7ef8f514af2f2974b6e5cf7e4be3614030e4ba65560ceda59809d6c390e",
+      "hash": "8f34162573b95dfad0ff6665777eb628f21c2b4efa57e90174ac56c674f578f8"
+    },
+    {
+      "index": 69,
+      "timestamp": 1781420832.6268716,
+      "event_type": "process_exec",
+      "agent_id": "User Interview Script#35",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360726.736222,
+        "agent_id": "User Interview Script#35",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 147565,
+          "confidence": 0.856,
+          "run_id": "5665",
+          "trace_id": "db9c9807-167d-443a-8e0e-21d5fc4a6635",
+          "error": null
+        },
+        "filename": "agent:User Interview Script",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "8f34162573b95dfad0ff6665777eb628f21c2b4efa57e90174ac56c674f578f8",
+      "hash": "ea84b70ba8bbb67277537514f33e697900f25b929d1763fd8ef289b5edc5c867"
+    },
+    {
+      "index": 70,
+      "timestamp": 1781420832.6269336,
+      "event_type": "process_exec",
+      "agent_id": "Social Proof Generator#31",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360677.859416,
+        "agent_id": "Social Proof Generator#31",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 38749,
+          "confidence": 0.816,
+          "run_id": "5664",
+          "trace_id": "79632bff-8b91-4e16-a16d-1625d7bb46aa",
+          "error": null
+        },
+        "filename": "agent:Social Proof Generator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "ea84b70ba8bbb67277537514f33e697900f25b929d1763fd8ef289b5edc5c867",
+      "hash": "139aae47270956dd442317c5810a7e165c71ebc10e69ccbbaf3313837293ed6a"
+    },
+    {
+      "index": 71,
+      "timestamp": 1781420832.626995,
+      "event_type": "process_exec",
+      "agent_id": "Social Proof Generator#31",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360672.296642,
+        "agent_id": "Social Proof Generator#31",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 43248,
+          "confidence": 0.83,
+          "run_id": "5663",
+          "trace_id": "5c9ce879-3d9d-4ef4-b324-2310a3f11e39",
+          "error": null
+        },
+        "filename": "agent:Social Proof Generator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "139aae47270956dd442317c5810a7e165c71ebc10e69ccbbaf3313837293ed6a",
+      "hash": "fe163f80354dcd786c41945279994332ff1fc3388bf141553ca58caef05b7aeb"
+    },
+    {
+      "index": 72,
+      "timestamp": 1781420832.627054,
+      "event_type": "process_exec",
+      "agent_id": "Social Proof Generator#31",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360658.773049,
+        "agent_id": "Social Proof Generator#31",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 25332,
+          "confidence": 0.816,
+          "run_id": "5662",
+          "trace_id": "96e34555-c7e6-4a6f-8933-c4634ed062d7",
+          "error": null
+        },
+        "filename": "agent:Social Proof Generator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "fe163f80354dcd786c41945279994332ff1fc3388bf141553ca58caef05b7aeb",
+      "hash": "4e106e4ed3d9ce5dba0095d3e6e7cabe3838599678cfbcf750850845faecb942"
+    },
+    {
+      "index": 73,
+      "timestamp": 1781420832.6271114,
+      "event_type": "process_exec",
+      "agent_id": "Social Proof Generator#31",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360658.737035,
+        "agent_id": "Social Proof Generator#31",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 31870,
+          "confidence": 0.84,
+          "run_id": "5661",
+          "trace_id": "555d3d48-6864-4815-87b7-63bfb0ff7dcc",
+          "error": null
+        },
+        "filename": "agent:Social Proof Generator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "4e106e4ed3d9ce5dba0095d3e6e7cabe3838599678cfbcf750850845faecb942",
+      "hash": "247e444902d0874b6651da1a494b7f907e70fd62cfbd49012a94c8015873ec55"
+    },
+    {
+      "index": 74,
+      "timestamp": 1781420832.6271682,
+      "event_type": "process_exec",
+      "agent_id": "Landing Generator#30",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360632.260495,
+        "agent_id": "Landing Generator#30",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 53200,
+          "confidence": 0.74,
+          "run_id": "5660",
+          "trace_id": "79632bff-8b91-4e16-a16d-1625d7bb46aa",
+          "error": null
+        },
+        "filename": "agent:Landing Generator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "247e444902d0874b6651da1a494b7f907e70fd62cfbd49012a94c8015873ec55",
+      "hash": "0577ed8170ba702516fcfa34d6ec5a47e6ced32b613c2531a37038eef0de3840"
+    },
+    {
+      "index": 75,
+      "timestamp": 1781420832.6272283,
+      "event_type": "process_exec",
+      "agent_id": "Landing Generator#30",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360627.877978,
+        "agent_id": "Landing Generator#30",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 48546,
+          "confidence": 0.806,
+          "run_id": "5659",
+          "trace_id": "96e34555-c7e6-4a6f-8933-c4634ed062d7",
+          "error": null
+        },
+        "filename": "agent:Landing Generator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "0577ed8170ba702516fcfa34d6ec5a47e6ced32b613c2531a37038eef0de3840",
+      "hash": "e874b0ceb9699e961d08b169b949bf95b94f02ddc8a161e9eaddfcfaa5ce3c33"
+    },
+    {
+      "index": 76,
+      "timestamp": 1781420832.6272886,
+      "event_type": "process_exec",
+      "agent_id": "Landing Generator#30",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360620.06088,
+        "agent_id": "Landing Generator#30",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 41499,
+          "confidence": 0.79,
+          "run_id": "5658",
+          "trace_id": "555d3d48-6864-4815-87b7-63bfb0ff7dcc",
+          "error": null
+        },
+        "filename": "agent:Landing Generator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "e874b0ceb9699e961d08b169b949bf95b94f02ddc8a161e9eaddfcfaa5ce3c33",
+      "hash": "45048b5f6532c28505c5493e92cedd0dbe201bdecc26858817c7f2799288c572"
+    },
+    {
+      "index": 77,
+      "timestamp": 1781420832.6273465,
+      "event_type": "process_exec",
+      "agent_id": "Landing Generator#30",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360619.42967,
+        "agent_id": "Landing Generator#30",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 41207,
+          "confidence": 0.79,
+          "run_id": "5657",
+          "trace_id": "5c9ce879-3d9d-4ef4-b324-2310a3f11e39",
+          "error": null
+        },
+        "filename": "agent:Landing Generator",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "45048b5f6532c28505c5493e92cedd0dbe201bdecc26858817c7f2799288c572",
+      "hash": "f90d1dbbddf0791c3cb9de8e0f9ecd4100e58835ae78776c9f28dcb2717faf4f"
+    },
+    {
+      "index": 78,
+      "timestamp": 1781420832.6274297,
+      "event_type": "process_exec",
+      "agent_id": "QA System Auditor#136",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781360580.934834,
+        "agent_id": "QA System Auditor#136",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 3738,
+          "confidence": 0.88,
+          "run_id": "5656",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:QA System Auditor",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f90d1dbbddf0791c3cb9de8e0f9ecd4100e58835ae78776c9f28dcb2717faf4f",
+      "hash": "35d1244ca2e7dff1455c005ad094168dd1987612abee44ec3c162ab5f1454fa3"
+    },
+    {
+      "index": 79,
+      "timestamp": 1781420832.6274972,
+      "event_type": "process_exec",
+      "agent_id": "ConnectionDetector#141",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781340104.688642,
+        "agent_id": "ConnectionDetector#141",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 13788,
+          "confidence": 0.484,
+          "run_id": "5655",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "35d1244ca2e7dff1455c005ad094168dd1987612abee44ec3c162ab5f1454fa3",
+      "hash": "3b34a5bfad0b6ed7435701ec99f9a3eec7c37169803dfb8141c781fdf0864ebf"
+    },
+    {
+      "index": 80,
+      "timestamp": 1781420832.6275787,
+      "event_type": "process_exec",
+      "agent_id": "KnowledgeClassifier#140",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781340084.42712,
+        "agent_id": "KnowledgeClassifier#140",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 3015,
+          "confidence": 0.75,
+          "run_id": "5654",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "3b34a5bfad0b6ed7435701ec99f9a3eec7c37169803dfb8141c781fdf0864ebf",
+      "hash": "c037b6a6a76ed7d7ab883478020c2caf2e2d0f1806eda83a5acc1f42c0449a72"
+    },
+    {
+      "index": 81,
+      "timestamp": 1781420832.627644,
+      "event_type": "process_exec",
+      "agent_id": "ConnectionDetector#141",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781340075.989018,
+        "agent_id": "ConnectionDetector#141",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 10218,
+          "confidence": 0.6,
+          "run_id": "5653",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "c037b6a6a76ed7d7ab883478020c2caf2e2d0f1806eda83a5acc1f42c0449a72",
+      "hash": "2fbfcb2a7bea2272f76b8f039147a42887e3b9884b9042b848cd4981d1c5ab85"
+    },
+    {
+      "index": 82,
+      "timestamp": 1781420832.6277075,
+      "event_type": "process_exec",
+      "agent_id": "KnowledgeClassifier#140",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781340058.371226,
+        "agent_id": "KnowledgeClassifier#140",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 3249,
+          "confidence": 0.784,
+          "run_id": "5652",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "2fbfcb2a7bea2272f76b8f039147a42887e3b9884b9042b848cd4981d1c5ab85",
+      "hash": "39e7e870d19c3d85e331b9b6bbaeacb9e3187c86614fb98a475d79c402eb1ca2"
+    },
+    {
+      "index": 83,
+      "timestamp": 1781420832.6277654,
+      "event_type": "process_exec",
+      "agent_id": "ConnectionDetector#141",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781340049.968478,
+        "agent_id": "ConnectionDetector#141",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 15734,
+          "confidence": 0.64,
+          "run_id": "5651",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "39e7e870d19c3d85e331b9b6bbaeacb9e3187c86614fb98a475d79c402eb1ca2",
+      "hash": "3b657719cc0a7e5ae8ad0b121fc0e8eac9fac0ec30fb4808422135c1fe171bc2"
+    },
+    {
+      "index": 84,
+      "timestamp": 1781420832.627823,
+      "event_type": "process_exec",
+      "agent_id": "KnowledgeClassifier#140",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781340027.861014,
+        "agent_id": "KnowledgeClassifier#140",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 2522,
+          "confidence": 0.75,
+          "run_id": "5650",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "3b657719cc0a7e5ae8ad0b121fc0e8eac9fac0ec30fb4808422135c1fe171bc2",
+      "hash": "1b8b3922ab3a7be49d149d9ebe0da83c235eec1ace20814a4bf232968c08a074"
+    },
+    {
+      "index": 85,
+      "timestamp": 1781420832.6278794,
+      "event_type": "process_exec",
+      "agent_id": "ConnectionDetector#141",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781340020.572896,
+        "agent_id": "ConnectionDetector#141",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 11591,
+          "confidence": 0.48,
+          "run_id": "5649",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "1b8b3922ab3a7be49d149d9ebe0da83c235eec1ace20814a4bf232968c08a074",
+      "hash": "fddaf40b0f795625f8ed460d4a56dba4e7549cba89161b05d1efcbde17993484"
+    },
+    {
+      "index": 86,
+      "timestamp": 1781420832.6279354,
+      "event_type": "process_exec",
+      "agent_id": "KnowledgeClassifier#140",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781340003.015121,
+        "agent_id": "KnowledgeClassifier#140",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 3149,
+          "confidence": 0.8,
+          "run_id": "5648",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "fddaf40b0f795625f8ed460d4a56dba4e7549cba89161b05d1efcbde17993484",
+      "hash": "e9fff237637f5f9e85f0a18ed8e7106e04f3e03f3566128a9cfa955570344d1f"
+    },
+    {
+      "index": 87,
+      "timestamp": 1781420832.6279922,
+      "event_type": "process_exec",
+      "agent_id": "ConnectionDetector#141",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339995.026351,
+        "agent_id": "ConnectionDetector#141",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 9484,
+          "confidence": 0.58,
+          "run_id": "5647",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:ConnectionDetector",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "e9fff237637f5f9e85f0a18ed8e7106e04f3e03f3566128a9cfa955570344d1f",
+      "hash": "65bd2fa6e74a8a63042826d3b4bfe433d7d6d686e2ce3a606a0a332feda7694d"
+    },
+    {
+      "index": 88,
+      "timestamp": 1781420832.6280482,
+      "event_type": "process_exec",
+      "agent_id": "KnowledgeClassifier#140",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339979.429811,
+        "agent_id": "KnowledgeClassifier#140",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 3515,
+          "confidence": 0.79,
+          "run_id": "5646",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:KnowledgeClassifier",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "65bd2fa6e74a8a63042826d3b4bfe433d7d6d686e2ce3a606a0a332feda7694d",
+      "hash": "f0e7e937a17596b9fdcaf92885a4a7e84d1e64d868c613115e20cd66e5bed6aa"
+    },
+    {
+      "index": 89,
+      "timestamp": 1781420832.6281133,
+      "event_type": "process_exec",
+      "agent_id": "Personal Context Filter#200",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339968.240323,
+        "agent_id": "Personal Context Filter#200",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 165117,
+          "confidence": 0.52,
+          "run_id": "5645",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Personal Context Filter",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f0e7e937a17596b9fdcaf92885a4a7e84d1e64d868c613115e20cd66e5bed6aa",
+      "hash": "d9fdf456a54691b8b8860fc748acbb6af9d76ba19df69e4393ddbee28da3af84"
+    },
+    {
+      "index": 90,
+      "timestamp": 1781420832.628171,
+      "event_type": "process_exec",
+      "agent_id": "Idea Scorer#11",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339795.957349,
+        "agent_id": "Idea Scorer#11",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 436890,
+          "confidence": 0.524,
+          "run_id": "5644",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Idea Scorer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d9fdf456a54691b8b8860fc748acbb6af9d76ba19df69e4393ddbee28da3af84",
+      "hash": "165c52030305faec9ddb59e72d87cda89b3b7666ddcd4c44615964ae1d896163"
+    },
+    {
+      "index": 91,
+      "timestamp": 1781420832.6282306,
+      "event_type": "process_exec",
+      "agent_id": "Trend Analyzer#10",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339350.293786,
+        "agent_id": "Trend Analyzer#10",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 107259,
+          "confidence": 0.784,
+          "run_id": "5643",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Trend Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "165c52030305faec9ddb59e72d87cda89b3b7666ddcd4c44615964ae1d896163",
+      "hash": "314f9293f63a24a9860c02326c2971d58b941cd2f4851da611c96a21a2a077fb"
+    },
+    {
+      "index": 92,
+      "timestamp": 1781420832.6282918,
+      "event_type": "process_exec",
+      "agent_id": "LinkedIn Jobs Scanner#135",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339235.916744,
+        "agent_id": "LinkedIn Jobs Scanner#135",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 254739,
+          "confidence": 0.45,
+          "run_id": "5642",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:LinkedIn Jobs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "314f9293f63a24a9860c02326c2971d58b941cd2f4851da611c96a21a2a077fb",
+      "hash": "a3bd81edd5f9032eccdd52bdaeb6b33b96486888a73e91b3d979d1318ff65af1"
+    },
+    {
+      "index": 93,
+      "timestamp": 1781420832.62835,
+      "event_type": "process_exec",
+      "agent_id": "Job Posting Analyzer#130",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339145.117437,
+        "agent_id": "Job Posting Analyzer#130",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 162185,
+          "confidence": 0.434,
+          "run_id": "5641",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Job Posting Analyzer",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "a3bd81edd5f9032eccdd52bdaeb6b33b96486888a73e91b3d979d1318ff65af1",
+      "hash": "801ec7feec680fa51aaaeecf439c45e73f0f6f3831d3b348b21a7dd88e00d5f3"
+    },
+    {
+      "index": 94,
+      "timestamp": 1781420832.6284213,
+      "event_type": "process_exec",
+      "agent_id": "Competitor Tracker#36",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339054.773453,
+        "agent_id": "Competitor Tracker#36",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 74678,
+          "confidence": 0.424,
+          "run_id": "5640",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Competitor Tracker",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "801ec7feec680fa51aaaeecf439c45e73f0f6f3831d3b348b21a7dd88e00d5f3",
+      "hash": "952db20ddb348e7abfa24086650fec6b1dfb418621c730fc833e02ffe9d2aeb5"
+    },
+    {
+      "index": 95,
+      "timestamp": 1781420832.6284924,
+      "event_type": "process_exec",
+      "agent_id": "Twitter/X Scanner#7",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339041.883226,
+        "agent_id": "Twitter/X Scanner#7",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 63104,
+          "confidence": 0.41,
+          "run_id": "5639",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Twitter/X Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "952db20ddb348e7abfa24086650fec6b1dfb418621c730fc833e02ffe9d2aeb5",
+      "hash": "dca35afeba7a0d83bb5b90026a359e7557d4a7373e9369960499ce2ccd8fe459"
+    },
+    {
+      "index": 96,
+      "timestamp": 1781420832.6286016,
+      "event_type": "process_exec",
+      "agent_id": "Product Hunt Scanner#3",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339034.027528,
+        "agent_id": "Product Hunt Scanner#3",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 54268,
+          "confidence": 0.38,
+          "run_id": "5638",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Product Hunt Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "dca35afeba7a0d83bb5b90026a359e7557d4a7373e9369960499ce2ccd8fe459",
+      "hash": "2350330f994d383813c63be1e0a0a58fa7f88530aeb2f0de17ce9c101c935538"
+    },
+    {
+      "index": 97,
+      "timestamp": 1781420832.6286778,
+      "event_type": "process_exec",
+      "agent_id": "YouTube Scanner#122",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339033.255888,
+        "agent_id": "YouTube Scanner#122",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 52311,
+          "confidence": 0.324,
+          "run_id": "5637",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:YouTube Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "2350330f994d383813c63be1e0a0a58fa7f88530aeb2f0de17ce9c101c935538",
+      "hash": "b53b18d08fddebe37366e02f5b2e96da572ff991adfba47a78948449d6053a7b"
+    },
+    {
+      "index": 98,
+      "timestamp": 1781420832.6287417,
+      "event_type": "process_exec",
+      "agent_id": "Dev.to Scanner#1",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339032.040341,
+        "agent_id": "Dev.to Scanner#1",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 50678,
+          "confidence": 0.48,
+          "run_id": "5636",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Dev.to Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "b53b18d08fddebe37366e02f5b2e96da572ff991adfba47a78948449d6053a7b",
+      "hash": "58f579b7cef3525afe81807818fdc754d402fa15af39ccdfd3c2863377dc9301"
+    },
+    {
+      "index": 99,
+      "timestamp": 1781420832.628806,
+      "event_type": "process_exec",
+      "agent_id": "Crunchbase Scanner#9",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339026.02415,
+        "agent_id": "Crunchbase Scanner#9",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 45377,
+          "confidence": 0.424,
+          "run_id": "5635",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Crunchbase Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "58f579b7cef3525afe81807818fdc754d402fa15af39ccdfd3c2863377dc9301",
+      "hash": "eb487a5651d194a5297403586778b5f873694ab7f54cd92ff3952d185675cf7b"
+    },
+    {
+      "index": 100,
+      "timestamp": 1781420832.6288657,
+      "event_type": "process_exec",
+      "agent_id": "App Store Scanner#8",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339020.779679,
+        "agent_id": "App Store Scanner#8",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 40095,
+          "confidence": 0.3,
+          "run_id": "5634",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:App Store Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "eb487a5651d194a5297403586778b5f873694ab7f54cd92ff3952d185675cf7b",
+      "hash": "d882235e895de6682310be27bc39097f3678ea928832a4ee09459c7882b1a8fb"
+    },
+    {
+      "index": 101,
+      "timestamp": 1781420832.6289303,
+      "event_type": "process_exec",
+      "agent_id": "Financial Signal Scanner#132",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339018.325443,
+        "agent_id": "Financial Signal Scanner#132",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 40146,
+          "confidence": 0.28,
+          "run_id": "5633",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Financial Signal Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "d882235e895de6682310be27bc39097f3678ea928832a4ee09459c7882b1a8fb",
+      "hash": "af715b80dae2d2081772a1f7303c743e31f5571be666c524c28dcb709b24b33c"
+    },
+    {
+      "index": 102,
+      "timestamp": 1781420832.6289897,
+      "event_type": "process_exec",
+      "agent_id": "GitHub Trending Scanner#5",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339015.328739,
+        "agent_id": "GitHub Trending Scanner#5",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 36250,
+          "confidence": 0.38,
+          "run_id": "5632",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:GitHub Trending Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "af715b80dae2d2081772a1f7303c743e31f5571be666c524c28dcb709b24b33c",
+      "hash": "ead719f80b0ba87b8933a4593c0bf0e2f86cf97cde28cc147c1792e516550535"
+    },
+    {
+      "index": 103,
+      "timestamp": 1781420832.6290498,
+      "event_type": "process_exec",
+      "agent_id": "HackerNews Scanner#2",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781339009.501578,
+        "agent_id": "HackerNews Scanner#2",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 30583,
+          "confidence": 0.404,
+          "run_id": "5631",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:HackerNews Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "ead719f80b0ba87b8933a4593c0bf0e2f86cf97cde28cc147c1792e516550535",
+      "hash": "21d062ec20312e9bca6cbea705f7bdf8109a0a7ccef06389936193944c38dc73"
+    },
+    {
+      "index": 104,
+      "timestamp": 1781420832.6291075,
+      "event_type": "process_exec",
+      "agent_id": "Podcast Scanner#131",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781338995.202426,
+        "agent_id": "Podcast Scanner#131",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 18659,
+          "confidence": 0.33,
+          "run_id": "5630",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Podcast Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "21d062ec20312e9bca6cbea705f7bdf8109a0a7ccef06389936193944c38dc73",
+      "hash": "9482dfcaa03a66b8294c964312822c9cf5659d9948f91edfa362e4114e2d083f"
+    },
+    {
+      "index": 105,
+      "timestamp": 1781420832.629164,
+      "event_type": "process_exec",
+      "agent_id": "RSS/Blogs Scanner#6",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781338994.898269,
+        "agent_id": "RSS/Blogs Scanner#6",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 16758,
+          "confidence": 0.23,
+          "run_id": "5629",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:RSS/Blogs Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "9482dfcaa03a66b8294c964312822c9cf5659d9948f91edfa362e4114e2d083f",
+      "hash": "f00fb85f49d3acc794a21b62b20c4a4098634756de6a3d7f92f433fa3b7cc01a"
+    },
+    {
+      "index": 106,
+      "timestamp": 1781420832.6292613,
+      "event_type": "process_exec",
+      "agent_id": "QA System Auditor#136",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781338994.897693,
+        "agent_id": "QA System Auditor#136",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 16221,
+          "confidence": 0.856,
+          "run_id": "5628",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:QA System Auditor",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "f00fb85f49d3acc794a21b62b20c4a4098634756de6a3d7f92f433fa3b7cc01a",
+      "hash": "28c664997b13ac56c16d937df82d0bb161255800958f247a5c29f14aed98982d"
+    },
+    {
+      "index": 107,
+      "timestamp": 1781420832.6293225,
+      "event_type": "process_exec",
+      "agent_id": "Google Trends Scanner#4",
+      "event_data": {
+        "type": "process_exec",
+        "timestamp": 1781338992.557734,
+        "agent_id": "Google Trends Scanner#4",
+        "pid": 0,
+        "tid": 0,
+        "uid": 0,
+        "comm": "",
+        "severity": "info",
+        "metadata": {
+          "duration_ms": 12348,
+          "confidence": 0.31,
+          "run_id": "5627",
+          "trace_id": null,
+          "error": null
+        },
+        "filename": "agent:Google Trends Scanner",
+        "args": [
+          "success"
+        ],
+        "parent_pid": 0,
+        "parent_comm": "",
+        "_policy_allowed": true,
+        "_policy_reasons": []
+      },
+      "prev_hash": "28c664997b13ac56c16d937df82d0bb161255800958f247a5c29f14aed98982d",
+      "hash": "5855cbc05bd2e131cd275e39e6a9f976a4a10b9de23249dd5b85891d4967825f"
+    }
+  ]
+}
