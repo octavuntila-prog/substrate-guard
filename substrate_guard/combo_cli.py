@@ -475,14 +475,14 @@ def register_stack_parsers(subparsers: argparse._SubParsersAction) -> None:
 
     eval_parser = subparsers.add_parser("evaluate", help="Evaluate a single event against policies")
     eval_parser.add_argument("--event", "-e", required=True, help="JSON event data")
-    eval_parser.add_argument("--policy", "-p", help="Path to .rego policy file/dir")
+    eval_parser.add_argument("--policy", "-p", help="Path to .rego policy file/dir (EXPERIMENTAL -- not at parity with the built-in engine)")
     eval_parser.add_argument("--no-opa", action="store_true",
                             help="Use built-in evaluator instead of OPA binary")
 
     mon_parser = subparsers.add_parser("monitor", help="Monitor an agent (observe + policy + verify)")
     mon_parser.add_argument("--agent", "-a", required=True, help="Agent ID")
     mon_parser.add_argument("--pid", type=int, help="PID to trace")
-    mon_parser.add_argument("--policy", "-p", help="Path to .rego policy file/dir")
+    mon_parser.add_argument("--policy", "-p", help="Path to .rego policy file/dir (EXPERIMENTAL -- not at parity with the built-in engine)")
     mon_parser.add_argument("--live", action="store_true",
                            help="Use real eBPF (requires root + kernel 5.4+)")
     mon_parser.add_argument(

@@ -86,6 +86,21 @@ class PolicyEngine:
             else:
                 logger.info("OPA binary not found — using built-in evaluator")
 
+        # EXPERIMENTAL GATE (decision 2026-06-14): the OPA/Rego path is opt-in and NOT at
+        # parity with the built-in engine (the production reference). Its decisions DIVERGE
+        # -- see the agent_safety.rego header caveat (PII under-block; command-deny is a
+        # best-effort subset; network allowlist). It also has no production consumer (the
+        # cron decides with the builtin). Warn whenever it would actually decide events, so
+        # it is never relied on silently. The Rego path is for operator-authored /
+        # experimental policy only.
+        if self._opa_bin and self._policies:
+            logger.warning(
+                "Policy: the OPA/Rego path (--policy rego) is EXPERIMENTAL and NOT at "
+                "parity with the built-in engine (the production reference); its decisions "
+                "diverge (see the agent_safety.rego header caveat). Use the built-in engine "
+                "for production; the Rego path is for operator-authored / experimental policy."
+            )
+
     def _load_policies(self):
         """Discover and load .rego files."""
         if self._policy_path.is_file():

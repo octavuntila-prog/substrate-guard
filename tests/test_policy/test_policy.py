@@ -115,6 +115,26 @@ def test_opa_input_not_double_wrapped(monkeypatch):
         f"OPA input is double-wrapped (rego sees input.input.*): {sent}"
 
 
+def test_opa_rego_path_warns_experimental(caplog):
+    """(A) gate (decision 2026-06-14): the OPA/Rego path must WARN it is EXPERIMENTAL and
+    NOT at parity with the builtin (the production reference), so it is never relied on
+    silently. The builtin path must NOT warn."""
+    import logging
+    from pathlib import Path
+
+    rego = str(Path(__file__).resolve().parents[2] / "substrate_guard" / "policy" / "policies")
+    with caplog.at_level(logging.WARNING, logger="substrate_guard.policy"):
+        PolicyEngine(policy_path=rego, use_opa_binary=True, opa_binary="opa")
+    assert any("experimental" in r.message.lower() and "parity" in r.message.lower()
+               for r in caplog.records), "OPA/Rego path did not warn it is experimental / not at parity"
+
+    caplog.clear()
+    with caplog.at_level(logging.WARNING, logger="substrate_guard.policy"):
+        PolicyEngine(policy_path="nonexistent/", use_opa_binary=False)
+    assert not any("experimental" in r.message.lower() for r in caplog.records), \
+        "builtin path wrongly emitted the experimental warning"
+
+
 # ============================================
 # DENY tests — 25 actions that must be blocked
 # ============================================

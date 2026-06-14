@@ -621,7 +621,7 @@ def main():
         "--policy",
         choices=sorted(VALID_POLICY_MODES),
         default=None,
-        help="Policy engine (default: builtin; env: SUBSTRATE_GUARD_POLICY)",
+        help="Policy engine (default: builtin; env: SUBSTRATE_GUARD_POLICY). NOTE: 'rego' is EXPERIMENTAL -- not at parity with builtin (the production reference).",
     )
 
     args = parser.parse_args()
