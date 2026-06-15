@@ -45,6 +45,12 @@ postgres = [
 comply-ml = [
     "sentence-transformers>=3.0.0",
 ]
+# Durable bijotel-backed chain sink (optional; AuditChain(bijotel_db=...))
+# adds persistent verify / Ed25519 export / Rekor / federation. Tests skip
+# if not installed. append_event landed in bijotel 2.16.0.
+bijotel = [
+    "bijotel>=2.16.0",
+]
 
 [project.scripts]
 substrate-guard = "substrate_guard.cli:main"

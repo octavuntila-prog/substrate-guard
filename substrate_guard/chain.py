@@ -91,16 +91,34 @@ class AuditChain:
                 provided (chain not verifiable across runs — random key lost
                 at process exit). For testing/demo only — production must
                 always provide a stable secret. Default: False (fail-loud).
+        bijotel_db: Optional path to a bijotel chain.db. When set, every
+                ``append`` ALSO seals the event into bijotel's durable,
+                tamper-evident chain (additive dual-write) — the in-memory
+                chain is unchanged. This grants substrate-guard bijotel's
+                persistent verify / Ed25519 export / Rekor / federation. The
+                sink is FAIL-OPEN: a bijotel write error never breaks the
+                guard's audit path. Default: None (sink off; behaviour
+                byte-identical to before).
+        bijotel_secret_hex: HMAC secret for the bijotel sink, as a HEX string
+                (bijotel decodes via ``bytes.fromhex`` — a SEPARATE secret from
+                substrate-guard's raw ``secret``). Falls back to the
+                ``BIJOTEL_HMAC_SECRET`` env var. Required (and validated at
+                construction, before any write) when ``bijotel_db`` is set.
 
     Raises:
         ChainConfigError: If no secret available (neither parameter nor env)
-                and ``allow_random_fallback=False`` (default).
+                and ``allow_random_fallback=False`` (default); also if
+                ``bijotel_db`` is set but no valid hex bijotel secret is
+                available (missing, invalid hex, or < 16 bytes) or the
+                ``bijotel`` package is not importable.
     """
 
     def __init__(
         self,
         secret: Optional[str] = None,
         allow_random_fallback: bool = False,
+        bijotel_db: Optional[str] = None,
+        bijotel_secret_hex: Optional[str] = None,
     ):
         # Accept SUBSTRATE_GUARD_HMAC_SECRET (the operational/cron name, set from
         # /etc/substrate-guard/hmac.key) first, then the legacy GUARD_HMAC_SECRET.
@@ -130,6 +148,44 @@ class AuditChain:
         self._entries: list[ChainEntry] = []
         self._head_hash: str = GENESIS_HASH
         self._lock = threading.Lock()  # serialize append; snapshot verify reads
+
+        # --- Optional bijotel durable sink (F1, additive dual-write) ---
+        # When bijotel_db is set, append() ALSO seals each event into bijotel's
+        # persistent HMAC chain (gaining verify / Ed25519 export / Rekor /
+        # federation). Config is validated NOW (pre-write), not at first seal:
+        # a missing package, missing secret, bad hex, or short key fails loud
+        # HERE. Runtime write errors, by contrast, are fail-open (see append) —
+        # they must never break the guard's audit path.
+        self._bijotel_db: Optional[str] = bijotel_db
+        self._bijotel_secret: Optional[bytes] = None
+        self._bijotel_append = None
+        if bijotel_db is not None:
+            try:
+                from bijotel import append_event as _bijotel_append_event
+            except ImportError as exc:
+                raise ChainConfigError(
+                    "bijotel_db set but the 'bijotel' package is not installed "
+                    "(pip install 'substrate-guard[bijotel]' or 'bijotel>=2.16.0')."
+                ) from exc
+            hex_secret = bijotel_secret_hex or os.environ.get("BIJOTEL_HMAC_SECRET", "")
+            if not hex_secret:
+                raise ChainConfigError(
+                    "bijotel_db set but no bijotel secret. Pass bijotel_secret_hex= "
+                    "or set BIJOTEL_HMAC_SECRET (a HEX string, separate from the "
+                    "substrate-guard secret)."
+                )
+            try:
+                bijotel_secret_bytes = bytes.fromhex(hex_secret)
+            except ValueError as exc:
+                raise ChainConfigError(
+                    f"BIJOTEL_HMAC_SECRET must be a valid hex string: {exc}"
+                ) from exc
+            if len(bijotel_secret_bytes) < 16:
+                raise ChainConfigError(
+                    "bijotel secret must be >= 16 bytes (32 hex chars)."
+                )
+            self._bijotel_secret = bijotel_secret_bytes
+            self._bijotel_append = _bijotel_append_event
 
     def _compute_hash(self, index: int, timestamp: float,
                       event_data: str, prev_hash: str) -> str:
@@ -178,6 +234,30 @@ class AuditChain:
             )
             self._entries.append(entry)
             self._head_hash = entry_hash
+
+        # Dual-write sink (additive, FAIL-OPEN): also seal into the durable
+        # bijotel chain if configured. Done OUTSIDE the in-memory lock so a slow
+        # bijotel write never blocks other appends, and wrapped so a bijotel
+        # failure NEVER breaks the guard's audit path — the in-memory entry above
+        # is already committed and is returned regardless.
+        if self._bijotel_db is not None:
+            try:
+                # Pass the JSON-coerced dict (default=str already applied in
+                # `canonical`) so bijotel's RFC 8785 canonicalizer never trips on
+                # a non-JSON type that substrate-guard tolerated.
+                self._bijotel_append(
+                    self._bijotel_db,
+                    self._bijotel_secret,
+                    json.loads(canonical),
+                    event_name=f"substrate-guard.{event_type}",
+                )
+            except Exception as exc:
+                import logging
+                logging.getLogger("substrate_guard.chain").warning(
+                    "bijotel sink seal failed (in-memory chain intact): %s: %s",
+                    type(exc).__name__,
+                    exc,
+                )
 
         return entry
 
