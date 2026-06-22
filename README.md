@@ -29,8 +29,10 @@ Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://a
 | HMAC-SHA256 chain | Wired in v13.4.0 (cron path); per-run chain export, cryptographic verify_export |
 | Cron audits | M0.7 baseline window: 7/7 verified (May 19–25, 2026) |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
-| Tests | **495** passing (**504** collected), 9 skipped (1 SBERT + 6 Postgres CI + 2 POSIX-only ops-exec); 100% accuracy on 5 benchmark scenarios |
+| Tests | **503** passing (**512** collected), 9 skipped (1 SBERT + 6 Postgres CI + 2 POSIX-only ops-exec); 100% accuracy on 5 benchmark scenarios |
 | Uptime | Continuous since March 22, 2026 |
+
+*Uptime and cron cadence (M0.7, "continuous since") are from operator monitoring — the per-night `audit_*.json` series is not committed to this repo. The events / latency / violation figures above are from the committed smoke audit (`docs/deploy-verification/`).*
 
 ### Release v13.3.0 (April 24, 2026) — configurable policy engine
 
@@ -118,7 +120,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 │  L3  Z3 SMT       PROVE     Bounded SMT verification        │  ← Deployed
 │  L4  ZK-SNM       COMPLY    Semantic non-membership         │  ← Prototyped
 │  L5  Ed25519      ATTEST    Cryptographic attestation        │  ← Prototyped
-│  L6  SQLite+CRDT  OFFLINE   Offline verification & sync     │  ← Prototyped
+│  L6  SQLite+HMAC  OFFLINE   Offline verification & sync     │  ← Prototyped
 │                                                             │
 │  Chain: HMAC-SHA256 tamper-evident audit trail               │
 │  Exports: SOC2 / ISO 27001 / ISO 42001                      │
@@ -134,7 +136,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 
 **Decide (L2):** Built-in Python policy rules evaluate each action (OPA/Rego available via `--policy rego`, not the cron default). 80 policy tests cover authorization, rate limiting, data access, and behavioral constraints.
 
-**Prove (L3):** Z3 SMT solver checks AI-generated artifacts (code, tool APIs, CLI commands) against safety invariants within a bounded modeled fragment — sound on each verifier's declared subset, **not** a universal proof (constructs outside the subset are not yet rejected; see [docs/AUDIT_COMPLEX_2026-06-07.md](docs/AUDIT_COMPLEX_2026-06-07.md)). Exercised via the CLI verifier and benchmark scenarios (not per-event in the batch cron audit).
+**Prove (L3):** The Z3 SMT solver checks AI-generated artifacts — code, tool-call APIs, hardware traces (RV32I), distillation arithmetic — against safety invariants within a bounded modeled fragment, sound on each verifier's declared subset, **not** a universal proof: constructs outside the subset abstain (UNKNOWN → not-verified), never a false VERIFIED (see [docs/AUDIT_COMPLEX_2026-06-07.md](docs/AUDIT_COMPLEX_2026-06-07.md)). The CLI/command domain is **separate and NOT Z3** — a regex + AST structural denylist where "SAFE" means no known-bad pattern matched, not a proof. None of these run per-event in the batch cron audit.
 
 **Chain:** Every event is recorded in an HMAC-SHA256 tamper-evident chain. Each entry references the hash of the previous entry, so any mid-chain modification, reordering, or insertion breaks the chain. (A valid *prefix* is itself a valid chain, so tail-truncation by a secret-holder is detected only via an out-of-band expected count/head — `verify(expected_count=...)` — or an external timestamp anchor, not by the chain alone.) Formal verification outcomes (`verify_artifact` / `session.verify`) append **`formal_verification`** entries with **`counterexample`** when a command or artifact is rejected, so audit exports retain *why* a check failed, not only that it failed.
 
@@ -154,16 +156,16 @@ substrate-guard/
 ├── policy/           # L2 — OPA/Rego policy engine
 │   └── engine.py     # 411 LOC — rule evaluation, violation detection
 ├── ast_parse/        # L3+ — AST-first CLI checks (Tree-sitter bash; Python ast)
-├── comply/           # L4 — ZK semantic non-membership proofs
+├── comply/           # L4 — threshold non-membership over a Merkle commitment (ZK-SNM prototype)
 ├── attest/           # L5 — Ed25519 cryptographic attestation
-├── offline/          # L6 — SQLite + CRDT offline verification
+├── offline/          # L6 — SQLite append-only HMAC store + sync (not a CRDT)
 ├── guard.py          # main guard pipeline (observe → policy → verify → chain)
 ├── audit.py          # automated audit and reporting (cron entry point)
 ├── combo_cli.py      # CLI for all layers
 ├── integrations/     # SUBSTRATE ecosystem connectors
 ├── chain.py          # HMAC-SHA256 tamper-evident chain
 ├── compliance.py     # SOC2 / ISO 27001 / ISO 42001 exports
-└── tests/            # 504 tests collected, organized by layer (incl. adversarial + fuzz)
+└── tests/            # 512 tests collected, organized by layer (incl. adversarial + fuzz)
     ├── test_policy/       # L2 policy decisions
     ├── test_verify/       # L3 verifier soundness (code / cli / hw / distill)
     ├── test_integration/  # chain, audit, compliance, docs-drift guard
@@ -182,7 +184,7 @@ This repository (substrate-guard) is deployed on the **Research server** (89.167
 
 The broader SUBSTRATE ecosystem includes a separate production stack on the **CPX52 server** (substrate-v2 core + ecosystem judges + V2.0 single-file guard daemon) — see [Related Projects](#related-projects) below. That stack is outside this repository's scope.
 
-**Tests: 504** collected (**495** passed in a local run on 2026-06-14; 9 skipped: 1 SBERT, 6 Postgres CI, 2 POSIX-only ops-exec). See [Related Projects](#related-projects) for the separate CPX52 V2.0 stack scope.
+**Tests: 512** collected (**503** passed in a local run on 2026-06-22; 9 skipped: 1 SBERT, 6 Postgres CI, 2 POSIX-only ops-exec). See [Related Projects](#related-projects) for the separate CPX52 V2.0 stack scope.
 
 ## Benchmark Results
 
@@ -261,7 +263,7 @@ What is **fully functional without Linux eBPF** vs. what needs a **real kernel /
 
 ## Production Deployment
 
-substrate-guard (this repository) runs on the **Research server** (89.167.66.225) — currently v13.4.2 (v13.4.0 deployed May 18, 2026; v13.4.1 patch June 2; v13.4.2 patch June 14). Daily automated cron audit at 04:00 UTC. M0.7 baseline window: 7/7 verified (May 19–25, 2026); zero missed cycles since the May 18 deployment.
+substrate-guard (this repository) runs on the **Research server** (89.167.66.225) — currently v13.4.2 (v13.4.0 deployed May 18, 2026; v13.4.1 patch June 2; v13.4.2 patch June 14). Daily automated cron audit at 04:00 UTC. M0.7 baseline window: 7/7 verified (May 19–25, 2026); zero missed cycles since the May 18 deployment — per operator monitoring; per-night audit JSONs are not committed to this repo.
 
 ### Related Projects
 
