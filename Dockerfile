@@ -13,6 +13,12 @@ COPY pyproject.toml README.md bandit.yaml /app/
 COPY substrate_guard/ /app/substrate_guard/
 COPY tests/ /app/tests/
 COPY examples/ /app/examples/
+# scripts/ and docs/deploy-verification/ are test fixtures: the ops-script tests
+# read/execute scripts/*.sh, and the drift-guard tests read the smoke JSONs. Without
+# these the build-time pytest (below) fails on missing fixtures in the Linux image
+# while skipping/passing on a Windows dev host.
+COPY scripts/ /app/scripts/
+COPY docs/deploy-verification/ /app/docs/deploy-verification/
 
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -e ".[dev,postgres]"
