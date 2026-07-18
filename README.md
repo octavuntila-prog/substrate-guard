@@ -15,7 +15,7 @@ One command: `substrate-guard` (also `ai-blackbox`). Z3 workflows use `verify` /
 
 ## The Thesis
 
-substrate-guard is a 6-layer verification architecture that observes, decides, proves, and audits every action taken by autonomous AI agents — in real time, with cryptographic evidence.
+substrate-guard is a 6-layer verification architecture that observes, decides, proves, and audits every action taken by autonomous AI agents, with cryptographic evidence. (The reference deployment runs as a nightly batch audit over recorded actions — not live real-time; the eBPF live-observation path is implemented but is not the deployed path. See Production Results.)
 
 Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current version v13.4.2 (released June 14, 2026). The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
 
@@ -29,7 +29,7 @@ Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://a
 | HMAC-SHA256 chain | Wired in v13.4.0 (cron path); per-run chain export, cryptographic verify_export |
 | Cron audits | M0.7 baseline window: 7/7 verified (May 19–25, 2026) |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
-| Tests | **503** passing (**512** collected), 9 skipped (1 SBERT + 6 Postgres CI + 2 POSIX-only ops-exec); 100% accuracy on 5 benchmark scenarios |
+| Tests | **503** passing (**512** collected), 9 skipped (1 SBERT + 6 Postgres CI + 2 POSIX-only ops-exec); 100% on 5 benchmark scenarios (design-target benchmark, not a production accuracy figure) |
 | Uptime | Continuous since March 22, 2026 |
 
 *Uptime and cron cadence (M0.7, "continuous since") are from operator monitoring — the per-night `audit_*.json` series is not committed to this repo. The events / latency / violation figures above are from the committed smoke audit (`docs/deploy-verification/`).*
@@ -118,7 +118,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 │  L1  eBPF         OBSERVE   Mock tracer (kernel hooks: #38b)│  ← Mock
 │  L2  OPA/Rego     DECIDE    Declarative policy enforcement  │  ← Deployed
 │  L3  Z3 SMT       PROVE     Bounded SMT verification        │  ← Deployed
-│  L4  ZK-SNM       COMPLY    Semantic non-membership         │  ← Prototyped
+│  L4  ZK-SNM       COMPLY    Threshold non-membership        │  ← Prototyped
 │  L5  Ed25519      ATTEST    Cryptographic attestation        │  ← Prototyped
 │  L6  SQLite+HMAC  OFFLINE   Offline verification & sync     │  ← Prototyped
 │                                                             │
@@ -211,7 +211,7 @@ All exports include HMAC chain hash, timestamp, event counts, and violation deta
 
 ## Publications
 
-7 published, 2 under peer review (as of audit 2026-04-06):
+6 published, 2 under review (as of audit 2026-04-06):
 
 | # | Title | Venue | DOI / ID |
 |---|-------|-------|----------|
