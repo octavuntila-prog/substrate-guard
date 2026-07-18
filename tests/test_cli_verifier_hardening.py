@@ -35,6 +35,24 @@ def test_new_denylist_class_flagged(cmd: str):
     assert not r.safe, f"expected UNSAFE for {cmd!r}"
 
 
+def test_shell_truncate_flagged_honestly_not_as_sql():
+    """`truncate -s 0 <file>` is a coreutils log-wipe, not a SQL TRUNCATE. It must
+    stay UNSAFE but with a FILESYSTEM reason -- the old detector misrouted it to the
+    SQL scanner and reported the false 'TRUNCATE statement (structural sqlparse)'."""
+    r = verify_cli("truncate -s 0 /var/log/auth.log")
+    assert not r.safe
+    names = [v.pattern_name for v in r.violations]
+    assert "file_truncate" in names
+    assert not any("sql" in n.lower() for n in names), names
+
+
+def test_real_sql_truncate_still_detected_as_sql():
+    r = verify_cli("TRUNCATE TABLE users")
+    assert not r.safe
+    assert any("truncate" in v.pattern_name.lower() and "sql" in v.pattern_name.lower()
+               for v in r.violations), [v.pattern_name for v in r.violations]
+
+
 # Guard against over-broad regexes: legitimate neighbours must stay SAFE.
 # (NB: `chmod 755`/`chmod 777` are already flagged by the pre-existing
 # privilege_escalation rule on the `7` digit -- that is intended, not a new

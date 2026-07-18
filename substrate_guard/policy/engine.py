@@ -1,7 +1,9 @@
-"""PolicyEngine — Evaluates AI agent actions against OPA/Rego policies.
+"""PolicyEngine — Evaluates AI agent actions against policy.
 
-Uses OPA binary (preferred, <5ms per decision) or built-in Python
-evaluator as fallback for environments without OPA installed.
+The built-in Python evaluator is the PRODUCTION reference (it decides the deployed
+cron audit). The OPA/Rego path is OPT-IN and gated by a CI builtin<->rego parity
+harness (opa v1.x); it is not the default and the flip to rego is a pending operator
+decision. Set SUBSTRATE_GUARD_POLICY=rego to select it where the OPA binary exists.
 
 Usage:
     engine = PolicyEngine("policies/")

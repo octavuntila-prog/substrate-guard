@@ -1,6 +1,8 @@
 """Unified Guard — The complete verification stack.
 
-eBPF observes → OPA decides → Z3 proves.
+observe → policy decides → Z3 proves. The DESIGN is eBPF-observes; the DEPLOYED
+observe source today is mock/inject (DB-replay or orchestrator-injected events) —
+the eBPF kernel path is implemented but is not the deployed path (see `source=`).
 
 Three levels, from silicon to theorem, in a single pipeline.
 
@@ -228,15 +230,19 @@ class Guard:
     """The complete verification stack.
     
     Connects three layers:
-    - Layer 1 (eBPF): What is the agent actually doing?
-    - Layer 2 (OPA/Rego): Does it have permission?
-    - Layer 3 (Z3): Is the output mathematically correct?
-    
+    - Layer 1 (observe): What is the agent actually doing? Source is mock / inject /
+      eBPF (see `source=`); eBPF is implemented but NOT the deployed path — today's
+      deployed observe is mock/inject (DB-replay or orchestrator injection).
+    - Layer 2 (policy): Does it have permission? Built-in Python engine decides in
+      production; OPA/Rego is opt-in with a CI parity gate.
+    - Layer 3 (Z3): Is the output mathematically correct — on the bounded fragment?
+
     Args:
-        observe: Enable eBPF kernel observation (Layer 1)
+        observe: Enable Layer 1 observation. Source is mock/inject/eBPF via `source=`;
+            eBPF kernel observation is implemented but not the deployed path.
         policy: Path to Rego policies or PolicyEngine instance (Layer 2)
         verify: Enable Z3 formal verification (Layer 3)
-        use_mock: Force mock mode for eBPF (testing without kernel access)
+        use_mock: Force mock mode for the tracer (testing without kernel access)
         verify_process_cli: If True, :meth:`evaluate_event` runs CLI verification on
             :class:`~substrate_guard.observe.events.ProcessEvent` by reconstructing the
             command line from ``args`` / ``filename``. Off by default (can duplicate
@@ -360,9 +366,11 @@ class Guard:
         )
 
         # Layer 3 (per-event): submit an artifact-bearing event for selective/sampled
-        # async formal verification (non-blocking; verdicts collected via
-        # collect_perevent_verdicts). Skipped events (no artifact / not sampled) are a
-        # no-op. Depends on the event carrying metadata['formal_artifact'].
+        # formal verification. SYNCHRONOUS by default (runs inline, bounded by the
+        # per-artifact Z3 timeout); async only if a ProcessPoolExecutor was injected.
+        # Verdicts are collected via collect_perevent_verdicts. Skipped events (no
+        # artifact / not sampled) are a no-op. NOTE: no production producer attaches
+        # metadata['formal_artifact'] yet -- this fires on injected/test artifacts.
         if self._perevent is not None:
             self._perevent.submit(event)
 

@@ -163,7 +163,7 @@ class ComplianceExporter:
                         "events_logged": self._chain.length,
                         "chain_algorithm": "HMAC-SHA256",
                         "chain_integrity": "VERIFIED" if self._chain.verify()[0] else "BROKEN",
-                        "retention": "Configurable (default 30 days)",
+                        "retention": "Governed by the operator's store; no retention/expiry is enforced by this library",
                     },
                 },
                 "A.8.16_monitoring": {

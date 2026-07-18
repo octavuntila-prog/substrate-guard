@@ -29,7 +29,7 @@ Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://a
 | HMAC-SHA256 chain | Wired in v13.4.0 (cron path); per-run chain export, cryptographic verify_export |
 | Cron audits | M0.7 baseline window: 7/7 verified (May 19–25, 2026) |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
-| Tests | **503** passing (**512** collected), 9 skipped (1 SBERT + 6 Postgres CI + 2 POSIX-only ops-exec); 100% on 5 benchmark scenarios (design-target benchmark, not a production accuracy figure) |
+| Tests | **589** passing (**613** collected), 24 skipped on this Windows dev host (14 POSIX-only bash ops-exec + 8 Postgres-CI + 2 OPA-parity — all run in CI); 100% on 5 benchmark scenarios (design-target benchmark, not a production accuracy figure) |
 | Uptime | Continuous since March 22, 2026 |
 
 *Uptime and cron cadence (M0.7, "continuous since") are from operator monitoring — the per-night `audit_*.json` series is not committed to this repo. The events / latency / violation figures above are from the committed smoke audit (`docs/deploy-verification/`).*

@@ -226,21 +226,18 @@ def detect_shell_language(code: str) -> str:
     if _looks_like_yaml(s):
         return "yaml"
     u = s.upper()
-    if any(
-        u.startswith(k)
-        for k in (
-            "SELECT ",
-            "INSERT ",
-            "UPDATE ",
-            "DELETE ",
-            "DROP ",
-            "CREATE ",
-            "ALTER ",
-            "WITH ",
-            "TRUNCATE ",
-        )
+    for k in (
+        "SELECT ", "INSERT ", "UPDATE ", "DELETE ", "DROP ",
+        "CREATE ", "ALTER ", "WITH ", "TRUNCATE ",
     ):
-        return "sql"
+        if u.startswith(k):
+            # Guard against a shell command that shares a leading word with a SQL
+            # verb -- e.g. coreutils `truncate -s 0 /var/log/x`, which is a file
+            # wipe, NOT a SQL TRUNCATE. A real SQL statement never has a shell-style
+            # -flag as its next token; route those to bash so the reason is honest.
+            if u[len(k):].lstrip().startswith("-"):
+                return "bash"
+            return "sql"
     return "unknown"
 
 

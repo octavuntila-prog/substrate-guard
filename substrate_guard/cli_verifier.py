@@ -329,6 +329,14 @@ DANGEROUS_PATTERNS = [
         ],
     },
     {
+        "name": "file_truncate",
+        "description": "Zero-length file truncation (log/evidence wiping via coreutils truncate)",
+        "patterns": [
+            r"\btruncate\s+(-s|--size)\s*=?\s*0\b",
+            r"\btruncate\s+[^\n]*(-s|--size)\s*=?\s*0\b",
+        ],
+    },
+    {
         "name": "setuid_setgid_bit",
         "description": "Grant setuid/setgid bit (privilege-escalation persistence)",
         "patterns": [

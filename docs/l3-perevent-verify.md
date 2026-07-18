@@ -52,13 +52,20 @@ per-event path passes a **small** budget (default 300 ms) so Z3 itself bounds th
 and returns fast; exceeding it yields `TIMEOUT` → `ABSTAIN`. This is the whole point:
 verification never runs unbounded on the ingestion path.
 
-## Async — never block ingestion
+## Execution — synchronous by default; async only via a process pool
 
-Candidates are submitted to a bounded `ThreadPoolExecutor`; ingestion continues while
-proofs run. Verdicts are collected (`drain`) and recorded into the HMAC chain as
+The default (and the only currently-wired) mode is **synchronous**: `submit` runs the
+verifier inline, bounded by the small per-artifact Z3 timeout, so it returns in
+~`timeout_ms`. Because selection + sampling make candidates rare, that inline cost is
+small. A `ThreadPoolExecutor` is **NOT** usable — Z3 is not thread-safe and corrupts its
+solver context across threads (verified by a crash during development). True async (off
+the ingestion path) is opt-in via an injected `ProcessPoolExecutor` (process isolation);
+`verify_one` is module-level and returns picklable primitives for exactly that.
+
+Verdicts are collected (`drain`) and recorded into the HMAC chain as
 `formal_verification` entries carrying the 4-way `verdict` (additive to the existing
-`verified` bool — the chain `event_data` is free-form). A verdict that is not ready by
-drain time is reported as still-pending, never silently dropped.
+`verified` bool — the chain `event_data` is free-form). In async mode a verdict that is
+not ready by drain time is reported as still-pending, never silently dropped.
 
 ## What this is NOT
 

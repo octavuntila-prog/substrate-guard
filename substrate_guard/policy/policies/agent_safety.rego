@@ -22,8 +22,10 @@
 #     only IPv4 link-local); ::ffff: IPv4-mapped metadata folded by the builtin.
 # Residual known non-issue: net.cidr_contains denies a CIDR-string remote_ip
 # ("169.254.1.1/24"); the builtin rejects that as a non-IP (fail-closed) -- both DENY, so
-# no divergence. Executable denylist (/bin/bash, su for non-admins) is at parity per the
-# harness corpus.
+# no divergence. NOTE: the executable denylist below (/bin/bash, su for non-admins) is a
+# REGO-ONLY rule -- the builtin engine has no executable denylist, and the parity corpus
+# does not exercise these cases, so this is NOT builtin<->rego parity; it is a
+# stricter-on-rego rule (safe direction). Do not read it as "both engines deny /bin/bash".
 
 package substrate_guard.agent_policy
 

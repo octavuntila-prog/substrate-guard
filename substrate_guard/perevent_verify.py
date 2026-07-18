@@ -1,10 +1,11 @@
-"""L3 per-event formal verification — selective, sampled, async, latency-bounded.
+"""L3 per-event formal verification — selective, sampled, latency-bounded.
 
 Runs the four SOUND verifiers (code/tool/hw/distill) on artifact-bearing LIVE events,
 under an explicit latency budget, producing a 4-way verdict {VERIFIED, REFUTED,
 ABSTAIN, TIMEOUT}. This is NOT "Z3 on every event": only events carrying a structured
 artifact are candidates, sampling bounds volume, and a small per-artifact Z3 timeout
-bounds work. See docs/l3-perevent-verify.md.
+bounds work. Execution is SYNCHRONOUS by default (Z3 is not thread-safe); async is
+opt-in via an injected ProcessPoolExecutor. See docs/l3-perevent-verify.md.
 """
 
 from __future__ import annotations
@@ -70,7 +71,7 @@ class PerEventConfig:
     enabled_types: tuple = ARTIFACT_TYPES
     sample_rate: float = 1.0     # 1.0 = verify every candidate; <1 samples deterministically
     timeout_ms: int = 300        # per-artifact Z3 budget (small -> fast ABSTAIN/TIMEOUT)
-    max_workers: int = 2
+    # (async worker count lives on the caller-injected ProcessPoolExecutor, not here.)
 
 
 def _extract_detail(result: Any) -> str:
