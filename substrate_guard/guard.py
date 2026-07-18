@@ -254,6 +254,7 @@ class Guard:
         *,
         verify_process_cli: bool = False,
         source: Optional[str] = None,
+        perevent_verify: Any = None,
     ):
         # Layer 1: Observe. source="inject" is the cross-platform L1-real path: an
         # orchestrator feeds REAL normalized events via session.inject_and_evaluate()
@@ -262,6 +263,16 @@ class Guard:
         self._tracer: Optional[AgentTracer] = None
         if observe:
             self._tracer = AgentTracer(use_mock=use_mock, source=source)
+
+        # Layer 3 (per-event): opt-in selective/sampled/budget-bounded formal verify of
+        # artifact-bearing events (metadata['formal_artifact']). Pass a PerEventConfig.
+        # Only runs the 4 Z3 verifiers on events that CARRY a provable artifact -- NOT
+        # "Z3 on every event". Depends on real artifacts (the inject/L1-real path).
+        self._perevent = None
+        if perevent_verify is not None:
+            from .perevent_verify import PerEventConfig, PerEventVerifier
+            cfg = perevent_verify if isinstance(perevent_verify, PerEventConfig) else PerEventConfig()
+            self._perevent = PerEventVerifier(cfg)
 
         # Layer 2: OPA Policy
         self._policy: Optional[PolicyEngine] = None
@@ -348,6 +359,13 @@ class Guard:
             verification=None,
         )
 
+        # Layer 3 (per-event): submit an artifact-bearing event for selective/sampled
+        # async formal verification (non-blocking; verdicts collected via
+        # collect_perevent_verdicts). Skipped events (no artifact / not sampled) are a
+        # no-op. Depends on the event carrying metadata['formal_artifact'].
+        if self._perevent is not None:
+            self._perevent.submit(event)
+
         # Layer 4: Tamper-evident chain (observe + policy first — then formal_verification)
         if self._chain:
             chain_data = event.to_dict() if hasattr(event, "to_dict") else {"raw": str(event)}
@@ -373,6 +391,18 @@ class Guard:
         if not self._chain:
             return
         self._chain.append(_verification_to_chain_event(vr, agent_id))
+
+    def collect_perevent_verdicts(self, timeout: float = 5.0) -> list:
+        """Drain ready per-event formal verdicts (4-way VERIFIED/REFUTED/ABSTAIN/
+        TIMEOUT) and record each as a formal_verification entry in the HMAC chain.
+        Returns the VerdictRecord list. No-op if per-event verify is not enabled."""
+        if self._perevent is None:
+            return []
+        records = self._perevent.drain(timeout=timeout)
+        if self._chain:
+            for rec in records:
+                self._chain.append(rec.to_chain_event())
+        return records
 
     def verify_artifact(
         self,
