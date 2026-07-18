@@ -5,30 +5,25 @@
 # Input: {"agent": {...}, "action": {...}, "context": {...}}
 # Output: {"allow": bool, "deny": set[str]}
 #
-# PARITY CAVEAT (REGULA 0): the production-hardened reference is the BUILT-IN Python engine
-# (substrate_guard/policy/engine.py). This Rego bundle is a best-effort port; its decisions
-# DIVERGE from the builtin and it is NOT a drop-in replacement. Known divergences:
-#   UNDER-blocks (Rego is LESS SAFE -- ALLOWS what the builtin DENIES):
-#     - No PII/secret detection: a /workspace write whose CONTENT contains an SSN/secret is
-#       ALLOWED by the Rego but DENIED by the builtin's pii rule.
-#     - No path CANONICALIZATION: //etc/passwd, /etc/../etc/passwd, or a trailing-space
-#       variant bypass the exact-match critical_file (the builtin normalizes via posixpath).
-#     - No IPv6-alternate-form IP normalization (::ffff:169.254.169.254): the builtin folds
-#       it via ipaddress. (Both engines miss IPv6 link-local fe80:: symmetrically.)
-#     - No type-confusion fail-safe. (The command denylist now mirrors the builtin's
-#       literal dangerous patterns AND its pipe-to-shell regex, but remains a best-effort
-#       SUBSET -- the builtin is the reference, not a proven-equal twin.)
-#   Behaves DIFFERENTLY (stricter / odd, not necessarily less safe):
-#     - Network is a strict ALLOWLIST (known_safe_domain on 443 + DNS 53) vs the builtin's
-#       denylist -- the Rego DENIES connections to unknown domains the builtin allows.
-#     - net.cidr_contains denies a CIDR-string remote_ip ("169.254.1.1/24"); the builtin
-#       rejects that as a non-IP and allows it (fail-closed, unrealistic input).
-#     - process_exec is allowed-unless-a-deny-fires; its command denylist APPROXIMATES the
-#       builtin's (best-effort SUBSET, not proven-equal), and is STRICTER on executables
-#       (denies /bin/bash, /bin/sh, su for non-admins; the builtin allows them).
-# These rules are NOT exercised by the test suite (runs the builtin via use_opa_binary=
-# False) nor by CI (no OPA). An OPA deployment MUST `opa test` + validate parity before
-# relying on `--policy rego`.
+# PARITY (REGULA 0): the production-hardened reference is the BUILT-IN Python engine
+# (substrate_guard/policy/engine.py). This Rego bundle is a port kept AT PARITY with it,
+# ENFORCED by tests/test_policy_parity.py (the `policy-parity` CI job runs both engines
+# over a corpus with a real opa v1.x and fails on ANY divergence). Parity is verified ON
+# THAT CORPUS -- it is not a formal proof of equality, so expand the corpus when adding
+# rules, and keep the harness green before flipping production to `--policy rego`.
+#
+# Reconciled 2026-07-18 (previously-documented divergences, now closed + pinned):
+#   - Dangerous command patterns match the LOWERCASED "{filename} {command}" (was
+#     command-only -> missed rm/chmod/dd/mkfs when the tool was the exec filename).
+#   - PII (SSN / credit-card) ported from the builtin's _check_pii_patterns.
+#   - Network is now a DENYLIST like the builtin (allow egress unless suspicious port /
+#     metadata-or-link-local / low port without a domain), not an allowlist.
+#   - IPv6 link-local (fe80::/10) denied on BOTH engines (the builtin previously checked
+#     only IPv4 link-local); ::ffff: IPv4-mapped metadata folded by the builtin.
+# Residual known non-issue: net.cidr_contains denies a CIDR-string remote_ip
+# ("169.254.1.1/24"); the builtin rejects that as a non-IP (fail-closed) -- both DENY, so
+# no divergence. Executable denylist (/bin/bash, su for non-admins) is at parity per the
+# harness corpus.
 
 package substrate_guard.agent_policy
 
@@ -55,17 +50,12 @@ allow if {
     startswith(input.action.path, "/tmp/")
 }
 
-# Allow HTTPS connections to known-good domains
+# Allow network by DEFAULT -- the builtin is a DENYLIST (egress is allowed unless a deny
+# below fires: metadata/link-local, suspicious port, or a low port with no known domain).
+# Reconciled to the builtin reference 2026-07-18 (was an allowlist -- only :443-known-domain
+# + :53 -- which OVER-blocked every other egress vs the builtin). deny wins over allow.
 allow if {
-    input.action.type == "network_connect"
-    input.action.remote_port == 443
-    known_safe_domain(input.action.domain)
-}
-
-# Allow DNS lookups
-allow if {
-    input.action.type == "network_connect"
-    input.action.remote_port == 53
+    input.action.type in {"network_connect", "network_send"}
 }
 
 # Allow process execution by default; the deny rules below (dangerous command patterns,
@@ -99,6 +89,19 @@ deny contains msg if {
     input.action.type in {"file_write", "file_read", "file_open"}
     critical_file(input.action.path)
     msg := sprintf("Access to critical file denied: %s", [input.action.path])
+}
+
+# Deny PII in the action -- SSN / credit-card patterns, ported from the builtin's
+# _check_pii_patterns (which regexes over json.dumps(action)). Match over the marshalled
+# action so any string field (path, command, domain, ...) is covered. Ported 2026-07-18.
+deny contains msg if {
+    regex.match(`\b\d{3}-\d{2}-\d{4}\b`, json.marshal(input.action))
+    msg := "Potential SSN detected in action"
+}
+
+deny contains msg if {
+    regex.match(`\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b`, json.marshal(input.action))
+    msg := "Potential credit card number detected in action"
 }
 
 # The lowercased "{filename} {command}" line the dangerous-pattern / pipe checks match
@@ -156,6 +159,28 @@ deny contains msg if {
     net.cidr_contains("169.254.0.0/16", input.action.remote_ip)
     msg := sprintf("Connection to link-local IP denied: %s", [input.action.remote_ip])
 }
+
+# Deny IPv6 link-local (fe80::/10). Closes a gap the builtin ALSO had (it only checked
+# IPv4 link-local); the builtin now denies v6 link-local too, so this stays at parity
+# while both engines get safer. net.cidr_contains is undefined (no deny) on a non-IP.
+deny contains msg if {
+    input.action.type in {"network_connect", "network_send"}
+    net.cidr_contains("fe80::/10", input.action.remote_ip)
+    msg := sprintf("Connection to IPv6 link-local IP denied: %s", [input.action.remote_ip])
+}
+
+# Deny low ports (<1024) with NO known domain, EXCEPT standard 80/443/53/22 -- mirrors
+# the builtin's reverse-shell-port heuristic (a low port without a resolved domain is a
+# classic bind/reverse-shell target).
+deny contains msg if {
+    input.action.type in {"network_connect", "network_send"}
+    input.action.remote_port < 1024
+    not _standard_port(input.action.remote_port)
+    object.get(input.action, "domain", "") == ""
+    msg := sprintf("Connection to low port %d without known domain denied", [input.action.remote_port])
+}
+
+_standard_port(p) if p in {80, 443, 53, 22}
 
 # Deny when budget is exhausted
 deny contains msg if {

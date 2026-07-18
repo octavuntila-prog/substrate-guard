@@ -95,10 +95,12 @@ class PolicyEngine:
         # experimental policy only.
         if self._opa_bin and self._policies:
             logger.warning(
-                "Policy: the OPA/Rego path (--policy rego) is EXPERIMENTAL and NOT at "
-                "parity with the built-in engine (the production reference); its decisions "
-                "diverge (see the agent_safety.rego header caveat). Use the built-in engine "
-                "for production; the Rego path is for operator-authored / experimental policy."
+                "Policy: the OPA/Rego path (--policy rego) is EXPERIMENTAL (not the "
+                "production default). It is kept at PARITY with the built-in engine on the "
+                "parity-harness corpus (tests/test_policy_parity.py / the policy-parity CI "
+                "job), but that is corpus-verified, NOT a formal proof of equality -- keep "
+                "the parity job green before relying on --policy rego. The built-in remains "
+                "the production reference."
             )
 
     def _load_policies(self):
@@ -462,10 +464,11 @@ def _check_network_exfiltration(action, agent, context) -> Optional[str]:
                 ipaddress.ip_address("192.0.0.192"),       # Oracle OCI
                 ipaddress.ip_address("fd00:ec2::254"),     # AWS IPv6 IMDS
             }
-            # Explicit metadata endpoints OR the whole IPv4 link-local range
-            # (169.254.0.0/16) -- the AWS/GCP/Azure/ECS family lives there and link-local
-            # egress is almost never legitimate for an agent (classic SSRF/exfil vector).
-            if addr in _meta or (addr.version == 4 and addr.is_link_local):
+            # Explicit metadata endpoints OR any link-local address -- IPv4 169.254.0.0/16
+            # (the AWS/GCP/Azure/ECS metadata family) AND IPv6 fe80::/10. Link-local egress
+            # is almost never legitimate for an agent (classic SSRF/exfil vector). The v6
+            # case was previously missed here; closed 2026-07-18 symmetrically with the Rego.
+            if addr in _meta or addr.is_link_local:
                 return f"Connection to cloud metadata / link-local IP {ip.strip()} denied"
         except ValueError:
             pass  # not a parseable IP literal -> the port checks below still apply

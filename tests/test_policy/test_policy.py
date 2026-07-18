@@ -116,9 +116,9 @@ def test_opa_input_not_double_wrapped(monkeypatch):
 
 
 def test_opa_rego_path_warns_experimental(caplog):
-    """(A) gate (decision 2026-06-14): the OPA/Rego path must WARN it is EXPERIMENTAL and
-    NOT at parity with the builtin (the production reference), so it is never relied on
-    silently. The builtin path must NOT warn."""
+    """(A) gate (decision 2026-06-14, updated 2026-07-18): the OPA/Rego path must WARN it
+    is EXPERIMENTAL and mention PARITY status (now corpus-verified-not-proven, was
+    'not at parity'), so it is never relied on silently. The builtin path must NOT warn."""
     import logging
     from pathlib import Path
 

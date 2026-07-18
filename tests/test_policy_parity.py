@@ -87,17 +87,32 @@ CORPUS: list[tuple[str, object]] = [
     ("proc:sudo role=user", _p("sudo", ["rm", "x"], role="user")),
     ("proc:benign ls", _p("ls", ["-la"])),
     ("proc:git status", _p("git", ["status"])),
+    # network denylist edge cases (reconciled 2026-07-18: rego now matches the builtin
+    # denylist -- allow egress unless suspicious port / metadata-or-link-local / low port
+    # without a domain).
+    ("net:8.8.8.8:443", _n("8.8.8.8", 443)),
+    ("net:1.2.3.4:8080", _n("1.2.3.4", 8080)),
+    ("net:1.2.3.4:4444 suspicious", _n("1.2.3.4", 4444)),
+    ("net:1.2.3.4:22", _n("1.2.3.4", 22)),
+    ("net:1.2.3.4:999 no-domain", _n("1.2.3.4", 999)),
+    ("net:1.2.3.4:999 with-domain", _n("1.2.3.4", 999, domain="api.x.com")),
+    ("net:2606:4700::1 v6-global", _n("2606:4700::1", 443, domain="cloudflare.com")),
+    # PII: SSN / credit-card in an action field (ported to rego 2026-07-18).
+    ("pii:ssn in path", _f("/workspace/ssn-123-45-6789.txt")),
+    ("pii:ssn clean", _f("/workspace/notes-000.txt")),
+    ("pii:cc in path", _f("/workspace/card-4111-1111-1111-1111.txt")),
+    # path with a .. segment that normalizes into workspace (both deny -- neither
+    # engine treats "/etc/../workspace/x" as a workspace write).
+    ("file:/etc/../workspace/x", _f("/etc/../workspace/x")),
 ]
 
-# Deliberately-pending reconciliation (plan 1.B step 2): network denylist-vs-allowlist.
-# The rego OVER-blocks non-safe network (deny-by-default) vs the builtin's denylist.
-# Represented by class, sampled by these corpus entries. Shrinks to empty when the
-# network model is reconciled; that is the Tier-2 "zero divergences" end state.
-KNOWN_DIVERGENCES = {
-    "net:fe80::1",
-    "net:8.8.8.8",
-    "net:10.0.0.5:443",
-}
+# Zero known divergences on this corpus as of 2026-07-18 (plan 1.B Tier-2, corpus-scoped):
+# the command-filename gap, the network denylist-vs-allowlist model, the IPv6 link-local
+# gap, and the PII rule have all been reconciled. NOTE: this is parity ON THE HARNESS
+# CORPUS, not a formal proof of engine equality -- expand the corpus when adding rules.
+# If a genuine, deliberate divergence is ever accepted, add its stable name here with a
+# comment; the gate then treats only that as expected.
+KNOWN_DIVERGENCES: set[str] = set()
 
 
 @pytest.fixture(scope="module")

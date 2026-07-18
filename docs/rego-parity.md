@@ -37,19 +37,22 @@ to shrink the baseline (parity progress). The Tier-2 end state is an empty basel
 
 ## Divergence status (2026-07-18)
 
-Measured on the corpus, opa v1.18.2:
+Measured on the corpus with opa v1.18.2. **`KNOWN_DIVERGENCES` is now empty** — zero
+divergences on the parity corpus (plan 1.B Tier-2, corpus-scoped). Reconciled:
 
-- **Closed:** dangerous commands where the executable token is in the process
-  `filename` (e.g. exec `rm` + args `-rf /`, also `chmod 777` / `dd if=` / `mkfs`).
-  The rego previously matched `input.action.command` only; it now matches the
-  lowercased `filename + " " + command`, exactly like the builtin. 4 real
-  under-blocks (rego was LESS safe) closed.
-- **Pending baseline (deliberate reconciliation):** network **denylist vs
-  allowlist**. The rego is `default allow := false` (deny network unless known-safe);
-  the builtin is a denylist (allow unless suspicious IP/port/metadata). The rego
-  OVER-blocks non-safe network — safe direction, but divergent. Reconciling the
-  network model is a policy decision, not a silent code change; tracked as the
-  remaining `KNOWN_DIVERGENCES`.
+- **Dangerous commands via the exec filename:** the rego matched
+  `input.action.command` only, so `rm`/`chmod`/`dd`/`mkfs` slipped when the tool was
+  the process `filename`. Now matches the lowercased `filename + " " + command`, like
+  the builtin (4 real under-blocks — rego was LESS safe — closed).
+- **Network model:** the rego was an ALLOWLIST (deny egress unless :443-known-domain
+  or :53); reconciled to the builtin's DENYLIST — allow egress unless suspicious port /
+  metadata-or-link-local / low port without a domain. This was an explicit **policy
+  decision** (chosen: match the production reference), not a silent change.
+- **IPv6 link-local (`fe80::/10`):** a gap the builtin ALSO had (it checked only IPv4
+  link-local). Now denied on BOTH engines — symmetric, both safer, parity held.
+- **PII:** the builtin's SSN / credit-card detection was ported to the rego.
 
-Do NOT flip production to Rego until `KNOWN_DIVERGENCES` is empty and the
-`policy-parity` job is green (plan 1.B Tier-2 acceptance).
+**Honesty caveat:** this is parity **on the harness corpus**, not a formal proof of
+engine equality. Expand the corpus when adding rules. A production flip to Rego is
+now *unblocked by the gate* but remains an operator decision; keep `policy-parity`
+green (Tier-2) as the precondition.
