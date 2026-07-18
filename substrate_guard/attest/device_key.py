@@ -1,11 +1,19 @@
 """Ed25519 device identity using cryptography (no PyNaCl required).
 
-The private key is stored UNENCRYPTED on disk (raw Ed25519, NoEncryption) and is
-protected by file permissions: owner-only via ``chmod 0o600`` on POSIX and via an
-``icacls`` ACL restriction on Windows. The audited gap was that Windows had NO
-restriction (``chmod`` only toggles the read-only bit there), leaving the key
-readable by other accounts. At-rest passphrase encryption is future work; until
-then ``key_dir`` should live on a protected volume.
+At-rest protection has two levels (audit 2026-07-17 item #14):
+
+1. **Passphrase encryption (recommended):** pass ``passphrase=`` or set
+   ``SUBSTRATE_ATTEST_KEY_PASSPHRASE`` — the private key is stored as
+   PKCS#8 PEM under ``BestAvailableEncryption``. An existing raw key is
+   transparently UPGRADED to the encrypted format on first load with a
+   passphrase. Loading an encrypted key without the passphrase (or with a
+   wrong one) fails LOUDLY — it never silently regenerates an identity.
+2. **File permissions (always applied):** owner-only via ``chmod 0o600`` on
+   POSIX and via an ``icacls`` ACL restriction on Windows (the audited gap
+   was that ``chmod`` only toggles the read-only bit there).
+
+Without a passphrase the key remains raw-unencrypted on disk (prototype
+default, permissions-only) — the loader warns about it.
 """
 
 from __future__ import annotations
@@ -23,15 +31,23 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 
 logger = logging.getLogger("substrate_guard.attest")
 
+_PASSPHRASE_ENV = "SUBSTRATE_ATTEST_KEY_PASSPHRASE"  # nosec B105 -- env-var NAME, not a secret value
+_PEM_HEADER = b"-----BEGIN"
+
 
 class DeviceKey:
-    """Load or generate a device Ed25519 keypair under ``key_dir``."""
+    """Load or generate a device Ed25519 keypair under ``key_dir``.
 
-    def __init__(self, key_dir: str | Path) -> None:
+    ``passphrase`` (or env ``SUBSTRATE_ATTEST_KEY_PASSPHRASE``) enables at-rest
+    encryption of the private key (PKCS#8 PEM, BestAvailableEncryption).
+    """
+
+    def __init__(self, key_dir: str | Path, passphrase: str | None = None) -> None:
         self.key_dir = Path(key_dir)
         self.key_dir.mkdir(parents=True, exist_ok=True)
         self._private_path = self.key_dir / "device.key"
         self._public_path = self.key_dir / "device.pub"
+        self._passphrase = (passphrase or os.environ.get(_PASSPHRASE_ENV) or None)
         self._signing_key: Ed25519PrivateKey | None = None
         self._verify_key = None
         self._load_or_generate()
@@ -42,13 +58,29 @@ class DeviceKey:
         else:
             self._generate()
 
-    def _generate(self) -> None:
-        sk = Ed25519PrivateKey.generate()
-        priv = sk.private_bytes(
+    def _private_bytes_for_storage(self, sk: Ed25519PrivateKey) -> bytes:
+        """Serialized private key for disk: encrypted PKCS#8 PEM when a
+        passphrase is configured, raw bytes otherwise (prototype default)."""
+        if self._passphrase:
+            return sk.private_bytes(
+                serialization.Encoding.PEM,
+                serialization.PrivateFormat.PKCS8,
+                serialization.BestAvailableEncryption(self._passphrase.encode()),
+            )
+        logger.warning(
+            "Device private key at %s is stored UNENCRYPTED (permissions-only). "
+            "Set %s to enable at-rest encryption.",
+            self._private_path, _PASSPHRASE_ENV,
+        )
+        return sk.private_bytes(
             serialization.Encoding.Raw,
             serialization.PrivateFormat.Raw,
             serialization.NoEncryption(),
         )
+
+    def _generate(self) -> None:
+        sk = Ed25519PrivateKey.generate()
+        priv = self._private_bytes_for_storage(sk)
         pub = sk.public_key().public_bytes(
             serialization.Encoding.Raw,
             serialization.PublicFormat.Raw,
@@ -108,7 +140,45 @@ class DeviceKey:
 
     def _load(self) -> None:
         priv_bytes = self._private_path.read_bytes()
-        self._signing_key = Ed25519PrivateKey.from_private_bytes(priv_bytes)
+        if priv_bytes.startswith(_PEM_HEADER):
+            # Encrypted PKCS#8 PEM (or unencrypted PEM). FAIL LOUD on a missing or
+            # wrong passphrase — never silently regenerate a device identity.
+            pw = self._passphrase.encode() if self._passphrase else None
+            try:
+                key = serialization.load_pem_private_key(priv_bytes, password=pw)
+            except TypeError as e:  # encrypted file, no passphrase supplied
+                raise RuntimeError(
+                    f"Device key at {self._private_path} is passphrase-encrypted; "
+                    f"set {_PASSPHRASE_ENV} (or pass passphrase=) to load it."
+                ) from e
+            except ValueError as e:  # wrong passphrase / corrupt PEM
+                raise RuntimeError(
+                    f"Could not decrypt device key at {self._private_path}: wrong "
+                    f"passphrase or corrupted key file."
+                ) from e
+            if not isinstance(key, Ed25519PrivateKey):
+                raise RuntimeError(
+                    f"Device key at {self._private_path} is not an Ed25519 key."
+                )
+            self._signing_key = key
+        else:
+            self._signing_key = Ed25519PrivateKey.from_private_bytes(priv_bytes)
+            if not self._passphrase:
+                logger.warning(
+                    "Device private key at %s is stored UNENCRYPTED (permissions-"
+                    "only). Set %s to upgrade it to at-rest encryption.",
+                    self._private_path, _PASSPHRASE_ENV,
+                )
+            if self._passphrase:
+                # UPGRADE path: raw legacy key + passphrase now configured ->
+                # rewrite at rest as encrypted PKCS#8 PEM (same identity).
+                self._private_path.write_bytes(
+                    self._private_bytes_for_storage(self._signing_key)
+                )
+                logger.info(
+                    "Device key at %s upgraded from raw to passphrase-encrypted "
+                    "PKCS#8 PEM (same key material).", self._private_path,
+                )
         self._verify_key = self._signing_key.public_key()
         pub = self._verify_key.public_bytes(
             serialization.Encoding.Raw,
