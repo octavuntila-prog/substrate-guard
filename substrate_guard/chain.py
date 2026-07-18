@@ -34,7 +34,7 @@ import threading
 import time
 import os
 from dataclasses import dataclass, asdict
-from typing import Optional
+from typing import Any, Optional
 from pathlib import Path
 
 
@@ -309,17 +309,29 @@ class AuditChain:
             return False, len(entries)
         return True, None
 
-    def export(self, path: str) -> str:
+    @staticmethod
+    def _head_commitment(head: str, count: int) -> bytes:
+        """The exact bytes both the HMAC ``chain_signature`` and the Ed25519
+        ``head_signature`` bind. A single source of truth so the two signatures
+        commit to the identical (head, count) tuple -- never edit this format alone."""
+        return f"chain:{head}:{count}".encode()
+
+    def export(self, path: str, device_key: Any = None) -> str:
         """Export the chain as signed JSON.
-        
-        The export includes a chain_signature — HMAC of the final hash,
-        so the entire export can be verified as a unit.
+
+        The export always includes a ``chain_signature`` — HMAC of ``chain:{head}:
+        {count}`` (symmetric: a verifier needs the secret). When a ``device_key``
+        (attest.DeviceKey) is supplied, ALSO attach an Ed25519 ``head_signature`` over
+        the SAME commitment plus the signer's public key + device id, giving PUBLIC
+        verifiability + non-repudiation of the head — anyone holding the public key can
+        check it without the HMAC secret. Additive: the HMAC path is unchanged.
         """
         # Snapshot entries + head TOGETHER under the lock so a concurrent append cannot
         # produce a torn export (count/head/entry-list captured at different instants).
         with self._lock:
             entries = list(self._entries)
             head = self._head_hash
+        commitment = self._head_commitment(head, len(entries))
         chain_data = {
             "version": "1.0",
             "format": "substrate-guard-audit-chain",
@@ -328,12 +340,19 @@ class AuditChain:
             "genesis_hash": GENESIS_HASH,
             "head_hash": head,
             "chain_signature": hmac.new(
-                self._secret,
-                f"chain:{head}:{len(entries)}".encode(),
-                hashlib.sha256,
+                self._secret, commitment, hashlib.sha256,
             ).hexdigest(),
             "entries": [e.to_dict() for e in entries],
         }
+
+        if device_key is not None:
+            # Ed25519 over the identical head commitment. Public-key verifiable, so a
+            # third party checks the head without the HMAC secret (non-repudiation is
+            # relative to a TRUSTED public key -- see verify_export).
+            chain_data["head_signature"] = device_key.sign(commitment).hex()
+            chain_data["head_signature_alg"] = "Ed25519"
+            chain_data["signer_public_key"] = device_key.public_key_hex
+            chain_data["signer_device_id"] = device_key.device_id
 
         Path(path).write_text(json.dumps(chain_data, indent=2, default=str))
         try:
@@ -343,8 +362,32 @@ class AuditChain:
         return path
 
     @classmethod
+    def verify_head_signature(cls, head: str, count: int, signature_hex: str,
+                              public_key_hex: str) -> bool:
+        """Publicly verify the Ed25519 head signature — NO HMAC secret required.
+
+        Proves that the holder of ``public_key_hex``'s private key signed this exact
+        (head, count). This is the non-repudiation / public-verifiability path: a third
+        party who trusts the public key can check the head without the chain secret.
+
+        Scope: it attests (head, count) to the device identity. It does NOT by itself
+        prove head↔entries — recomputing the head from the entries is HMAC-gated
+        (needs the secret, via verify_export). Use both together: the HMAC binds head to
+        entries; the Ed25519 binds head to a device, publicly and non-repudiably.
+        """
+        from .attest.device_key import DeviceKey
+        try:
+            return DeviceKey.verify_with_public_key(
+                public_key_hex, cls._head_commitment(head, count), bytes.fromhex(signature_hex)
+            )
+        except (ValueError, TypeError):
+            return False
+
+    @classmethod
     def verify_export(cls, path: str, secret: str, expected_count: Optional[int] = None,
-                      expected_head: Optional[str] = None) -> tuple[bool, Optional[str]]:
+                      expected_head: Optional[str] = None, *,
+                      trusted_public_key: Optional[str] = None,
+                      require_signature: bool = False) -> tuple[bool, Optional[str]]:
         """Verify an exported chain file.
 
         Returns (True, None) if valid, (False, reason) if invalid.
@@ -352,6 +395,14 @@ class AuditChain:
         The chain_signature binds head+count, but BOTH are recomputed from the file, so a
         secret-holder could truncate-and-re-sign undetected. Pass ``expected_count`` /
         ``expected_head`` held out-of-band to detect tail-truncation.
+
+        Ed25519 head signature (optional): if the export carries a ``head_signature`` it
+        is checked against the embedded ``signer_public_key`` (or ``trusted_public_key``
+        if supplied). NON-REPUDIATION IS RELATIVE TO A TRUSTED KEY: verifying against the
+        EMBEDDED key only proves the head was signed by whoever wrote the file
+        (self-consistent). Pin the signer's public key out-of-band and pass it as
+        ``trusted_public_key`` for real non-repudiation. ``require_signature=True`` fails
+        an export that lacks the Ed25519 signature.
         """
         try:
             data = json.loads(Path(path).read_text())
@@ -410,6 +461,26 @@ class AuditChain:
         
         if data.get("chain_signature") != expected_sig:
             return False, "Chain signature mismatch — file may be tampered"
+
+        # Ed25519 head signature (public-key verifiable, no secret needed).
+        head_sig = data.get("head_signature")
+        if head_sig is None:
+            if require_signature:
+                return False, "Missing Ed25519 head_signature (require_signature=True)"
+        else:
+            pub = trusted_public_key or data.get("signer_public_key")
+            if not pub:
+                return False, "head_signature present but no signer_public_key to check it"
+            if trusted_public_key is not None and data.get("signer_public_key") not in (None, trusted_public_key):
+                return False, "signer_public_key does not match the trusted key (wrong signer)"
+            commitment = cls._head_commitment(chain._head_hash, len(entries))
+            from .attest.device_key import DeviceKey
+            try:
+                ok = DeviceKey.verify_with_public_key(pub, commitment, bytes.fromhex(head_sig))
+            except (ValueError, TypeError) as e:
+                return False, f"Malformed Ed25519 head_signature: {e}"
+            if not ok:
+                return False, "Ed25519 head signature invalid — head may be tampered"
 
         # Tail-truncation: the signature is recomputed from the file, so enforce an
         # out-of-band expected count/head when the caller can supply one.
