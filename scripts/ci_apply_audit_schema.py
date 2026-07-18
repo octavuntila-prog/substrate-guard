@@ -17,20 +17,15 @@ SQL_DIR = REPO / "scripts" / "sql"
 
 
 def _split_statements(sql: str) -> list[str]:
-    """Split DDL file on ';' — safe for our init scripts (no semicolons in strings)."""
+    """Split DDL on ';'. Full-line ``--`` comments are stripped BEFORE the split so a
+    semicolon inside a comment cannot break a statement into an orphan fragment (that
+    bug reached Postgres once as 'syntax error at or near SyncEngine')."""
+    code = "\n".join(
+        ln for ln in sql.splitlines() if not ln.strip().startswith("--")
+    )
     out: list[str] = []
-    for raw in sql.split(";"):
-        block = raw.strip()
-        if not block:
-            continue
-        lines = [
-            ln
-            for ln in block.splitlines()
-            if ln.strip() and not ln.strip().startswith("--")
-        ]
-        if not lines:
-            continue
-        stmt = "\n".join(lines).strip()
+    for raw in code.split(";"):
+        stmt = "\n".join(ln for ln in raw.splitlines() if ln.strip()).strip()
         if stmt:
             out.append(stmt + ";")
     return out
