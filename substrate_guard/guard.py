@@ -182,6 +182,8 @@ class SessionReport:
     cli_process_verifications: int = 0
     events: list[GuardEvent] = field(default_factory=list)
     cost_estimate_usd: float = 0.0
+    # Honest event source: "ebpf" | "inject" | "mock" (see AgentTracer.source).
+    observe_source: str = "mock"
 
     def to_dict(self) -> dict:
         return {
@@ -190,6 +192,7 @@ class SessionReport:
             "layers": {
                 "observe": {
                     "events": self.events_observed,
+                    "source": self.observe_source,
                 },
                 "policy": {
                     "violations": self.policy_violations,
@@ -250,11 +253,15 @@ class Guard:
         use_mock: bool = False,
         *,
         verify_process_cli: bool = False,
+        source: Optional[str] = None,
     ):
-        # Layer 1: eBPF Observe
+        # Layer 1: Observe. source="inject" is the cross-platform L1-real path: an
+        # orchestrator feeds REAL normalized events via session.inject_and_evaluate()
+        # (no kernel). It is honestly labeled "inject" -- neither simulated "mock" nor
+        # kernel "eBPF". source=None/"auto" tries eBPF then falls back to mock.
         self._tracer: Optional[AgentTracer] = None
         if observe:
-            self._tracer = AgentTracer(use_mock=use_mock)
+            self._tracer = AgentTracer(use_mock=use_mock, source=source)
 
         # Layer 2: OPA Policy
         self._policy: Optional[PolicyEngine] = None
@@ -286,8 +293,7 @@ class Guard:
 
         layers = []
         if self._tracer:
-            mode = "mock" if self._tracer.is_mock else "eBPF"
-            layers.append(f"observe({mode})")
+            layers.append(f"observe({self._tracer.source})")
         if self._policy:
             # Report the engine that ACTUALLY runs (OPA only when the binary is
             # present AND .rego policies loaded), not merely whether .rego files were
@@ -568,4 +574,5 @@ class GuardSession:
             formal_failures=formal_fails,
             cli_process_verifications=cli_pc,
             events=self._events,
+            observe_source=(self._guard._tracer.source if self._guard._tracer else "none"),
         )

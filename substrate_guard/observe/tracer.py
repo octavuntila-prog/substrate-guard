@@ -56,7 +56,8 @@ class AgentTracer:
         use_mock: Force mock mode even if eBPF is available
     """
 
-    def __init__(self, buffer_pages: int = 64, use_mock: bool = False):
+    def __init__(self, buffer_pages: int = 64, use_mock: bool = False,
+                 source: Optional[str] = None):
         self._buffer_pages = buffer_pages
         self._watched_pids: dict[int, str] = {}  # pid -> agent_id
         self._event_queue: Queue[Event] = Queue(maxsize=10000)
@@ -64,9 +65,17 @@ class AgentTracer:
         self._running = False
         self._poll_thread: Optional[threading.Thread] = None
         self._bpf = None
-        self._mock = use_mock
+        # Honest event source (see the `source` property):
+        #   "auto"   -> try eBPF; fall back to simulated mock (default)
+        #   "mock"   -> simulated events (MockScenario) -- NOT real
+        #   "inject" -> REAL events fed via inject_event() by an orchestrator
+        #               (cross-platform L1-real, NO kernel) -- never simulated, never eBPF
+        self._source_intent = source or ("mock" if use_mock else "auto")
+        if self._source_intent not in ("auto", "mock", "inject"):
+            raise ValueError(f"source must be one of auto/mock/inject, got {source!r}")
+        self._mock = self._source_intent != "auto"
 
-        if not use_mock:
+        if self._source_intent == "auto":
             self._try_init_bpf()
 
     def _try_init_bpf(self):
@@ -113,7 +122,21 @@ class AgentTracer:
 
     @property
     def is_mock(self) -> bool:
+        """True when events are NOT kernel-observed (i.e. NOT eBPF). Note this is True
+        for BOTH simulated 'mock' AND real 'inject' -- it only means 'no kernel'. For
+        the honest 3-way label use `source`, so injected REAL events are not conflated
+        with simulated ones."""
         return self._mock
+
+    @property
+    def source(self) -> str:
+        """Honest event source: 'ebpf' (kernel-observed), 'inject' (REAL events fed via
+        inject_event() by an orchestrator -- no kernel), or 'mock' (simulated /
+        MockScenario). This is what reports should show so injected real events are
+        never mislabeled as simulated 'mock' nor as kernel 'eBPF'."""
+        if self._bpf is not None:
+            return "ebpf"
+        return "inject" if self._source_intent == "inject" else "mock"
 
     @property
     def stream(self) -> EventStream:

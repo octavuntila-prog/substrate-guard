@@ -42,6 +42,13 @@ dev = [
 postgres = [
     "psycopg2-binary>=2.9",
 ]
+# L1 eBPF live-observation path (Linux only; bcc is an OS package, NOT pip-installable
+# on most distros -- prefer `apt install bpfcc-tools python3-bpfcc`). Absent this, the
+# observe layer runs as mock (simulated) or inject (real events via API). Declaring the
+# extra documents the dependency; `substrate-guard doctor` reports whether bcc is present.
+ebpf = [
+    "bcc>=0.29; platform_system == 'Linux'",
+]
 # Real semantic embeddings (optional; tests skip if not installed)
 comply-ml = [
     "sentence-transformers>=3.0.0",

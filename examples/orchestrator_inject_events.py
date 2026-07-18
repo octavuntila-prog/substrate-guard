@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Simulate an external orchestrator feeding events into Guard without eBPF.
+"""External orchestrator feeding REAL events into Guard without eBPF (L1-real, inject).
 
-Uses :meth:`GuardSession.inject_and_evaluate` — same path as SubstrateGuard-style
-integrations when traces are already normalized to :class:`~substrate_guard.observe.events.Event`.
+Uses :meth:`GuardSession.inject_and_evaluate` — the same path as SubstrateGuard-style
+integrations when traces are already normalized to
+:class:`~substrate_guard.observe.events.Event`. Constructing the Guard with
+``source="inject"`` labels this honestly: the report's ``observe.source`` is
+``"inject"`` (real events via API, cross-platform, NO kernel) — NOT ``"mock"``
+(which would hide that the events are real) and NOT ``"eBPF"`` (no kernel here).
 
 Run from repo root::
 
@@ -20,7 +24,7 @@ def main() -> None:
         observe=True,
         policy="nonexistent/",
         verify=True,
-        use_mock=True,
+        source="inject",   # real events via API, honestly labeled (not mock, not eBPF)
     )
     agent_id = "orchestrator-demo"
 
@@ -46,6 +50,7 @@ def main() -> None:
     d = report.to_dict()
     # Avoid emoji in summary_line() on Windows consoles (cp1252).
     print("verdict:", d.get("verdict"), "| duration_s:", d.get("duration_s"))
+    print("observe.source:", d["layers"]["observe"]["source"])  # -> "inject" (real, no kernel)
     print("events_observed:", report.events_observed)
     print("policy_violations:", report.policy_violations)
 

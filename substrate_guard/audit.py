@@ -500,7 +500,10 @@ def run_audit(
         },
         "violations_detail": violations[:50],  # first 50 for paper
         "layers": {
-            "observe": "eBPF" if (guard._tracer and not guard._tracer.is_mock) else "mock",
+            # Honest 3-way source: ebpf (kernel) / inject (real events via API) / mock
+            # (simulated). The cron path is use_mock=True -> "mock" (batch replay of DB
+            # records). Never claims eBPF unless the kernel path is actually attached.
+            "observe": guard._tracer.source if guard._tracer else "none",
             "policy": guard._policy.active_engine if guard._policy else policy_mode,
             "verify": "z3 (available, not exercised per-event in batch)" if guard._z3_available else "unavailable",
         },
