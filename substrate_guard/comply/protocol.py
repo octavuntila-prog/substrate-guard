@@ -19,8 +19,15 @@ from .fingerprinter import DeterministicFingerprinter, SemanticFingerprinter
 from .verifier import NonMembershipVerifier
 
 
-class ZKSNMProtocol:
-    """Fingerprint -> Merkle commit -> threshold non-membership check."""
+class ThresholdNonMembershipProtocol:
+    """Fingerprint -> Merkle commit -> threshold non-membership check.
+
+    Renamed from ``ZKSNMProtocol`` (2026-07-18): the honest name matches what the
+    code does — threshold non-membership over a Merkle commitment. "ZK-SNM" is the
+    paper-era brand (see the module docstring); a backward-compat alias remains at
+    the bottom of this module, and the ``protocol`` field in emitted certificates
+    keeps the wire identifier ``"ZK-SNM"`` (changing it would alter every
+    certificate hash)."""
 
     def __init__(
         self,
@@ -82,6 +89,8 @@ class ZKSNMProtocol:
             )
 
         certificate: dict[str, Any] = {
+            # Stable WIRE identifier (kept through the 2026-07-18 class rename:
+            # certificates are hashed/HMAC'd, so this string must not drift).
             "protocol": "ZK-SNM",
             "version": "0.1.0",
             "phase": "verify",
@@ -131,3 +140,8 @@ class ZKSNMProtocol:
             },
             "certificates": results,
         }
+
+
+# Backward-compat alias: paper-era brand name ("ZK Proofs of Semantic
+# Non-Membership", Zenodo 10.5281/zenodo.19185843). Prefer the honest name above.
+ZKSNMProtocol = ThresholdNonMembershipProtocol

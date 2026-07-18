@@ -11,7 +11,7 @@ Others record what AI does. We prove it was correct.
 
 ### Unified CLI
 
-One command: `substrate-guard` (also `ai-blackbox`). Z3 workflows use `verify` / `benchmark`; the Black Box pipeline uses `demo`, `monitor`, `evaluate`, `export`, and `stack-benchmark` (all mock scenarios through observe → policy → Z3 — not the same as Z3-only `benchmark`). **Layer 4:** `comply demo` — semantic non-membership prototype (deterministic embeddings + Merkle + threshold; optional `sentence-transformers`). **Layer 5:** `attest demo` — device fingerprint + Ed25519 signing + local short-lived cert (`cryptography`). **Layer 6:** `offline demo` — SQLite append-only + HMAC chain + sync către o a doua bază (ex. PostgreSQL sau un al doilea fișier SQLite cu tabel `guard_events`). `python -m substrate_guard.combo_cli` delegates to the same entry point.
+One command: `substrate-guard` (also `ai-blackbox`). Z3 workflows use `verify` / `benchmark`; the Black Box pipeline uses `demo`, `monitor`, `evaluate`, `export`, and `stack-benchmark` (all mock scenarios through observe → policy → Z3 — not the same as Z3-only `benchmark`). **Layer 4:** `comply demo` — threshold non-membership prototype (deterministic embeddings + Merkle + threshold; optional `sentence-transformers` for actually-semantic embeddings). **Layer 5:** `attest demo` — device fingerprint + Ed25519 signing + local short-lived cert (`cryptography`). **Layer 6:** `offline demo` — SQLite append-only + HMAC chain + sync către o a doua bază (ex. PostgreSQL sau un al doilea fișier SQLite cu tabel `guard_events`). `python -m substrate_guard.combo_cli` delegates to the same entry point.
 
 ## The Thesis
 
@@ -156,7 +156,7 @@ substrate-guard/
 ├── policy/           # L2 — OPA/Rego policy engine
 │   └── engine.py     # 411 LOC — rule evaluation, violation detection
 ├── ast_parse/        # L3+ — AST-first CLI checks (Tree-sitter bash; Python ast)
-├── comply/           # L4 — threshold non-membership over a Merkle commitment (ZK-SNM prototype)
+├── comply/           # L4 — threshold non-membership over a Merkle commitment (prototype; paper-era brand: "ZK-SNM")
 ├── attest/           # L5 — Ed25519 cryptographic attestation
 ├── offline/          # L6 — SQLite append-only HMAC store + sync (not a CRDT)
 ├── guard.py          # main guard pipeline (observe → policy → verify → chain)

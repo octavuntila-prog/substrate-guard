@@ -8,7 +8,7 @@ import argparse
 def register_comply_parser(subparsers: argparse._SubParsersAction) -> None:
     p = subparsers.add_parser(
         "comply",
-        help="Layer 4: semantic non-membership over a committed corpus (ZK-SNM prototype)",
+        help="Layer 4: threshold non-membership over a committed corpus (prototype; paper-era brand: ZK-SNM)",
     )
     sp = p.add_subparsers(dest="comply_action", required=True)
     sp.add_parser(
@@ -25,13 +25,13 @@ def cmd_comply(args: argparse.Namespace) -> int:
 
 def run_demo() -> int:
     from .fingerprinter import DeterministicFingerprinter
-    from .protocol import ZKSNMProtocol
+    from .protocol import ThresholdNonMembershipProtocol
 
     fp = DeterministicFingerprinter()
-    p = ZKSNMProtocol(threshold=0.85, use_z3=True, fingerprinter=fp)
+    p = ThresholdNonMembershipProtocol(threshold=0.85, use_z3=True, fingerprinter=fp)
     corpus = ["protected-alpha-unique-string", "other-beta-secret"]
     c = p.commit_training_data(corpus)
-    print("ZK-SNM demo (deterministic encoder)")
+    print("L4 threshold non-membership demo (deterministic encoder)")
     print(f"  commitment_root: {c['commitment_root'][:24]}...")
     print(f"  encoder:         {c['encoder']}")
 

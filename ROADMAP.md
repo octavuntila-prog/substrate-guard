@@ -16,7 +16,7 @@ Fiecare fază se închide doar când **toate testele** trec și criteriul de dov
 
 ## Faza 2 — Layer 4 (comply / semantic non-membership) (făcut)
 
-- **Cod:** `substrate_guard/comply/` — `DeterministicFingerprinter` (SHA256, fără ML), `SemanticFingerprinter` opțional (`sentence-transformers`), `EmbeddingCommitment`, `NonMembershipVerifier` (numpy + verificare Z3 pe scalare întreagă), `ZKSNMProtocol`, `ComplyGuard`.
+- **Cod:** `substrate_guard/comply/` — `DeterministicFingerprinter` (SHA256, fără ML), `SemanticFingerprinter` opțional (`sentence-transformers`), `EmbeddingCommitment`, `NonMembershipVerifier` (numpy + verificare Z3 pe scalare întreagă), `ThresholdNonMembershipProtocol` (alias compat: `ZKSNMProtocol`), `ComplyGuard`.
 - **CLI:** `substrate-guard comply demo`
 - **Dovadă:** `pytest tests/test_comply/` (1 test skip fără `sentence-transformers`).
 - **Opțional ML:** `pip install sentence-transformers` pentru encoder real.

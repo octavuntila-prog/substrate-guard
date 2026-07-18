@@ -5,18 +5,18 @@ from __future__ import annotations
 import logging
 from typing import Any, List
 
-from .protocol import ZKSNMProtocol
+from .protocol import ThresholdNonMembershipProtocol
 
 logger = logging.getLogger("substrate_guard.comply")
 
 
 class ComplyGuard:
-    """Attach ZK-SNM-style checks to a Guard instance (L1-L3)."""
+    """Attach L4 threshold non-membership checks to a Guard instance (L1-L3)."""
 
     def __init__(self, guard: Any, config: dict | None = None) -> None:
         config = config or {}
         self.guard = guard
-        self.protocol = ZKSNMProtocol(
+        self.protocol = ThresholdNonMembershipProtocol(
             threshold=float(config.get("similarity_threshold", 0.85)),
             use_z3=bool(config.get("use_z3", True)),
         )
