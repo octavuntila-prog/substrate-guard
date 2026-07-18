@@ -48,8 +48,13 @@ def _readme() -> str:
 
 def _readme_production_section() -> str:
     readme = _readme()
-    assert "Production Results" in readme, "README has no Production Results section"
-    after = readme.split("Production Results", 1)[1]
+    # Anchor on the section HEADING, not the first prose occurrence: the thesis
+    # legitimately cross-references "See Production Results." (2026-07-18), and
+    # slicing at that mention returned the thesis tail instead of the metrics
+    # table (CI red on 78fa058 — this guard caught its own fragile anchor).
+    m = re.search(r"\n#{2,3} Production Results", readme)
+    assert m, "README has no Production Results section heading"
+    after = readme[m.end():]
     return re.split(r"\n#{2,3} ", after)[0]
 
 
