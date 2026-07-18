@@ -316,11 +316,50 @@ DANGEROUS_PATTERNS = [
             r"\biptables\s+-t\s+nat\s+[^\n]*-j\s+DNAT\b",
         ],
     },
+    # ── D3 expansion (audit 2026-07-17 item #16): secure-erase + setuid class ──
+    {
+        "name": "secure_erase",
+        "description": "Irreversible secure-wipe / filesystem-signature destruction",
+        "patterns": [
+            r"\bshred\b",
+            r"\bwipefs\b",
+            r"\bblkdiscard\b",
+            r"\bmkswap\s+/dev/",
+            r"\bscrub\b\s+[^\n]*/dev/",
+        ],
+    },
+    {
+        "name": "setuid_setgid_bit",
+        "description": "Grant setuid/setgid bit (privilege-escalation persistence)",
+        "patterns": [
+            r"\bchmod\s+[^\n]*[ugao]*\+s\b",              # chmod u+s / g+s / +s
+            r"\bchmod\s+(?:-\w+\s+)*[24678]\d{3}\b",      # chmod 4755 / 2755 / 6755 (leading setid digit)
+            r"\bchmod\s+(?:-\w+\s+)*[24678]\d{3}\s",
+        ],
+    },
+    {
+        "name": "capabilities_grant_escalation",
+        "description": "Grant escalation-capable Linux file capabilities",
+        "patterns": [
+            r"\bsetcap\s+[^\n]*cap_setuid\b",
+            r"\bsetcap\s+[^\n]*cap_sys_admin\b",
+            r"\bsetcap\s+[^\n]*cap_dac_override\b",
+            r"\bsetcap\s+[^\n]*=ep\b",
+        ],
+    },
 ]
 
 
 def _structural_cli_violations(command: str) -> list[CLIViolation]:
-    """AST-first checks (bash Tree-sitter, Python ``ast``) when dependencies allow."""
+    """AST-first checks (bash Tree-sitter, Python ``ast``) when dependencies allow.
+
+    FAIL-CLOSED (audit 2026-07-17 item #17): when the AST layer is AVAILABLE but
+    throws while scanning a specific command, that command is treated as UNSAFE --
+    an input that crashes the parser is exactly where a denylist must not fall open
+    (a crafted string could evade the regex list AND crash the AST scan). A missing
+    tree-sitter dependency is a deployment-config state, not a per-command signal,
+    so it degrades to regex-only rather than flagging every command.
+    """
     try:
         from substrate_guard.ast_parse.safety_checker import structural_scan
 
@@ -332,7 +371,22 @@ def _structural_cli_violations(command: str) -> list[CLIViolation]:
             )
             for sv in structural_scan(command)
         ]
-    except Exception:
+    except Exception as e:
+        try:
+            from substrate_guard.ast_parse.parser import tree_sitter_bash_available
+
+            ast_available = tree_sitter_bash_available()
+        except Exception:
+            ast_available = False
+        if ast_available:
+            return [CLIViolation(
+                pattern_name="unparseable_shell",
+                description=(
+                    f"AST structural scan failed ({type(e).__name__}); command "
+                    "treated as unsafe (fail-closed)"
+                ),
+                matched_text=command[:400],
+            )]
         return []
 
 
