@@ -100,6 +100,38 @@ jobs:
       - name: Pytest (Postgres integration only)
         run: python -m pytest tests/test_postgres_ci.py -v --tb=short -m postgres_ci
 
+  # Builtin<->OPA/Rego parity gate (plan 1.B step 1). Installs a real opa v1.x and
+  # runs the parity harness with REQUIRE_PARITY_OPA=1 so a missing binary FAILS here
+  # (never a silent skip). Any NEW builtin/rego divergence turns the build red before
+  # a Rego flip could silently invert an allow/deny decision on production traffic.
+  policy-parity:
+    runs-on: ubuntu-latest
+    env:
+      OPA_VERSION: v1.18.2
+      SUBSTRATE_GUARD_OPA_BIN: /usr/local/bin/opa
+      REQUIRE_PARITY_OPA: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Install OPA ${{ env.OPA_VERSION }} (rego uses import rego.v1 -> v1.x)
+        run: |
+          curl -fsSL -o /usr/local/bin/opa \
+            "https://github.com/open-policy-agent/opa/releases/download/${OPA_VERSION}/opa_linux_amd64_static"
+          chmod +x /usr/local/bin/opa
+          opa version
+      - name: Rego bundle parse-check
+        run: opa check substrate_guard/policy/policies/
+      - name: Builtin<->Rego parity harness
+        run: python -m pytest tests/test_policy_parity.py -v --tb=short
+
   # Optional extended checks — enable when you want CI-time benchmark harnesses
   benchmarks:
     if: github.event_name == 'workflow_dispatch'

