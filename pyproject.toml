@@ -35,6 +35,7 @@ dependencies = [
 dev = [
     "pytest>=7.4",
     "pytest-asyncio>=0.24",
+    "pytest-cov>=4.1",
     "hypothesis>=6.92",
     "bandit>=1.7.0",
 ]
@@ -93,3 +94,15 @@ markers = [
     "postgres_ci: integration tests for CI Postgres job (POSTGRES_CI=1)",
     "fuzz: property-based / random short-input stress (hypothesis)",
 ]
+
+# Coverage (audit 2026-07-17 item #17: pytest-cov). Measured, not gated: no
+# --cov-fail-under yet -- CI reports the number so a baseline can be set from a
+# real run before a floor is enforced (measured-before-applied).
+[tool.coverage.run]
+source = ["substrate_guard"]
+branch = true
+omit = ["*/observe/bpf_programs/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false

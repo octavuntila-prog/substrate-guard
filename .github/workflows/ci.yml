@@ -30,8 +30,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
-      - name: Pytest (full suite)
-        run: python -m pytest tests/ -q --tb=short
+      - name: Pytest (full suite, coverage measured + bandit gate required)
+        env:
+          REQUIRE_BANDIT: "1"   # missing bandit -> test FAILS, never silent-skips
+        run: >-
+          python -m pytest tests/ -q --tb=short
+          --cov=substrate_guard --cov-report=term-missing
 
       - name: Manual code-verifier smoke (exit code enforced)
         run: python tests/smoke_test.py

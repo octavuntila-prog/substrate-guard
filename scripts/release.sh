@@ -64,6 +64,12 @@ fi
 
 TAG="$1"
 
+# Non-interactive mode (audit 2026-07-17 item #17): set RELEASE_YES=1 (or export
+# it in CI) to auto-confirm every prompt. Validation gates (clean tree, on main,
+# version sync, notes, tests) are UNCHANGED and still hard-fail -- this only
+# removes the human keypress, it does not weaken any check.
+RELEASE_YES="${RELEASE_YES:-0}"
+
 # Validate semver format: vN.N.N (optionally vN.N.N-suffix)
 if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
     log_error "Invalid version format: $TAG"
@@ -216,10 +222,14 @@ log_info "Step 7/8: Running tests..."
 if ! command -v pytest >/dev/null 2>&1; then
     log_warn "pytest not found in PATH — skipping test execution"
     log_warn "This is allowed but not recommended. Install with: pip install pytest"
-    read -p "Continue without tests? [y/N] " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 3
+    if [ "$RELEASE_YES" = "1" ]; then
+        log_warn "RELEASE_YES=1 — proceeding without tests"
+    else
+        read -p "Continue without tests? [y/N] " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 3
+        fi
     fi
 else
     if ! pytest --quiet --tb=short 2>&1 | tail -20; then
@@ -251,11 +261,15 @@ echo "  Tests:            PASSED (or skipped)"
 echo "════════════════════════════════════════════════════════════"
 echo ""
 
-read -p "Proceed with tag + push to origin? [y/N] " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    log_warn "Aborted by user — no tag created"
-    exit 0
+if [ "$RELEASE_YES" = "1" ]; then
+    log_info "RELEASE_YES=1 — proceeding with tag + push"
+else
+    read -p "Proceed with tag + push to origin? [y/N] " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        log_warn "Aborted by user — no tag created"
+        exit 0
+    fi
 fi
 
 # Create annotated tag with release notes content
@@ -293,8 +307,13 @@ log_ok "Tag $TAG pushed to origin"
 
 if command -v gh >/dev/null 2>&1; then
     echo ""
-    read -p "Create GitHub Release via gh CLI? [Y/n] " -n 1 -r
-    echo
+    if [ "$RELEASE_YES" = "1" ]; then
+        REPLY="y"
+        log_info "RELEASE_YES=1 — creating GitHub Release"
+    else
+        read -p "Create GitHub Release via gh CLI? [Y/n] " -n 1 -r
+        echo
+    fi
     if [[ ! $REPLY =~ ^[Nn]$ ]]; then
         if gh release create "$TAG" \
             --title "$TAG" \

@@ -113,8 +113,8 @@ check_deps() {
 
 install_host() {
     log "Installing substrate-guard on host (hybrid mock mode)..."
-    
-    INSTALL_DIR="/opt/substrate-guard"
+
+    INSTALL_DIR="${INSTALL_DIR:-/opt/substrate-guard}"
     
     # Install Python deps
     pip3 install z3-solver --break-system-packages -q 2>/dev/null \
@@ -130,8 +130,15 @@ install_host() {
         && ok "psycopg2-binary installed" \
         || warn "psycopg2-binary install failed — cron audit cannot reach PostgreSQL"
 
-    # Copy project
+    # Snapshot the currently-installed tree BEFORE overwriting it, so a bad
+    # deploy can be reverted with scripts/rollback.sh restore (audit item #17).
+    # Best-effort: a first-time install has nothing to back up.
     mkdir -p "$INSTALL_DIR"
+    INSTALL_DIR="$INSTALL_DIR" bash "$SCRIPT_DIR/rollback.sh" backup 2>/dev/null \
+        && ok "previous install snapshotted (rollback.sh restore to revert)" \
+        || true
+
+    # Copy project
     cp -r "$PROJECT_DIR/substrate_guard" "$INSTALL_DIR/"
     cp -r "$PROJECT_DIR/tests" "$INSTALL_DIR/"
     cp -r "$PROJECT_DIR/scripts" "$INSTALL_DIR/"   # cron-audit.sh etc. must reach /opt (H3)

@@ -20,6 +20,13 @@ def test_bandit_config_present() -> None:
 def test_bandit_reports_no_issues_under_policy() -> None:
     bandit_exe = shutil.which("bandit")
     if bandit_exe is None:
+        # Blocking in CI (audit 2026-07-17 item #17): REQUIRE_BANDIT=1 turns a
+        # missing bandit into a FAILURE so the gate cannot silently no-op in a
+        # pipeline that forgot to install it. Locally it still skips.
+        import os
+
+        if os.environ.get("REQUIRE_BANDIT") == "1":
+            pytest.fail("bandit not installed but REQUIRE_BANDIT=1 (CI gate)")
         pytest.skip("bandit not installed (pip install -e '.[dev]')")
 
     cmd = [
