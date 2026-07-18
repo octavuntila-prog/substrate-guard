@@ -199,3 +199,96 @@ def test_run_audit_violation_row_exits_1(tmp_path):
             conn.commit()
         finally:
             conn.close()
+
+
+_GUARD_EVENTS_DDL = """
+CREATE TABLE IF NOT EXISTS guard_events (
+    id TEXT PRIMARY KEY, timestamp TEXT NOT NULL, event_type TEXT NOT NULL,
+    agent_id TEXT, layer TEXT NOT NULL, data TEXT NOT NULL,
+    hmac_hash TEXT NOT NULL, prev_hash TEXT NOT NULL, source TEXT
+)
+"""
+
+
+def test_sync_engine_to_real_postgres(tmp_path):
+    """L6 SyncEngine local(SQLite events) -> REAL Postgres guard_events (audit 2.C step 2).
+
+    Exercises the Postgres-only branches the SQLite-as-remote tests cannot:
+    %s placeholders + INSERT ... ON CONFLICT (id) DO NOTHING. Asserts the
+    HMAC-chain columns cross the boundary byte-exact (integrity preserved) and that
+    a re-sync is idempotent -- append-only union-by-id, no duplicates.
+    """
+    from substrate_guard.offline.local_store import LocalStore
+    from substrate_guard.offline.sync import SyncEngine
+
+    try:
+        import psycopg2
+    except ImportError:
+        pytest.skip("psycopg2-binary not installed")
+
+    db_url = _db_url()
+
+    def _pg():
+        return psycopg2.connect(db_url)
+
+    # Ensure the remote table exists (CI schema-apply also creates it via 002_*.sql).
+    admin = _pg()
+    admin.autocommit = True
+    try:
+        with admin.cursor() as cur:
+            cur.execute(_GUARD_EVENTS_DDL)
+    finally:
+        admin.close()
+
+    store = LocalStore(tmp_path / "local.db", hmac_key="pg-sync-test")
+    store.store_event("audit", "guard", {"n": 1}, agent_id="agentA")
+    store.store_event("audit", "guard", {"n": 2}, agent_id="agentB")
+    local = {e["id"]: e for e in store.get_unsynced(limit=100)}
+    ids = list(local)
+
+    try:
+        out = SyncEngine(store, _pg).sync()
+        assert out["status"] == "complete", out
+        assert out["synced"] == 2
+        assert store.count(synced=False) == 0
+
+        # rows landed byte-exact (HMAC chain still verifiable across the sink) + source tag
+        conn = _pg()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT id, hmac_hash, prev_hash, source FROM guard_events "
+                    "WHERE id = ANY(%s)", (ids,)
+                )
+                remote = {r[0]: r for r in cur.fetchall()}
+        finally:
+            conn.close()
+        assert set(remote) == set(ids)
+        for eid, e in local.items():
+            assert remote[eid][1] == e["hmac_hash"], "hmac drifted across sync"
+            assert remote[eid][2] == e["prev_hash"], "prev_hash drifted across sync"
+            assert remote[eid][3] == "offline_sync"
+
+        # append-only idempotence: force a re-sync; ON CONFLICT (id) DO NOTHING must
+        # keep exactly 2 rows (no dupes) and still report complete. (No public API
+        # un-marks a synced row, so reset the local flag directly for the test.)
+        store.conn.execute("UPDATE events SET synced = 0")
+        store.conn.commit()
+        out2 = SyncEngine(store, _pg).sync()
+        assert out2["status"] == "complete", out2
+        conn = _pg()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) FROM guard_events WHERE id = ANY(%s)", (ids,))
+                assert cur.fetchone()[0] == 2, "ON CONFLICT failed -- duplicate rows"
+        finally:
+            conn.close()
+    finally:
+        store.close()
+        cleanup = _pg()
+        cleanup.autocommit = True
+        try:
+            with cleanup.cursor() as cur:
+                cur.execute("DELETE FROM guard_events WHERE id = ANY(%s)", (ids,))
+        finally:
+            cleanup.close()

@@ -110,6 +110,49 @@ def test_sync_already_present_row_is_marked_not_re_pushed(tmp_path):
     store.close()
 
 
+def test_sync_postgres_dialect_sql(tmp_path):
+    """Postgres branch (audit 2.C): the SQLite-remote tests never exercise the
+    non-sqlite dialect. Capture the generated SQL via a fake non-sqlite3 connection
+    and assert it uses %s placeholders + INSERT ... ON CONFLICT (id) DO NOTHING --
+    verifiable without a real Postgres. (The real-Postgres end-to-end run lives in
+    tests/test_postgres_ci.py::test_sync_engine_to_real_postgres.)"""
+    store = LocalStore(tmp_path / "l.db", hmac_key="k")
+    store.store_event("audit", "guard", {"n": 1})
+
+    executed: list[str] = []
+
+    class _FakeCursor:
+        rowcount = 1
+
+        def execute(self, sql, params=None):
+            executed.append(sql)
+
+        def close(self):
+            pass
+
+    class _FakePgConn:  # __module__ is the test module, not 'sqlite3' -> is_sqlite False
+        def cursor(self):
+            return _FakeCursor()
+
+        def commit(self):
+            pass
+
+        def rollback(self):
+            pass
+
+        def close(self):
+            pass
+
+    out = SyncEngine(store, lambda: _FakePgConn()).sync()
+    assert out["synced"] == 1, out
+    assert executed, "no SQL executed"
+    sql = executed[0]
+    assert "%s" in sql and "?" not in sql
+    assert "ON CONFLICT (id) DO NOTHING" in sql
+    assert "INSERT INTO guard_events" in sql
+    store.close()
+
+
 def test_sync_sqlite_constraint_drop_not_falsely_complete(tmp_path):
     """A row silently dropped by a remote SQLite constraint (INSERT OR IGNORE no-op,
     rowcount 0, no exception -- same signature as already-present) must NOT be marked
