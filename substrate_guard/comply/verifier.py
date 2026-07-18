@@ -61,54 +61,8 @@ class NonMembershipVerifier:
             "backend": "numpy_cosine",
         }
 
-    def verify_with_z3(
-        self,
-        query_embedding: np.ndarray,
-        committed_embeddings: List[np.ndarray],
-    ) -> dict[str, Any]:
-        """Redundantly re-evaluate the NumPy dot products as scaled integers.
-
-        NOTE: this is NOT an independent SMT decision. The dot products are computed
-        in NumPy/Python and injected as Z3 IntVal CONSTANTS; the solver is asked
-        whether ``IntVal(dot) >= IntVal(thr)`` — an expression with no free variables,
-        so sat/unsat is a fixed evaluation of ``dot >= thr`` that Z3 cannot use to
-        catch any error in the NumPy computation. The verdict (``verified``) is
-        decided entirely by ``verify()`` above; this is a deterministic re-check.
-        """
-        numpy_result = self.verify(query_embedding, committed_embeddings)
-        try:
-            import z3
-        except ImportError:
-            return {**numpy_result, "z3_skipped": True, "backend": numpy_result["backend"]}
-
-        start = time.perf_counter()
-        q = np.asarray(query_embedding, dtype=np.float64)
-        SCALE = 10_000
-        q_s = [int(round(float(x) * SCALE)) for x in q]
-        thr = int(round(self.threshold * SCALE * SCALE))
-
-        z3_sat_violations: list[int] = []
-        for i, emb in enumerate(committed_embeddings):
-            e = np.asarray(emb, dtype=np.float64)
-            e_s = [int(round(float(x) * SCALE)) for x in e]
-            dot = sum(a * b for a, b in zip(q_s, e_s))
-            sol = z3.Solver()
-            sol.add(z3.IntVal(dot) >= z3.IntVal(thr))
-            if sol.check() == z3.sat:
-                z3_sat_violations.append(i)
-
-        extra_ms = (time.perf_counter() - start) * 1000
-        z3_matches_numpy = (len(z3_sat_violations) > 0) == (not numpy_result["verified"])
-        return {
-            **numpy_result,
-            "z3_violation_indices": z3_sat_violations,
-            "z3_confirmed": z3_matches_numpy and len(z3_sat_violations) == len(
-                numpy_result.get("violations", [])
-            ),
-            "z3_note": (
-                "redundant deterministic re-evaluation of NumPy dot products as "
-                "integer constants; not an independent SMT decision (no free variables)"
-            ),
-            "backend": "numpy_cosine+z3_int",
-            "time_ms": round(numpy_result["time_ms"] + extra_ms, 2),
-        }
+    # NOTE (audit 2026-07-17 item 2.A step 2): the former ``verify_with_z3`` was
+    # removed. It re-evaluated the NumPy dot products as Z3 integer CONSTANTS
+    # (``IntVal(dot) >= IntVal(thr)``, no free variables), so the solver could not
+    # change the verdict decided by ``verify()`` -- decorative, not a proof. The
+    # honest verifier is the single NumPy cosine pass above.

@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import hashlib
-from typing import List
+import importlib.util
+import logging
+from typing import List, Union
 
 import numpy as np
+
+logger = logging.getLogger("substrate_guard.comply")
 
 
 class DeterministicFingerprinter:
@@ -91,3 +95,28 @@ class SemanticFingerprinter:
     @property
     def protocol_id(self) -> str:
         return f"sbert:{self._model_name}:dim{self.DIMENSIONS}:normalized"
+
+
+def sentence_transformers_available() -> bool:
+    """True if the optional sentence-transformers backend can be imported (cheap
+    spec check -- does NOT load the model)."""
+    return importlib.util.find_spec("sentence_transformers") is not None
+
+
+def default_fingerprinter() -> Union["SemanticFingerprinter", "DeterministicFingerprinter"]:
+    """The default encoder (audit 2026-07-17 item 2.A step 3).
+
+    Real semantic matching (all-MiniLM-L6-v2) when sentence-transformers is
+    installed -- the "activated" configuration where the `semantic` guarantee is
+    genuine; otherwise the deterministic byte-exact fallback, whose certificates
+    honestly report ``semantic=False``. This makes the default meaningful when the
+    ML extra is present without forcing a heavy dependency on the base install.
+    """
+    if sentence_transformers_available():
+        return SemanticFingerprinter()
+    logger.info(
+        "sentence-transformers not installed; L4 default encoder is the "
+        "deterministic byte-exact fallback (certificates report semantic=False). "
+        "Install .[comply-ml] for real semantic non-membership."
+    )
+    return DeterministicFingerprinter()

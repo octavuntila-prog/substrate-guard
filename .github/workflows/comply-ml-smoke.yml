@@ -23,5 +23,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev,comply-ml]"
 
-      - name: Semantic fingerprinter smoke
-        run: python -m pytest tests/test_comply/test_fingerprinter.py::test_sbert_optional_smoke -v --tb=short
+      - name: Comply suite incl. semantic calibration (0.85 threshold, audit 2.A step 3)
+        # Runs the WHOLE comply suite with sentence-transformers present, so the
+        # calibration tests (test_calibration.py) that SKIP on the base CI actually
+        # execute here: default-encoder-is-semantic, near-paraphrase >= 0.85,
+        # unrelated < 0.85, and the documented loose-paraphrase-below-0.85 limit.
+        run: python -m pytest tests/test_comply/ -v --tb=short

@@ -28,7 +28,7 @@ def run_demo() -> int:
     from .protocol import ThresholdNonMembershipProtocol
 
     fp = DeterministicFingerprinter()
-    p = ThresholdNonMembershipProtocol(threshold=0.85, use_z3=True, fingerprinter=fp)
+    p = ThresholdNonMembershipProtocol(threshold=0.85, fingerprinter=fp)
     corpus = ["protected-alpha-unique-string", "other-beta-secret"]
     c = p.commit_training_data(corpus)
     print("L4 threshold non-membership demo (deterministic encoder)")

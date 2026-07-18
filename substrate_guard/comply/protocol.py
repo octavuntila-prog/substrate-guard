@@ -15,7 +15,11 @@ from datetime import datetime, timezone
 from typing import Any, List
 
 from .commitment import EmbeddingCommitment
-from .fingerprinter import DeterministicFingerprinter, SemanticFingerprinter
+from .fingerprinter import (
+    DeterministicFingerprinter,
+    SemanticFingerprinter,
+    default_fingerprinter,
+)
 from .verifier import NonMembershipVerifier
 
 
@@ -32,14 +36,29 @@ class ThresholdNonMembershipProtocol:
     def __init__(
         self,
         threshold: float = 0.85,
-        use_z3: bool = True,
         fingerprinter: DeterministicFingerprinter | SemanticFingerprinter | None = None,
         hmac_key: str | None = None,
+        use_z3: bool | None = None,
     ) -> None:
-        self.fingerprinter = fingerprinter or DeterministicFingerprinter()
+        # use_z3 is DEPRECATED and a no-op (2026-07-18, audit item 2.A step 2): the
+        # former Z3 step re-evaluated the NumPy dot products as integer CONSTANTS
+        # (no free variables), so it could never change the verdict -- decorative,
+        # not a proof. Kept only so existing callers don't crash; passing it warns.
+        if use_z3 is not None:
+            import warnings
+
+            warnings.warn(
+                "ThresholdNonMembershipProtocol(use_z3=...) is deprecated and ignored; "
+                "the decorative Z3 re-check was removed (it added no soundness).",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+        # Default encoder = real semantic (sentence-transformers) when installed,
+        # else the deterministic byte-exact fallback (certificates report the truth
+        # via the `semantic` field). Explicit fingerprinter always wins.
+        self.fingerprinter = fingerprinter or default_fingerprinter()
         self.commitment = EmbeddingCommitment()
         self.verifier = NonMembershipVerifier(threshold=threshold)
-        self.use_z3 = use_z3
         self._hmac_key = hmac_key.encode() if hmac_key else None
         self._committed = False
         self._committed_root: str | None = None
@@ -79,14 +98,11 @@ class ThresholdNonMembershipProtocol:
         query_emb = self.fingerprinter.fingerprint(query_document)
         committed = self.commitment.embeddings
 
-        if self.use_z3:
-            result = self.verifier.verify_with_z3(query_emb, committed)
-        else:
-            result = self.verifier.verify(
-                query_emb,
-                committed,
-                commitment_root=self.commitment.commit(),
-            )
+        result = self.verifier.verify(
+            query_emb,
+            committed,
+            commitment_root=self.commitment.commit(),
+        )
 
         certificate: dict[str, Any] = {
             # Stable WIRE identifier (kept through the 2026-07-18 class rename:
@@ -104,13 +120,12 @@ class ThresholdNonMembershipProtocol:
             "note": (
                 f"Threshold (cosine >= {self.verifier.threshold}) non-membership over "
                 "a binding Merkle commitment. The `semantic` field reflects the encoder: "
-                "with the default deterministic encoder it is FALSE -- matching is "
-                "BYTE-EXACT only, so the 'semantic' guarantee is vacuous; use "
-                "SemanticFingerprinter for real semantic matching. NOT zero-knowledge: "
-                "the verifier operates on cleartext embeddings (true ZK privacy needs a "
-                "circuit backend, future work). The Z3 step is a redundant integer "
-                "re-check, not an independent proof. certificate_hash is an unkeyed "
-                "checksum unless an hmac_key is configured (then a keyed HMAC MAC)."
+                "True for the sentence-transformers encoder (real semantic matching), "
+                "False for the deterministic byte-exact fallback (the 'semantic' "
+                "guarantee is then vacuous). NOT zero-knowledge: the verifier operates "
+                "on cleartext embeddings (true ZK privacy needs a circuit backend, "
+                "future work). certificate_hash is an unkeyed checksum unless an "
+                "hmac_key is configured (then a keyed HMAC MAC)."
             ),
         }
         cert_bytes = json.dumps(certificate, sort_keys=True, default=str).encode()

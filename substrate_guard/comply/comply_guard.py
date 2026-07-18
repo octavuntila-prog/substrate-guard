@@ -16,9 +16,9 @@ class ComplyGuard:
     def __init__(self, guard: Any, config: dict | None = None) -> None:
         config = config or {}
         self.guard = guard
+        # use_z3 in config is ignored (the decorative Z3 step was removed, 2026-07-18).
         self.protocol = ThresholdNonMembershipProtocol(
             threshold=float(config.get("similarity_threshold", 0.85)),
-            use_z3=bool(config.get("use_z3", True)),
         )
         self._protected_docs: List[str] = []
         self._committed = False

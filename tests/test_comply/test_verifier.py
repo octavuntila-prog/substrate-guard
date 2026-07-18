@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import numpy as np
-import pytest
 
 from substrate_guard.comply.verifier import NonMembershipVerifier
 
@@ -66,13 +65,11 @@ def test_multiple_violations():
     assert len(r["violations"]) >= 2
 
 
-def test_verify_with_z3_includes_z3_fields():
-    pytest.importorskip("z3")
+def test_decorative_z3_path_removed():
+    """The decorative verify_with_z3 (audit 2.A step 2) is gone; only the honest
+    single NumPy cosine pass remains, and its backend never claims a Z3 step."""
     v = NonMembershipVerifier(threshold=0.85)
-    q = _unit(384, 0)
-    corpus = [_unit(384, 3)]
-    r = v.verify_with_z3(q, corpus)
-    if r.get("z3_skipped"):
-        pytest.skip("z3 module unavailable")
-    assert "z3_confirmed" in r
-    assert r["verified"] is True
+    assert not hasattr(v, "verify_with_z3")
+    r = v.verify(_unit(384, 0), [_unit(384, 3)])
+    assert r["backend"] == "numpy_cosine"
+    assert "z3_confirmed" not in r and "z3_note" not in r
