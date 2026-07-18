@@ -169,6 +169,9 @@ def test_run_audit_violation_row_exits_1(tmp_path):
                 )
                 """
             )
+        conn.commit()   # psycopg2 is NOT autocommit -- run_audit's separate
+        #                 connection must actually SEE the row (the benign clean(0)
+        #                 test above passes even uncommitted; a violation row does not).
     finally:
         conn.close()
 
@@ -193,5 +196,6 @@ def test_run_audit_violation_row_exits_1(tmp_path):
         try:
             with conn.cursor() as cur:
                 cur.execute("DELETE FROM pipeline_traces WHERE trace_id = 'ci-violation-1'")
+            conn.commit()
         finally:
             conn.close()
