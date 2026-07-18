@@ -132,3 +132,66 @@ def test_run_audit_with_one_trace(tmp_path):
                 cur.execute("DELETE FROM pipeline_traces WHERE trace_id = 'ci-row-1'")
         finally:
             conn.close()
+
+
+def test_run_audit_violation_row_exits_1(tmp_path):
+    """Execute-test for the violation(1) branch (audit 2026-07-17 item #13).
+
+    The clean(0) branch above is execute-tested; this closes the other half of
+    the exit-code contract on real Postgres. Deterministic route through the
+    vendor bridge: a critical system path in output_summary becomes
+    FileEvent(FILE_WRITE, path=/etc/passwd) -> _check_dangerous_paths denies ->
+    >=1 violation -> run_audit returns 1. model_used stays NULL so the only
+    other synthesized event is a harmless PROCESS_EXEC.
+    """
+    from substrate_guard.audit import run_audit
+    from substrate_guard.constants import BUILTIN_POLICY_PATH
+
+    try:
+        import psycopg2
+    except ImportError:
+        pytest.skip("psycopg2-binary not installed")
+
+    db_url = _db_url()
+    conn = psycopg2.connect(db_url)
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO pipeline_traces (
+                    trace_id, pipeline_run_id, step_index, agent_name, status,
+                    model_used, input_summary, output_summary, duration_ms,
+                    started_at, completed_at
+                ) VALUES (
+                    'ci-violation-1', '1', 1, 'CI Violation Agent', 'completed',
+                    NULL, 'n/a', 'wrote config to /etc/passwd then continued', 10,
+                    NOW(), NOW()
+                )
+                """
+            )
+    finally:
+        conn.close()
+
+    try:
+        code = run_audit(
+            db_url,
+            hours=None,
+            output_dir=str(tmp_path),
+            policy_path=BUILTIN_POLICY_PATH,
+            policy_mode='builtin',
+            policy_source='default',
+        )
+        assert code == 1, f"violation row must exit 1, got {code}"
+        # the report must actually record the violation
+        import json
+        reports = sorted(tmp_path.glob("audit_*.json"))
+        assert reports, "no audit report written"
+        data = json.loads(reports[-1].read_text())
+        assert data["evaluation"]["violations"] >= 1
+    finally:
+        conn = psycopg2.connect(db_url)
+        try:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM pipeline_traces WHERE trace_id = 'ci-violation-1'")
+        finally:
+            conn.close()

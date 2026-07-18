@@ -95,3 +95,79 @@ def test_cron_audit_insecure_perms_exits_2(tmp_path):
     code, log = _run_cron(tmp_path, setup_key=setup)
     assert code == 2, f"insecure-perms key did not exit 2 (got {code})"
     assert "insecure permissions" in log
+
+
+# ── item #13 (audit 2026-07-17): execute the 0/1/error branches of the wrapper ──────
+# The exit-2 HMAC branches above are execute-tested; these cover the remaining
+# branches by shimming python3 on PATH so `python3 -m substrate_guard.audit`
+# returns a forced exit code (no DB needed). The telegram helper self-no-ops
+# (APP_DIR has no .env), so nothing leaves the sandbox.
+
+
+def _run_cron_with_audit_exit(tmp_path, audit_exit, with_report=False):
+    """_run_cron variant with a python3 PATH-shim forcing the audit exit code."""
+    log_dir = tmp_path / "log"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    if with_report:
+        (log_dir / "audit_20990101_000000.json").write_text(
+            '{"evaluation": {"violations": 3}, "events_generated": 61}'
+        )
+    guard_dir = tmp_path / "guard"
+    guard_dir.mkdir(exist_ok=True)
+    key = tmp_path / "hmac.key"
+    key.write_text("deadbeef")
+    os.chmod(key, 0o600)
+
+    shim_dir = tmp_path / "bin"
+    shim_dir.mkdir(exist_ok=True)
+    shim = shim_dir / "python3"
+    shim.write_text(
+        "#!/usr/bin/env bash\n"
+        'if [ "$1" = "-m" ]; then exit ' + str(audit_exit) + "; fi\n"
+        'if [ "$1" = "-c" ]; then echo 3; exit 0; fi\n'
+        "exit 0\n"
+    )
+    shim.chmod(0o755)
+
+    env = dict(
+        os.environ,
+        PATH=f"{shim_dir}{os.pathsep}{os.environ['PATH']}",
+        LOG_DIR=str(log_dir),
+        APP_DIR=str(tmp_path / "noapp"),
+        GUARD_DIR=str(guard_dir),
+        HMAC_KEY_FILE=str(key),
+    )
+    r = subprocess.run(["bash", str(_CRON)], env=env, capture_output=True, timeout=60)
+    logs = list(log_dir.glob("cron_*.log"))
+    log_text = logs[0].read_text(errors="replace") if logs else ""
+    return r.returncode, log_text
+
+
+@pytest.mark.skipif(_NO_BASH, reason="needs a POSIX bash to execute the cron script")
+def test_cron_audit_clean_branch_executes(tmp_path):
+    """audit exit 0 -> the clean(0) wrapper branch logs 'Audit clean'."""
+    code, log = _run_cron_with_audit_exit(tmp_path, audit_exit=0)
+    assert code == 0, f"wrapper must exit 0 on clean audit (got {code})"
+    assert "Audit clean" in log
+    assert "VIOLATIONS DETECTED" not in log
+
+
+@pytest.mark.skipif(_NO_BASH, reason="needs a POSIX bash to execute the cron script")
+def test_cron_audit_violation_branch_executes(tmp_path):
+    """audit exit 1 -> the violation(1) wrapper branch fires (alert path), and
+    the wrapper itself still exits 0 (cron alerting is via telegram, not rc)."""
+    code, log = _run_cron_with_audit_exit(tmp_path, audit_exit=1, with_report=True)
+    assert code == 0, f"wrapper exit (got {code})"
+    assert "VIOLATIONS DETECTED" in log
+    assert "Audit clean" not in log
+    assert "AUDIT ERROR" not in log
+
+
+@pytest.mark.skipif(_NO_BASH, reason="needs a POSIX bash to execute the cron script")
+def test_cron_audit_error_branch_executes(tmp_path):
+    """audit exit 2 -> the ERROR branch (DB/config), explicitly NOT the
+    violations alert -- the distinction the exit-code contract exists for."""
+    code, log = _run_cron_with_audit_exit(tmp_path, audit_exit=2)
+    assert code == 0, f"wrapper exit (got {code})"
+    assert "AUDIT ERROR (exit 2)" in log
+    assert "VIOLATIONS DETECTED" not in log
