@@ -16,3 +16,9 @@ venv/
 .hypothesis/
 .ruff_cache/
 *.docx
+
+# coverage (audit #17)
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
