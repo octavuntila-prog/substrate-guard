@@ -68,11 +68,15 @@ class AgentTracer:
         # Honest event source (see the `source` property):
         #   "auto"   -> try eBPF; fall back to simulated mock (default)
         #   "mock"   -> simulated events (MockScenario) -- NOT real
-        #   "inject" -> REAL events fed via inject_event() by an orchestrator
-        #               (cross-platform L1-real, NO kernel) -- never simulated, never eBPF
+        #   "inject" -> REAL events fed via inject_event() by an ORCHESTRATOR at run
+        #               time (cross-platform L1-real, NO kernel) -- live, never simulated
+        #   "replay" -> REAL RECORDED events re-fed via inject_event() as a BATCH REPLAY
+        #               of historical DB traces (e.g. the nightly audit) -- real data,
+        #               not live. Kept DISTINCT from live "inject" so the two are never
+        #               conflated in the source field a compliance reader consumes.
         self._source_intent = source or ("mock" if use_mock else "auto")
-        if self._source_intent not in ("auto", "mock", "inject"):
-            raise ValueError(f"source must be one of auto/mock/inject, got {source!r}")
+        if self._source_intent not in ("auto", "mock", "inject", "replay"):
+            raise ValueError(f"source must be one of auto/mock/inject/replay, got {source!r}")
         self._mock = self._source_intent != "auto"
 
         if self._source_intent == "auto":
@@ -130,13 +134,17 @@ class AgentTracer:
 
     @property
     def source(self) -> str:
-        """Honest event source: 'ebpf' (kernel-observed), 'inject' (REAL events fed via
-        inject_event() by an orchestrator -- no kernel), or 'mock' (simulated /
-        MockScenario). This is what reports should show so injected real events are
-        never mislabeled as simulated 'mock' nor as kernel 'eBPF'."""
+        """Honest event source: 'ebpf' (kernel-observed), 'inject' (REAL events fed live
+        via inject_event() by an orchestrator -- no kernel), 'replay' (REAL recorded
+        events re-fed as a batch replay of historical DB traces -- real but not live), or
+        'mock' (simulated / MockScenario). This is what reports should show so real
+        events -- whether live-injected or replayed -- are never mislabeled as simulated
+        'mock' nor as kernel 'eBPF', and live 'inject' is never conflated with 'replay'."""
         if self._bpf is not None:
             return "ebpf"
-        return "inject" if self._source_intent == "inject" else "mock"
+        if self._source_intent in ("inject", "replay"):
+            return self._source_intent
+        return "mock"
 
     @property
     def stream(self) -> EventStream:

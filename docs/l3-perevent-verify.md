@@ -34,8 +34,8 @@ An event is a verification candidate **only** if it carries a structured artifac
 a bounded SMT fragment proves — it is handled by L2 policy, not L3. So the selection
 rate is naturally tiny: only artifact-bearing events, and only the enabled types.
 
-**Depends on L1-real.** The cron mock/DB-replay path carries no structured artifacts;
-the orchestrator **inject** path (L1 `source="inject"`) is where an agent's generated
+**Depends on L1-real.** The cron `replay` path (batch DB-replay of recorded traces)
+carries no structured artifacts; the orchestrator **inject** path (L1 `source="inject"`) is where an agent's generated
 code / tool-spec actually arrives. So per-event verify is exercised on the inject path.
 
 ## Sampling — deterministic, budget-bounded

@@ -394,7 +394,12 @@ def run_audit(
             observe=True,
             policy=policy_path,
             verify=True,
-            use_mock=True,
+            # The cron audit re-feeds REAL recorded DB traces (pipeline_traces /
+            # agent_runs) through the pipeline as a BATCH REPLAY -- real data, not live,
+            # and NOT simulated. Honest source label: "replay" (distinct from live
+            # "inject" and from simulated "mock"). Was use_mock=True -> "mock", which
+            # mislabelled real recorded events as simulated (audit HARD #10).
+            source="replay",
             chain=True,
             hmac_secret=hmac_secret,
         )
@@ -500,10 +505,15 @@ def run_audit(
         },
         "violations_detail": violations[:50],  # first 50 for paper
         "layers": {
-            # Honest 3-way source: ebpf (kernel) / inject (real events via API) / mock
-            # (simulated). The cron path is use_mock=True -> "mock" (batch replay of DB
-            # records). Never claims eBPF unless the kernel path is actually attached.
+            # Honest 4-way source: ebpf (kernel) / inject (real events fed LIVE by an
+            # orchestrator) / replay (real RECORDED events re-fed as a batch replay of
+            # historical DB traces -- what THIS cron does) / mock (simulated). Never
+            # claims eBPF unless the kernel path is actually attached.
             "observe": guard._tracer.source if guard._tracer else "none",
+            "observe_note": (
+                "replay = historical DB-replay of recorded pipeline_traces/agent_runs; "
+                "liveness disclosed by the preserved per-event timestamps (not wall-clock)"
+            ),
             "policy": guard._policy.active_engine if guard._policy else policy_mode,
             "verify": "z3 (available, not exercised per-event in batch)" if guard._z3_available else "unavailable",
         },
@@ -564,7 +574,12 @@ def run_audit(
     if guard._chain is not None and guard._chain.length > 0:
         try:
             from substrate_guard.compliance import ComplianceExporter
-            exporter = ComplianceExporter(chain=guard._chain)
+            # Thread the REAL observe source (guard._tracer.source == "replay" in cron)
+            # so the L1 evidence reports the actual source instead of a hardcoded label.
+            exporter = ComplianceExporter(
+                chain=guard._chain,
+                observe_source=guard._tracer.source if guard._tracer else None,
+            )
 
             compliance_dir = Path(output_dir) / "compliance"
             compliance_dir.mkdir(parents=True, exist_ok=True)

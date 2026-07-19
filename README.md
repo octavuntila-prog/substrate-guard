@@ -25,7 +25,7 @@ Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://a
 |--------|-------|
 | Events processed | 108 (cron audit over platform-DB `agent_runs`, Research server) |
 | Violations detected | 0 (0.0%) — the audited agents are benign internal scanners; adversarial **detection** is demonstrated in [Benchmark Results](#benchmark-results) (Malicious 4/4, Prompt Injection 4/3) |
-| Processing time | 4.64 ms/event (500.8 ms / 108 events) — batch-mock replay budget, NOT live wall-clock latency |
+| Processing time | 4.64 ms/event (500.8 ms / 108 events) — batch-replay budget, NOT live wall-clock latency |
 | HMAC-SHA256 chain | Wired in v13.4.0 (cron path); per-run chain export, cryptographic verify_export |
 | Cron audits | M0.7 baseline window: 7/7 verified (May 19–25, 2026) |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |
@@ -127,12 +127,12 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**L1**: The production cron is a batch-DB audit — correctly mock (it replays database records; no live process to observe). Real eBPF kernel hooks are wired in the separate live-monitor path (`monitor --live`), just not in the cron (#38b). **L2-L3**: Deployed in production (Research server, v13.4.2 cron audit pipeline).
+**L1**: The production cron is a batch-DB audit — it replays REAL recorded database records, so its honest source label is `replay` (real data, not live, not simulated). Real eBPF kernel hooks are wired in the separate live-monitor path (`monitor --live`), just not in the cron (#38b). **L2-L3**: Deployed in production (Research server, v13.4.2 cron audit pipeline).
 **L4-L6**: Prototyped with tests. Code exists, validated, not yet in production pipeline.
 
 ## How It Works
 
-**Observe (L1):** The production cron is a batch-DB audit — it replays database records, so it correctly uses a mock tracer (no live process to observe). Real eBPF kernel observation is wired in the separate live-monitor path (`monitor --live`), not the cron (#38b). On the Research server, the live path currently falls back to mock — kernel headers are not installed, and there is no production driver for live observation there.
+**Observe (L1):** The production cron is a batch-DB audit — it replays REAL recorded database records (`pipeline_traces` / `agent_runs`), so its honest source label is `replay` (real data, not live; the underlying tracer runs in no-kernel mode). Real eBPF kernel observation is wired in the separate live-monitor path (`monitor --live`), not the cron (#38b). On the Research server, the live path currently falls back to mock — kernel headers are not installed, and there is no production driver for live observation there.
 
 **Decide (L2):** Built-in Python policy rules evaluate each action (OPA/Rego available via `--policy rego`, not the cron default). 80 policy tests cover authorization, rate limiting, data access, and behavioral constraints.
 

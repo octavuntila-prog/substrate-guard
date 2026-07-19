@@ -37,10 +37,40 @@ class ComplianceExporter:
         chain: AuditChain,
         report: Optional[SessionReport] = None,
         org_name: str = "Aisophical SRL",
+        observe_source: Optional[str] = None,
     ):
         self._chain = chain
         self._report = report
         self._org = org_name
+        # The REAL observe source, threaded in by the caller (e.g. cron passes
+        # guard._tracer.source). Takes precedence over the report; both keep the L1
+        # evidence honest instead of a hardcoded label. See _observe_source().
+        self._observe_source_override = observe_source
+
+    def _observe_source(self) -> str:
+        """The REAL observe source, THREADED from the SessionReport -- never hardcoded.
+
+        This closes an honesty-drift CLASS (not just an instance): the L1 evidence must
+        report whatever the tracer actually was ('mock'/'inject'/'replay'/'ebpf'), so it
+        can never silently disagree with the run's true source. Falls back to 'unknown'
+        (honest) when no report was supplied, rather than guessing a label.
+        Pinned by test_compliance_observe_source_matches_tracer."""
+        if self._observe_source_override:
+            return self._observe_source_override
+        return getattr(self._report, "observe_source", None) or "unknown"
+
+    def _observe_evidence(self) -> str:
+        """Human L1-observe evidence string reflecting the ACTUAL source."""
+        src = self._observe_source()
+        desc = {
+            "replay": "batch replay of recorded DB traces (real data, not live)",
+            "inject": "real events fed live by an orchestrator (no kernel)",
+            "mock": "simulated events (MockScenario) -- NOT real",
+            "ebpf": "eBPF kernel observation",
+            "unknown": "source not reported",
+        }.get(src, src)
+        return (f"L1 observe source = '{src}' ({desc}); eBPF kernel hooks implemented, "
+                "not the deployed path (#38b)")
 
     def _base_metadata(self) -> dict:
         now = datetime.now(timezone.utc)
@@ -103,9 +133,9 @@ class ComplianceExporter:
                 },
                 "CC7.2_system_monitoring": {
                     "description": "The entity monitors system components for anomalies",
-                    "control": "Observation layer (eBPF: execve/openat/connect/TLS) implemented; production cron ingests platform-DB records via adapters (mock tracer) — live eBPF not wired (#38b)",
+                    "control": f"Observation layer (eBPF: execve/openat/connect/TLS) implemented; production cron ingests platform-DB records via adapters (source='{self._observe_source()}') — live eBPF not wired (#38b)",
                     "evidence": {
-                        "observation_layer": "DB-batch ingestion (mock tracer); eBPF tracepoints+uprobes implemented, not production-wired (#38b)",
+                        "observation_layer": self._observe_evidence(),
                         "event_types": ["syscall", "file_open", "file_write", "file_read",
                                        "network_connect", "process_exec", "tls_read", "tls_write"],
                         "events_captured": self._report.events_observed if self._report else self._chain.length,
@@ -171,7 +201,7 @@ class ComplianceExporter:
                     "implementation": "Three-layer monitoring: eBPF kernel observation, OPA policy evaluation, and formal/structural artifact verification (Z3 SMT for code/tool-API/hardware/distillation; the CLI domain is a regex/AST denylist, no Z3)",
                     "evidence": {
                         "layers": {
-                            "L1_observe": "DB-batch ingestion (mock tracer); eBPF implemented, not wired (#38b)",
+                            "L1_observe": self._observe_evidence(),
                             "L2_decide": "Built-in Python engine, 7 rules (Rego/OPA available, not default)",
                             "L3_prove": "Z3 SMT for code/tool-API/hardware/distillation; the CLI domain is a regex/AST denylist (no Z3/proof); 5 adversarial benchmark scenarios (100%, design target); not exercised per-event in batch audit",
                         },
@@ -204,7 +234,7 @@ class ComplianceExporter:
             "controls": {
                 "risk_assessment": {
                     "description": "AI risk identification and treatment",
-                    "implementation": "Three-layer stack identifies risks at observe (eBPF impl., mock in cron — #38b), policy (built-in Python), and formal/structural verify (Z3 on 4 domains; CLI is a regex/AST denylist) levels",
+                    "implementation": f"Three-layer stack identifies risks at observe (source='{self._observe_source()}'; eBPF implemented, not the deployed path — #38b), policy (built-in Python), and formal/structural verify (Z3 on 4 domains; CLI is a regex/AST denylist) levels",
                     "risk_categories_covered": [
                         "unauthorized_file_access",
                         "dangerous_command_execution",
@@ -256,7 +286,7 @@ class ComplianceExporter:
                 "EU_AI_Act": "PARTIAL — audit trail + explainability ready",
             },
             "verification_stack": {
-                "Layer_1_observe": "Mock tracer (DB-batch ingestion via adapters); eBPF kernel hooks implemented, NOT wired in production cron (#38b)",
+                "Layer_1_observe": self._observe_evidence(),
                 "Layer_2_policy": "Active — built-in Python engine, 7 rules (Rego/OPA available via --policy rego, not cron default)",
                 "Layer_3_verify": "Z3 SMT for code/tool-API/hardware/distillation; the CLI domain is a regex/AST denylist (no Z3/proof); 5 adversarial benchmark scenarios (100%, design target); NOT exercised per-event in batch audit",
                 "Audit_Chain": f"{'INTACT' if chain_ok else 'BROKEN'} ({self._chain.length} entries)",
