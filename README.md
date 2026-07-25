@@ -17,7 +17,7 @@ One command: `substrate-guard` (also `ai-blackbox`). Z3 workflows use `verify` /
 
 substrate-guard is a 6-layer verification architecture that observes, decides, proves, and audits every action taken by autonomous AI agents, with cryptographic evidence. (The reference deployment runs as a nightly batch audit over recorded actions — not live real-time; the eBPF live-observation path is implemented but is not the deployed path. See Production Results.)
 
-Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current version v13.4.2 (released June 14, 2026). The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
+Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current version v13.4.3 (released July 25, 2026). The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
 
 ## Production Results (v13.4.2 cron audit, 2026-06-14)
 
@@ -140,7 +140,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 
 **Chain:** Every event is recorded in an HMAC-SHA256 tamper-evident chain. Each entry references the hash of the previous entry, so any mid-chain modification, reordering, or insertion breaks the chain. (A valid *prefix* is itself a valid chain, so tail-truncation by a secret-holder is detected only via an out-of-band expected count/head — `verify(expected_count=...)` — or an external timestamp anchor, not by the chain alone.) Formal verification outcomes (`verify_artifact` / `session.verify`) append **`formal_verification`** entries with **`counterexample`** when a command or artifact is rejected, so audit exports retain *why* a check failed, not only that it failed.
 
-**Audit:** Daily automated cron audit (04:00 UTC on Research server, currently v13.4.2) verifies chain integrity, counts violations, measures latency, and exports compliance reports. M0.7 baseline window: 7/7 verified (May 19–25, 2026).
+**Audit:** Daily automated cron audit (04:00 UTC on Research server, currently v13.4.3) verifies chain integrity, counts violations, measures latency, and exports compliance reports. M0.7 baseline window: 7/7 verified (May 19–25, 2026).
 
 ## Codebase
 
@@ -263,7 +263,7 @@ What is **fully functional without Linux eBPF** vs. what needs a **real kernel /
 
 ## Production Deployment
 
-substrate-guard (this repository) runs on the **Research server** (89.167.66.225) — currently v13.4.2 (v13.4.0 deployed May 18, 2026; v13.4.1 patch June 2; v13.4.2 patch June 14). Daily automated cron audit at 04:00 UTC. M0.7 baseline window: 7/7 verified (May 19–25, 2026); zero missed cycles since the May 18 deployment — per operator monitoring; per-night audit JSONs are not committed to this repo.
+substrate-guard (this repository) runs on the **Research server** (89.167.66.225) — currently v13.4.3 (v13.4.0 deployed May 18, 2026; v13.4.1 patch June 2; v13.4.2 patch June 14; v13.4.3 July 25). Daily automated cron audit at 04:00 UTC. M0.7 baseline window: 7/7 verified (May 19–25, 2026); zero missed cycles since the May 18 deployment — per operator monitoring; per-night audit JSONs are not committed to this repo.
 
 ### Related Projects
 
