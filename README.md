@@ -19,13 +19,14 @@ substrate-guard is a 6-layer verification architecture that observes, decides, p
 
 Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current version v13.4.3 (released July 25, 2026). The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
 
-## Production Results (v13.4.2 cron audit, 2026-06-14)
+## Production Results (v13.4.3 cron audit, 2026-07-25)
 
 | Metric | Value |
 |--------|-------|
-| Events processed | 108 (cron audit over platform-DB `agent_runs`, Research server) |
+| Events processed | 61 (cron audit over platform-DB `agent_runs`, Research server; 22 unique agents) |
+| Observe source | `replay` — REAL recorded DB traces, batch-replayed (not simulated `mock`, not live `inject`, not kernel `ebpf`) |
 | Violations detected | 0 (0.0%) — the audited agents are benign internal scanners; adversarial **detection** is demonstrated in [Benchmark Results](#benchmark-results) (Malicious 4/4, Prompt Injection 4/3) |
-| Processing time | 4.64 ms/event (500.8 ms / 108 events) — batch-replay budget, NOT live wall-clock latency |
+| Processing time | 8.21 ms/event (501.0 ms / 61 events) — batch-replay budget, NOT live wall-clock latency |
 | HMAC-SHA256 chain | Wired in v13.4.0 (cron path); per-run chain export, cryptographic verify_export |
 | Cron audits | M0.7 baseline window: 7/7 verified (May 19–25, 2026) |
 | Compliance exports | SOC2, ISO/IEC 27001, ISO/IEC 42001 |

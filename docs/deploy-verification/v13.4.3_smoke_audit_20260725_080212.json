@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-07-25T08:02:12.452818",
+  "substrate_guard_version": "13.4.3",
+  "policy_engine": "builtin",
+  "policy_engine_source": "default",
+  "policy_engine_active": "builtin",
+  "db_records": {
+    "pipeline_traces": 0,
+    "agent_runs": 61,
+    "total": 61
+  },
+  "events_generated": 61,
+  "unique_agents": 22,
+  "categories": [
+    "App Store Scanner",
+    "Competitor Tracker",
+    "ConnectionDetector",
+    "Crunchbase Scanner",
+    "Dev.to Scanner",
+    "Financial Signal Scanner",
+    "GitHub Trending Scanner",
+    "Google Trends Scanner",
+    "HackerNews Scanner",
+    "Idea Scorer",
+    "Job Posting Analyzer",
+    "KnowledgeClassifier",
+    "LinkedIn Jobs Scanner",
+    "Personal Context Filter",
+    "Podcast Scanner",
+    "Product Hunt Scanner",
+    "QA System Auditor",
+    "RSS/Blogs Scanner",
+    "Trend Analyzer",
+    "Twitter/X Scanner",
+    "Weekly Mini-Review",
+    "YouTube Scanner"
+  ],
+  "total_cost_usd": 0,
+  "evaluation": {
+    "allowed": 61,
+    "violations": 0,
+    "violation_rate": 0.0,
+    "total_ms": 501.0,
+    "per_event_ms": 8.21
+  },
+  "violations_detail": [],
+  "layers": {
+    "observe": "replay",
+    "observe_note": "replay = historical DB-replay of recorded pipeline_traces/agent_runs; liveness disclosed by the preserved per-event timestamps (not wall-clock)",
+    "policy": "builtin",
+    "verify": "z3 (available, not exercised per-event in batch)"
+  },
+  "server": {
+    "arch": "aarch64",
+    "hostname": "ai-research-agency"
+  }
+}

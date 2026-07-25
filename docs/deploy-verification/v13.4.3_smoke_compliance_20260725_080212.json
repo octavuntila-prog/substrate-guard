@@ -1,0 +1,25 @@
+{
+  "generator": "substrate-guard / AI Black Box",
+  "version": "1.0",
+  "generated_at": "2026-07-25T08:02:12.463154+00:00",
+  "organization": "Aisophical SRL",
+  "chain_integrity": {
+    "status": "VERIFIED",
+    "chain_length": 61,
+    "head_hash": "c39ebc17d12973dd454598053a4e21b9867c9c91e64930e13f78c0910258e348",
+    "algorithm": "HMAC-SHA256"
+  },
+  "compliance_status": {
+    "SOC_2_Type_II": "EVIDENCE_AVAILABLE",
+    "ISO_27001_2022": "EVIDENCE_AVAILABLE",
+    "ISO_42001_2023": "EVIDENCE_AVAILABLE",
+    "EU_AI_Act": "PARTIAL \u2014 audit trail + explainability ready"
+  },
+  "verification_stack": {
+    "Layer_1_observe": "L1 observe source = 'replay' (batch replay of recorded DB traces (real data, not live)); eBPF kernel hooks implemented, not the deployed path (#38b)",
+    "Layer_2_policy": "Active \u2014 built-in Python engine, 7 rules (Rego/OPA available via --policy rego, not cron default)",
+    "Layer_3_verify": "Z3 SMT for code/tool-API/hardware/distillation; the CLI domain is a regex/AST denylist (no Z3/proof); 5 adversarial benchmark scenarios (100%, design target); NOT exercised per-event in batch audit",
+    "Audit_Chain": "INTACT (61 entries)"
+  },
+  "differentiator": "Others record what AI does. We add tamper-evident provenance + bounded formal checks (Z3 on code/tool-API/hardware/distillation, within each verifier's modeled subset) \u2014 not a universal proof of correctness, and the CLI domain is a regex/AST denylist, not a proof."
+}
