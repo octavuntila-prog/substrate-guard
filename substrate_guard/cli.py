@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""substrate-guard — Single entry: Z3 verify + Black Box pipeline.
+"""substrate-guard — Single entry: L3 verify + Black Box pipeline.
 
 Usage:
     substrate-guard verify --type code   <file> --spec <spec_file>
     substrate-guard verify --type tool   <tool_json>
     substrate-guard verify --type cli -c "<command>"
-    substrate-guard benchmark [--type code|tool|cli|all]   # Z3 verifier benchmarks
+    substrate-guard benchmark [--type code|tool|cli|all]   # L3 verifier benchmarks
     substrate-guard demo [--scenario safe] [--chain]
     substrate-guard monitor -a <id> [--live] [--verify-process-cli] [--no-verify-process-cli]
     substrate-guard stack-benchmark [--no-verify-process-cli]  # full pipeline scenarios
@@ -56,51 +56,46 @@ def cmd_verify_code(args):
     sys.exit(0 if result.verified else 1)
 
 
+TOOL_CATEGORIES = ("filesystem", "database", "network", "cloud", "cli")
+
+
 def cmd_verify_tool(args):
-    from substrate_guard.tool_verifier import (
-        ToolDefinition, ToolParam, verify_tool,
-        FILESYSTEM_FORBIDDEN, DATABASE_FORBIDDEN, NETWORK_FORBIDDEN,
-    )
+    """Exit 0 = SAFE, 1 = UNSAFE (witness printed), 2 = UNKNOWN (reason printed),
+    3 = invalid input (missing/unreadable file, malformed tool JSON)."""
+    from substrate_guard import tool_verifier as tv
 
-    with open(args.file) as f:
-        tool_data = json.load(f)
+    if not args.file:
+        print("Error: a tool JSON file is required for tool verification")
+        sys.exit(3)
+    try:
+        with open(args.file, encoding="utf-8") as f:
+            tool_data = json.load(f)
+        # keeps operation_template (the old hand-built ToolDefinition dropped it -> always UNKNOWN)
+        tool = tv.tool_definition_from_payload(tool_data)
+    except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as e:
+        print(f"Error: invalid tool input: {type(e).__name__}: {e}")
+        sys.exit(3)
 
-    params = [
-        ToolParam(
-            name=p["name"],
-            type=p.get("type", "string"),
-            enum_values=p.get("enum", p.get("enum_values")),
-            min_value=p.get("min"),
-            max_value=p.get("max"),
-        )
-        for p in tool_data.get("params", tool_data.get("parameters", []))
-    ]
+    # --categories omitted -> the library default (STANDARD_FORBIDDEN), same as Guard / perevent
+    forbidden = None
+    if args.categories:
+        sets = {
+            "filesystem": tv.FILESYSTEM_FORBIDDEN, "database": tv.DATABASE_FORBIDDEN,
+            "network": tv.NETWORK_FORBIDDEN, "cloud": tv.CLOUD_FORBIDDEN, "cli": tv.CLI_DENYLIST_FORBIDDEN,
+        }
+        forbidden = [p for c in args.categories for p in sets[c]]
 
-    tool = ToolDefinition(
-        name=tool_data.get("name", "unknown"),
-        description=tool_data.get("description", ""),
-        params=params,
-    )
-
-    # Select forbidden pattern sets
-    forbidden = []
-    categories = args.categories or ["filesystem", "database", "network"]
-    if "filesystem" in categories:
-        forbidden.extend(FILESYSTEM_FORBIDDEN)
-    if "database" in categories:
-        forbidden.extend(DATABASE_FORBIDDEN)
-    if "network" in categories:
-        forbidden.extend(NETWORK_FORBIDDEN)
-
-    result = verify_tool(tool, forbidden)
+    result = tv.verify_tool(tool, forbidden)
     print(result)
-    sys.exit(0 if result.safe else 1)
+    if result.safe:
+        sys.exit(0)
+    sys.exit(1 if result.status == tv.ToolSafetyStatus.UNSAFE else 2)
 
 
 def cmd_verify_cli(args):
     from substrate_guard.cli_verifier import verify_cli
 
-    result = verify_cli(args.command)
+    result = verify_cli(args.cli_command)
     print(result)
     sys.exit(0 if result.safe else 1)
 
@@ -231,31 +226,42 @@ def main() -> None:
     from substrate_guard.attest.cli_commands import cmd_attest, register_attest_parser
     from substrate_guard.offline.cli_commands import cmd_offline, register_offline_parser
 
+    # verifier results print non-ASCII marks; a cp1252 console must not turn a verdict into a traceback
+    try:
+        sys.stdout.reconfigure(errors="replace")
+    except (AttributeError, ValueError):  # pragma: no cover - non-reconfigurable stream
+        pass
+
     parser = argparse.ArgumentParser(
         prog="substrate-guard",
-        description="Formal verification (Z3) + AI Black Box pipeline (observe, policy, chain)",
+        description="Formal + typed-schema verification (L3) + AI Black Box pipeline (observe, policy, chain)",
     )
     subparsers = parser.add_subparsers(dest="command")
 
     # verify subcommand
-    verify_parser = subparsers.add_parser("verify", help="Verify an AI output with Z3")
+    verify_parser = subparsers.add_parser(
+        "verify", help="Verify an AI output (code: Z3; tool: typed-schema checker; cli: regex/AST denylist)")
     verify_parser.add_argument("--type", "-t", required=True,
                                choices=["code", "tool", "cli"],
                                help="Type of verification")
     verify_parser.add_argument("file", nargs="?", help="File to verify")
-    verify_parser.add_argument("--command", "-c", help="CLI command to verify")
+    # dest must not be 'command': that is the subparser dest, and sharing it made
+    # `verify` unreachable (args.command was overwritten by this option / None).
+    verify_parser.add_argument("--command", "-c", dest="cli_command", help="CLI command to verify")
     verify_parser.add_argument("--spec", "-s", help="Spec file (JSON)")
     verify_parser.add_argument("--precondition", "-pre", action="append",
                                help="Precondition expression")
     verify_parser.add_argument("--postcondition", "-post", action="append",
                                help="Postcondition expression")
-    verify_parser.add_argument("--categories", nargs="+",
-                               help="Forbidden pattern categories for tool verification")
+    verify_parser.add_argument("--categories", nargs="+", choices=list(TOOL_CATEGORIES),
+                               help="Forbidden pattern categories for tool verification "
+                                    "(default: all = library STANDARD_FORBIDDEN); tool exit codes 0 SAFE / 1 UNSAFE / 2 UNKNOWN / 3 invalid input "
+                                    "(code and cli stay 0 verified|safe / 1 otherwise)")
 
-    # Z3-only benchmarks (distinct from stack-benchmark)
+    # L3 verifier benchmarks (distinct from stack-benchmark)
     bench_parser = subparsers.add_parser(
         "benchmark",
-        help="Run Z3 verifier benchmarks (code / tool / CLI harnesses)",
+        help="Run L3 verifier benchmarks (code / tool / CLI harnesses)",
     )
     bench_parser.add_argument("--type", "-t",
                               choices=["code", "tool", "cli", "all"],
@@ -330,7 +336,7 @@ def main() -> None:
         elif args.type == "tool":
             cmd_verify_tool(args)
         elif args.type == "cli":
-            if not args.command:
+            if not args.cli_command:
                 print("Error: --command required for CLI verification")
                 sys.exit(1)
             cmd_verify_cli(args)

@@ -143,12 +143,12 @@ class ComplianceExporter:
                 },
                 "CC8.1_change_management": {
                     "description": "The entity authorizes, designs, develops, configures, documents, tests, approves, and implements changes",
-                    "control": "Pre-change verification checks AI-generated code, tool APIs, CLI commands, hardware assembly, and distilled models against safety specifications within a bounded modeled fragment. Code, tool-API, hardware-assembly, and distillation use Z3 SMT (sound on each verifier's declared subset; Z3 available but NOT exercised per-event in the batch cron audit — #38b); the CLI verifier is a regex/pattern + AST structural denylist with no Z3/SMT — a command it passes is 'not matched by any known-bad pattern', NOT proven safe (see cli_verifier.py, M-c)",
+                    "control": "Pre-change verification checks AI-generated code, tool APIs, CLI commands, hardware assembly, and distilled models against safety specifications within a bounded modeled fragment. Code, hardware-assembly, and distillation use Z3 SMT; tool APIs use exhaustive typed-schema instantiation + literal forbidden lists + the L2 CLI denylist (Z3 only for unbounded integer parameters or finite domains above the enumeration cap; each sound on its declared subset; Z3 available but NOT exercised per-event in the batch cron audit — #38b); the CLI verifier is a regex/pattern + AST structural denylist with no Z3/SMT — a command it passes is 'not matched by any known-bad pattern', NOT proven safe (see cli_verifier.py, M-c)",
                     "evidence": {
-                        "verification_engine": "Z3 SMT (code, tool_api, hardware_riscv, distillation) + regex/AST structural denylist (cli — no Z3/SMT)",
+                        "verification_engine": "Z3 SMT (code, hardware_riscv, distillation) + typed-schema instantiation with literal lists (tool_api; Z3 only for unbounded ints or over-cap finite domains) + regex/AST structural denylist (cli — no Z3/SMT)",
                         "verification_engine_by_domain": {
                             "code": "Z3 SMT",
-                            "tool_api": "Z3 SMT",
+                            "tool_api": "exhaustive typed-schema instantiation + literal forbidden lists + L2 CLI denylist (Z3 only for unbounded integer params or over-cap finite domains)",
                             "cli": "regex/AST structural denylist (no Z3/SMT)",
                             "hardware_riscv": "Z3 SMT",
                             "distillation": "Z3 SMT",
@@ -198,12 +198,12 @@ class ComplianceExporter:
                 },
                 "A.8.16_monitoring": {
                     "description": "Networks, systems and applications shall be monitored for anomalous behaviour",
-                    "implementation": "Three-layer monitoring: eBPF kernel observation, OPA policy evaluation, and formal/structural artifact verification (Z3 SMT for code/tool-API/hardware/distillation; the CLI domain is a regex/AST denylist, no Z3)",
+                    "implementation": "Three-layer monitoring: eBPF kernel observation, OPA policy evaluation, and formal/structural artifact verification (Z3 SMT for code/hardware/distillation, typed-schema instantiation for tool-API; the CLI domain is a regex/AST denylist, no Z3)",
                     "evidence": {
                         "layers": {
                             "L1_observe": self._observe_evidence(),
                             "L2_decide": "Built-in Python engine, 7 rules (Rego/OPA available, not default)",
-                            "L3_prove": "Z3 SMT for code/tool-API/hardware/distillation; the CLI domain is a regex/AST denylist (no Z3/proof); 5 adversarial benchmark scenarios (100%, design target); not exercised per-event in batch audit",
+                            "L3_prove": "Z3 SMT for code/hardware/distillation, typed-schema instantiation for tool-API; the CLI domain is a regex/AST denylist (no Z3/proof); 5 adversarial benchmark scenarios (100%, design target); not exercised per-event in batch audit",
                         },
                     },
                 },
@@ -234,7 +234,7 @@ class ComplianceExporter:
             "controls": {
                 "risk_assessment": {
                     "description": "AI risk identification and treatment",
-                    "implementation": f"Three-layer stack identifies risks at observe (source='{self._observe_source()}'; eBPF implemented, not the deployed path — #38b), policy (built-in Python), and formal/structural verify (Z3 on 4 domains; CLI is a regex/AST denylist) levels",
+                    "implementation": f"Three-layer stack identifies risks at observe (source='{self._observe_source()}'; eBPF implemented, not the deployed path — #38b), policy (built-in Python), and formal/structural verify (Z3 on 3 domains + typed-schema instantiation for tool-API; CLI is a regex/AST denylist) levels",
                     "risk_categories_covered": [
                         "unauthorized_file_access",
                         "dangerous_command_execution",
@@ -247,7 +247,7 @@ class ComplianceExporter:
                 },
                 "ai_system_lifecycle": {
                     "description": "Management of AI system throughout its lifecycle",
-                    "implementation": "Daily batch cron audit (04:00 UTC) over platform-DB records; per-event built-in policy evaluation; formal/structural verification (Z3 on code/tool-API/hardware/distillation; the CLI is a regex/AST denylist) available but not exercised per-event in the batch path (#38b)",
+                    "implementation": "Daily batch cron audit (04:00 UTC) over platform-DB records; per-event built-in policy evaluation; formal/structural verification (Z3 on code/hardware/distillation, typed-schema instantiation on tool-API; the CLI is a regex/AST denylist) available but not exercised per-event in the batch path (#38b)",
                     "evidence": {
                         "monitoring_frequency": "continuous + daily audit",
                         "total_events_evaluated": self._chain.length,
@@ -256,10 +256,10 @@ class ComplianceExporter:
                 },
                 "transparency": {
                     "description": "AI system decisions shall be explainable",
-                    "implementation": "Every policy decision includes human-readable reasons. Z3 verifications (code/tool-API/hardware/distillation) include a counterexample on failure; the CLI check reports the matched dangerous patterns, not a proof",
+                    "implementation": "Every policy decision includes human-readable reasons. Z3 verifications (code/hardware/distillation) and the tool-API checker include a counterexample on failure (tool-API: the instantiated operation + matched literal, or an UNKNOWN reason code); the CLI check reports the matched dangerous patterns, not a proof",
                     "evidence": {
                         "decision_format": "allow/deny + list of reasons",
-                        "verification_format": "Z3 domains: verified/unsafe + counterexample; CLI: safe/unsafe + matched patterns (no proof)",
+                        "verification_format": "Z3 domains and tool-API: verified/unsafe/unknown + counterexample or reason; CLI: safe/unsafe + matched patterns (no proof)",
                     },
                 },
                 "audit_trail": {
@@ -288,11 +288,11 @@ class ComplianceExporter:
             "verification_stack": {
                 "Layer_1_observe": self._observe_evidence(),
                 "Layer_2_policy": "Active — built-in Python engine, 7 rules (Rego/OPA available via --policy rego, not cron default)",
-                "Layer_3_verify": "Z3 SMT for code/tool-API/hardware/distillation; the CLI domain is a regex/AST denylist (no Z3/proof); 5 adversarial benchmark scenarios (100%, design target); NOT exercised per-event in batch audit",
+                "Layer_3_verify": "Z3 SMT for code/hardware/distillation, typed-schema instantiation for tool-API; the CLI domain is a regex/AST denylist (no Z3/proof); 5 adversarial benchmark scenarios (100%, design target); NOT exercised per-event in batch audit",
                 "Audit_Chain": f"{'INTACT' if chain_ok else 'BROKEN'} ({self._chain.length} entries)",
             },
             **self._session_data(),
-            "differentiator": "Others record what AI does. We add tamper-evident provenance + bounded formal checks (Z3 on code/tool-API/hardware/distillation, within each verifier's modeled subset) — not a universal proof of correctness, and the CLI domain is a regex/AST denylist, not a proof.",
+            "differentiator": "Others record what AI does. We add tamper-evident provenance + bounded formal checks (Z3 on code/hardware/distillation and exhaustive typed-schema instantiation on tool-API, within each verifier's modeled subset) — not a universal proof of correctness, and the CLI domain is a regex/AST denylist, not a proof.",
         }
 
         Path(path).write_text(json.dumps(summary, indent=2, default=str))

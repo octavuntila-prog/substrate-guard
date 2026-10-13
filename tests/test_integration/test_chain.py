@@ -496,6 +496,10 @@ class TestComplianceExport:
                 "non-Z3 regex/AST denylist, not Z3 SMT"
             assert "z3" in by_domain["code"].lower(), \
                 "CC8.1 code domain should still be attributed to Z3 SMT"
+            # 2026-10-13: the tool checker is exhaustive typed-schema instantiation, not Z3 SMT
+            tool_engine = by_domain["tool_api"].lower()
+            assert "typed-schema" in tool_engine and not tool_engine.startswith("z3 smt"), \
+                "CC8.1 verification_engine_by_domain[tool_api] must describe the typed-schema checker"
             assert data["chain_integrity"]["status"] == "VERIFIED"
         finally:
             os.unlink(path)

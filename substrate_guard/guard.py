@@ -146,7 +146,7 @@ def _verification_to_chain_event(vr: "VerificationResult", agent_id: Optional[st
 
 @dataclass
 class VerificationResult:
-    """Result from Z3 formal verification of a single artifact."""
+    """Result from Layer 3 verification of a single artifact (Z3 verifiers / tool checker / CLI denylist)."""
     verified: bool
     verifier_type: str  # "code", "tool", "cli", "hw", "distill"
     artifact: str  # what was verified
@@ -235,13 +235,14 @@ class Guard:
       deployed observe is mock/inject (DB-replay or orchestrator injection).
     - Layer 2 (policy): Does it have permission? Built-in Python engine decides in
       production; OPA/Rego is opt-in with a CI parity gate.
-    - Layer 3 (Z3): Is the output mathematically correct — on the bounded fragment?
+    - Layer 3 (verify): Is the output correct on the bounded fragment? (Z3 for code/hw/distill,
+      typed-schema instantiation for tool definitions, regex/AST denylist for CLI)
 
     Args:
         observe: Enable Layer 1 observation. Source is mock/inject/eBPF via `source=`;
             eBPF kernel observation is implemented but not the deployed path.
         policy: Path to Rego policies or PolicyEngine instance (Layer 2)
-        verify: Enable Z3 formal verification (Layer 3)
+        verify: Enable Layer 3 verification (Z3 verifiers + tool checker)
         use_mock: Force mock mode for the tracer (testing without kernel access)
         verify_process_cli: If True, :meth:`evaluate_event` runs CLI verification on
             :class:`~substrate_guard.observe.events.ProcessEvent` by reconstructing the
@@ -272,8 +273,9 @@ class Guard:
 
         # Layer 3 (per-event): opt-in selective/sampled/budget-bounded formal verify of
         # artifact-bearing events (metadata['formal_artifact']). Pass a PerEventConfig.
-        # Only runs the 4 Z3 verifiers on events that CARRY a provable artifact -- NOT
-        # "Z3 on every event". Depends on real artifacts (the inject/L1-real path).
+        # Only runs the 4 verifiers (3 Z3 + the typed-schema tool checker) on events that
+        # CARRY a provable artifact -- NOT "Z3 on every event". Depends on real artifacts
+        # (the inject/L1-real path).
         self._perevent = None
         if perevent_verify is not None:
             from .perevent_verify import PerEventConfig, PerEventVerifier
@@ -367,7 +369,7 @@ class Guard:
 
         # Layer 3 (per-event): submit an artifact-bearing event for selective/sampled
         # formal verification. SYNCHRONOUS by default (runs inline, bounded by the
-        # per-artifact Z3 timeout); async only if a ProcessPoolExecutor was injected.
+        # per-artifact budget); async only if a ProcessPoolExecutor was injected.
         # Verdicts are collected via collect_perevent_verdicts. Skipped events (no
         # artifact / not sampled) are a no-op. NOTE: no production producer attaches
         # metadata['formal_artifact'] yet -- this fires on injected/test artifacts.
@@ -420,7 +422,8 @@ class Guard:
         *,
         agent_id: Optional[str] = None,
     ) -> VerificationResult:
-        """Run Z3 formal verification on an AI-generated artifact.
+        """Run Layer 3 verification on an AI-generated artifact (code/hw/distill: Z3; tool:
+        typed-schema checker; cli: regex/AST denylist).
         
         Args:
             artifact: Code string, tool definition, CLI command, etc.
@@ -576,7 +579,7 @@ class GuardSession:
 
     def verify(self, artifact: str, artifact_type: str = "code",
                spec: Any = None) -> VerificationResult:
-        """Run Z3 verification on an artifact within this session."""
+        """Run Layer 3 verification on an artifact within this session."""
         return self._guard.verify_artifact(artifact, artifact_type, spec, agent_id=self.agent_id)
 
     @property

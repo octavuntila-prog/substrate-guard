@@ -1,11 +1,13 @@
 """L3 per-event formal verification — selective, sampled, latency-bounded.
 
-Runs the four SOUND verifiers (code/tool/hw/distill) on artifact-bearing LIVE events,
-under an explicit latency budget, producing a 4-way verdict {VERIFIED, REFUTED,
-ABSTAIN, TIMEOUT}. This is NOT "Z3 on every event": only events carrying a structured
-artifact are candidates, sampling bounds volume, and a small per-artifact Z3 timeout
-bounds work. Execution is SYNCHRONOUS by default (Z3 is not thread-safe); async is
-opt-in via an injected ProcessPoolExecutor. See docs/l3-perevent-verify.md.
+Runs the four verifiers (code/hw/distill are Z3; tool is the typed-schema checker —
+exhaustive instantiation + literal lists, Z3 only for unbounded ints or finite domains
+above its enumeration cap) on artifact-bearing LIVE events, under an explicit latency
+budget, producing a 4-way verdict {VERIFIED, REFUTED, ABSTAIN, TIMEOUT}. This is NOT
+"Z3 on every event": only events carrying a
+structured artifact are candidates, sampling bounds volume, and a small per-artifact
+budget bounds work. Execution is SYNCHRONOUS by default (Z3 is not thread-safe); async
+is opt-in via an injected ProcessPoolExecutor. See docs/l3-perevent-verify.md.
 """
 
 from __future__ import annotations
@@ -46,6 +48,8 @@ class VerdictRecord:
     agent_id: str
     detail: str = ""
     elapsed_ms: float = 0.0
+    engine: str = ""          # verifier-reported engine (tool: enumeration / witness / z3)
+    z3_version: str = ""      # recorded when the tool checker selected its z3 engine
 
     @property
     def verified(self) -> bool:
@@ -54,7 +58,7 @@ class VerdictRecord:
     def to_chain_event(self) -> dict:
         """A ``formal_verification`` chain entry. Carries the 4-way ``verdict`` ADDITIVE
         to the legacy ``verified`` bool (the chain event_data is free-form)."""
-        return {
+        ev = {
             "type": "formal_verification",
             "agent_id": self.agent_id,
             "verifier_type": self.artifact_type,
@@ -64,17 +68,35 @@ class VerdictRecord:
             "counterexample": self.detail or None,
             "proof_time_ms": round(self.elapsed_ms, 2),
         }
+        if self.engine:
+            ev["engine"] = self.engine
+        if self.z3_version:
+            ev["z3_version"] = self.z3_version
+        return ev
 
 
 @dataclass
 class PerEventConfig:
     enabled_types: tuple = ARTIFACT_TYPES
     sample_rate: float = 1.0     # 1.0 = verify every candidate; <1 samples deterministically
-    timeout_ms: int = 300        # per-artifact Z3 budget (small -> fast ABSTAIN/TIMEOUT)
+    timeout_ms: int = 300        # per-artifact budget: wall-clock deadline for tool, Z3 timeout for code/hw/distill
     # (async worker count lives on the caller-injected ProcessPoolExecutor, not here.)
 
 
 def _extract_detail(result: Any) -> str:
+    # tool verifier: violations carry the instantiated operation + the matched literal;
+    # an UNKNOWN names the first pattern that was not decided and why
+    viols = getattr(result, "violations", None)
+    if isinstance(viols, list) and viols and isinstance(viols[0], dict) and viols[0].get("operation") is not None:
+        v = viols[0]
+        what = v.get("keyword") if v.get("keyword") is not None else v.get("matched")
+        return f"{v.get('pattern')}: {what!r} in {v['operation'][:120]}"[:200]
+    checks = getattr(result, "checks", None)
+    if isinstance(checks, list) and checks and not viols:
+        for c in checks:
+            if isinstance(c, dict) and c.get("outcome") not in ("passed", "violated"):
+                detail = f" ({c['detail']})" if c.get("detail") else ""
+                return f"{c.get('pattern')}: {c.get('outcome')}{detail}"[:200]
     ce = getattr(result, "counterexample", None)
     if ce is not None:
         return str(ce)[:200]
@@ -85,9 +107,10 @@ def _extract_detail(result: Any) -> str:
 
 
 def _map_status_to_verdict(result: Any, elapsed_ms: float, budget_ms: int) -> tuple[Verdict, str]:
-    """Map a verifier's native status enum to the 4-way verdict. An ABSTAIN that
-    consumed ~the whole budget is reported as TIMEOUT (budget pressure vs genuine
-    out-of-domain)."""
+    """Map a verifier's native status enum to the 4-way verdict. A verifier that reports
+    a machine-readable ``reason`` decides TIMEOUT vs ABSTAIN by that reason; otherwise an
+    ABSTAIN that consumed ~the whole budget is reported as TIMEOUT (budget pressure vs
+    genuine out-of-domain)."""
     status = getattr(result, "status", None)
     name = (getattr(status, "name", None) or str(status) or "").upper()
     detail = _extract_detail(result)
@@ -95,6 +118,11 @@ def _map_status_to_verdict(result: Any, elapsed_ms: float, budget_ms: int) -> tu
         return Verdict.VERIFIED, detail
     if name in _REFUTED_NAMES:
         return Verdict.REFUTED, detail
+    reason = getattr(result, "reason", None)
+    if reason == "timeout" or getattr(result, "budget_exhausted", False):
+        return Verdict.TIMEOUT, detail or f"budget {budget_ms}ms exhausted ({reason or 'timeout'})"
+    if reason:
+        return Verdict.ABSTAIN, detail or f"not decided ({reason})"
     if budget_ms and elapsed_ms >= 0.85 * budget_ms:
         return Verdict.TIMEOUT, detail or f"solver latency budget {budget_ms}ms reached"
     return Verdict.ABSTAIN, detail or f"out-of-domain ({name.lower() or 'unknown'})"
@@ -108,10 +136,14 @@ def verify_one(artifact_type: str, artifact: str, spec: Any, agent_id: str,
     is the only safe way to parallelize it; never a ThreadPoolExecutor). Never raises:
     a broken artifact ABSTAINs rather than crashing ingestion."""
     start = time.perf_counter()
+    engine = z3_version = ""
     try:
         result = _run_verifier(artifact_type, artifact, spec, timeout_ms)
         elapsed = (time.perf_counter() - start) * 1000
         verdict, detail = _map_status_to_verdict(result, elapsed, timeout_ms)
+        engine = str(getattr(result, "engine", "") or "")
+        if engine == "z3":
+            z3_version = str(getattr(result, "z3_version", "") or "")
     except Exception as e:
         elapsed = (time.perf_counter() - start) * 1000
         verdict = Verdict.ABSTAIN
@@ -119,7 +151,7 @@ def verify_one(artifact_type: str, artifact: str, spec: Any, agent_id: str,
     return VerdictRecord(
         verdict=verdict, artifact_type=artifact_type,
         artifact_preview=artifact[:100], agent_id=agent_id,
-        detail=detail, elapsed_ms=elapsed,
+        detail=detail, elapsed_ms=elapsed, engine=engine, z3_version=z3_version,
     )
 
 
@@ -149,7 +181,8 @@ class PerEventVerifier:
     """Selective, sampled, budget-bounded per-event dispatcher for the 4 verifiers.
 
     Default is SYNCHRONOUS: ``submit`` runs the verifier inline, bounded by the small
-    per-artifact Z3 timeout (so it returns in ~timeout_ms). Because selection + sampling
+    per-artifact budget (so it returns in ~timeout_ms plus a 15-35 ms solver overshoot on
+    the Z3 paths). Because selection + sampling
     make candidates rare, that inline cost is small. For true async (verification off the
     ingestion path) pass a ``concurrent.futures.Executor`` -- it MUST be a
     ``ProcessPoolExecutor`` (Z3 is NOT thread-safe; a ThreadPoolExecutor corrupts the
@@ -161,6 +194,14 @@ class PerEventVerifier:
                  executor: Optional[Executor] = None):
         self.cfg = config or PerEventConfig()
         self._executor = executor          # None -> synchronous
+        if "tool" in self.cfg.enabled_types:
+            # one-time costs (z3 import ~85 ms, L2 denylist import ~90 ms) paid here, not inside
+            # the first ingestion-path verdict's elapsed_ms / proof_time_ms
+            try:
+                from .tool_verifier import CLIDenylistMatcher
+                CLIDenylistMatcher().warm()
+            except Exception as e:  # pragma: no cover - a missing optional import only costs latency later
+                logger.debug("tool checker warm-up skipped: %s", e)
         self._verdicts: list[VerdictRecord] = []          # sync results awaiting drain
         self._pending: list[tuple[Future, str, str, str]] = []  # (fut, type, preview, agent)
         # counters (auditability of what was verified vs skipped)
