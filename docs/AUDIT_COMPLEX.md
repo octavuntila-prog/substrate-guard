@@ -30,7 +30,7 @@
 |-------|-----------------|-----|
 | **L1 Observe** | `observe/tracer.py`, `observe/events.py` | Evenimente (fișier, rețea, proces); scenarii mock pentru teste |
 | **L2 Policy** | `policy/engine.py` | Reguli OPA-style / built-in; `PolicyDecision` |
-| **L3 Verify** | `code_verifier`, `tool_verifier`, `cli_verifier`, `hw_verifier`, `distill_verifier`, `ast_translator` | Domenii Z3 / simbolic; CLI = regex + schemă Z3 booleană |
+| **L3 Verify** | `code_verifier`, `tool_verifier`, `cli_verifier`, `hw_verifier`, `distill_verifier`, `ast_translator` | Domenii Z3 / simbolic; CLI = regex + denylist structural AST (fără Z3 — schema Z3 booleană decorativă a fost scoasă). *(2026-10-13: `tool_verifier` = instanțiere exhaustivă a schemei tipate + liste de literali + denylist L2, Z3 doar pentru int nemărginit sau domenii peste plafonul de enumerare — vezi docstring-ul modulului.)* |
 | **Chain** | `chain.py` | `AuditChain` HMAC-SHA256, export JSON semnat |
 | **Guard** | `guard.py` | Orchestrare sesiuni, `verify_artifact`, append **`formal_verification`** în chain |
 | **L4 Comply** | `comply/*` | Fingerprinter, commitment, protocol, `ComplyGuard` (embeddings opționale) |

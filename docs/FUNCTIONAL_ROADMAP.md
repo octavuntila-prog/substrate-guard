@@ -9,7 +9,7 @@ Acest document separă ce **funcționează astăzi** din repo de ce necesită **
 | Capabilitate | Cum se validează |
 |--------------|-------------------|
 | Instalare din sursă | `pip install -e ".[dev]"` sau `pip install -r requirements-dev.txt` |
-| Verificatori Z3 (cod / tool / CLI) | `substrate-guard verify --type cli -c "echo test"` |
+| Verificatori L3 (cod: Z3 / tool: schemă tipată / CLI: denylist) | `substrate-guard verify --type cli -c "echo test"` |
 | Pipeline Black Box (mock observe) | `substrate-guard demo --scenario safe` |
 | Teste + Bandit + politică documentată | `pytest tests/`; vezi `bandit.yaml`, `SECURITY.md` |
 | **Diagnostic mediu** | `substrate-guard doctor` |
