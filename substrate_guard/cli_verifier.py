@@ -50,7 +50,7 @@ DANGEROUS_PATTERNS = [
     {
         "name": "recursive_delete",
         "description": "Recursive file deletion",
-        "patterns": [r"\brm\s+(-\w*r\w*|-\w*f\w*r|--recursive)", r"\brm\b.*\s+/\s*$"],
+        "patterns": [r"\brm\s+(-\w*[rR]\w*|-\w*f\w*[rR]|--recursive)", r"\brm\b.*\s+/\s*$"],
     },
     {
         "name": "root_filesystem",
@@ -60,7 +60,8 @@ DANGEROUS_PATTERNS = [
     {
         "name": "privilege_escalation",
         "description": "Privilege escalation",
-        "patterns": [r"\bsudo\b", r"\bsu\s+-?\s", r"\bchmod\s+[0-7]*7[0-7]*\s"],
+        # `su root`, `su - root`, `su -` (the old r"\bsu\s+-?\s" needed a dash or two spaces)
+        "patterns": [r"\bsudo\b", r"\bsu\s+(-\s+)?\S", r"\bchmod\s+[0-7]*7[0-7]*\s"],
     },
     {
         "name": "disk_wipe",
@@ -103,7 +104,7 @@ DANGEROUS_PATTERNS = [
         "patterns": [
             r"\bcurl\b[^\n]*\|\s*(bash|sh)\b",
             r"\bwget\b[^\n]*\|\s*(bash|sh)\b",
-            r"\|\s*(bash|sh)\s*(-c|\s|<)",
+            r"\|\s*(bash|sh|zsh|dash)\s*(-c|\s|<|$)",
         ],
     },
     {
