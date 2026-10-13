@@ -516,13 +516,20 @@ class DistillationVerifier:
         if result == unsat:
             return StepVerification(step_number=step_num, status=StepStatus.VALID,
                                    raw_text=f"{step['expression']} = {step['value']}")
-        else:
+        if result == sat:
             return StepVerification(
                 step_number=step_num, status=StepStatus.INVALID,
                 raw_text=f"{step['expression']} = {step['value']}",
-                error="Z3 found counterexample or could not verify",
+                error="Z3 found a counterexample",
                 expected=str(value), actual=str(expr),
             )
+        # Z3 returned unknown (timeout / undecidable): not refuted, not proven. Reporting
+        # INVALID here was a false REFUTED that depended on the solver budget.
+        return StepVerification(
+            step_number=step_num, status=StepStatus.UNCHECKED,
+            raw_text=f"{step['expression']} = {step['value']}",
+            error="Z3 returned unknown (timeout or undecidable) — not proven",
+        )
 
     def _parse_equation(self, s: str) -> sympy.Eq | None:
         """Parse 'lhs = rhs' into a SymPy Eq."""
