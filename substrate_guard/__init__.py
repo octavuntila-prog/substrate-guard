@@ -1,3 +1,3 @@
 """substrate-guard: Formal verification safety layer for AI outputs."""
 
-__version__ = "13.4.3"
+__version__ = "13.5.0"

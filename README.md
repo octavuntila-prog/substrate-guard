@@ -17,7 +17,7 @@ One command: `substrate-guard` (also `ai-blackbox`). L3 verifier workflows use `
 
 substrate-guard is a 6-layer verification architecture designed to observe, decide, prove, and audit the actions of autonomous AI agents, with cryptographic evidence. (What is deployed is narrower: the reference deployment is a nightly batch audit that replays recorded DB rows — roughly one event per recorded row (an `agent_runs` run or a `pipeline_traces` step, plus a `file_write` per system path mentioned in its output), not every action, not live real-time — through observe (replay) → decide (builtin rules) → HMAC chain; no Z3 runs on that path; it detects and records, it does not block; the eBPF live-observation path is implemented but is not the deployed path. See Production Results.)
 
-Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current version v13.4.3 (released July 25, 2026). The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
+Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current release v13.5.0 (October 14, 2026 — the tool checker rebuilt, see [docs/releases/v13.5.0.md](docs/releases/v13.5.0.md)); the Research server runs v13.4.3 (deployed July 25, 2026) until the next deploy. The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
 
 ## Production Results (v13.4.3 post-deploy smoke run of the cron audit pipeline, 2026-07-25 08:02 UTC)
 
@@ -269,7 +269,7 @@ What is **fully functional without Linux eBPF** vs. what needs a **real kernel /
 
 ## Production Deployment
 
-substrate-guard (this repository) runs on the **Research server** (89.167.66.225) — currently v13.4.3 (v13.4.0 deployed May 18, 2026; v13.4.1 patch June 2; v13.4.2 patch June 14; v13.4.3 July 25). Daily automated cron audit at 04:00 UTC. M0.7 baseline window: 7/7 verified (May 19–25, 2026); zero missed cycles since the May 18 deployment — re-verified on the host on 2026-09-24 (an audit JSON for every calendar day since 2026-03-22); the per-night series is not committed to this repo.
+substrate-guard (this repository) runs on the **Research server** (89.167.66.225) — currently v13.4.3 (v13.4.0 deployed May 18, 2026; v13.4.1 patch June 2; v13.4.2 patch June 14; v13.4.3 July 25; v13.5.0 released October 14, 2026, not yet deployed). Daily automated cron audit at 04:00 UTC. M0.7 baseline window: 7/7 verified (May 19–25, 2026); zero missed cycles since the May 18 deployment — re-verified on the host on 2026-09-24 (an audit JSON for every calendar day since 2026-03-22); the per-night series is not committed to this repo.
 
 ### Related Projects
 
