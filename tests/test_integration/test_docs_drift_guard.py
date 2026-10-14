@@ -72,11 +72,31 @@ def test_smoke_audit_internally_consistent():
         ), "per_event_ms inconsistent with total_ms/events"
 
 
+def _vtuple(s: str) -> tuple:
+    return tuple(int(x) for x in re.findall(r"\d+", s)[:3])
+
+
 def test_version_consistent_across_artifacts():
-    v = _pyproject_version()
-    assert _latest("*_smoke_audit_*.json")["substrate_guard_version"] == v, \
-        "latest smoke-audit JSON version disagrees with pyproject"
-    assert v in _readme(), f"README does not mention the current version {v}"
+    """Released (pyproject) vs deployed (latest smoke-audit JSON) version.
+
+    Until 2026-10-14 this asserted equality, which made every release wait for a deploy
+    (the smoke JSON only exists after the cron audit ran on the Research server). The
+    honest invariant is narrower: the README's Production Results section must describe
+    the DEPLOYED version (its heading names the same version as the smoke JSON), the
+    README must name the released version, and the release may be ahead of the deployment
+    but never behind it. The README prose stating what the server currently runs is
+    load-bearing for a reader; the heading check is what pins it.
+    """
+    released = _pyproject_version()
+    deployed = _latest("*_smoke_audit_*.json")["substrate_guard_version"]
+    assert released in _readme(), f"README does not mention the released version {released}"
+    heading = re.search(r"\n#{2,3} Production Results \(v(\d+\.\d+\.\d+)", _readme())
+    assert heading, ("README Production Results heading must name the deployed version, "
+                     "e.g. '## Production Results (v13.4.3 post-deploy smoke run ...'")
+    assert heading.group(1) == deployed, \
+        f"README Production Results describes v{heading.group(1)} but the latest smoke-audit JSON is v{deployed}"
+    assert _vtuple(released) >= _vtuple(deployed), \
+        f"pyproject {released} is behind the deployed {deployed}"
 
 
 def test_readme_production_metrics_match_smoke_audit():
