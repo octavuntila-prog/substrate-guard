@@ -17,21 +17,21 @@ One command: `substrate-guard` (also `ai-blackbox`). L3 verifier workflows use `
 
 substrate-guard is a 6-layer verification architecture designed to observe, decide, prove, and audit the actions of autonomous AI agents, with cryptographic evidence. (What is deployed is narrower: the reference deployment is a nightly batch audit that replays recorded DB rows — roughly one event per recorded row (an `agent_runs` run or a `pipeline_traces` step, plus a `file_write` per system path mentioned in its output), not every action, not live real-time — through observe (replay) → decide (builtin rules) → HMAC chain; no Z3 runs on that path; it detects and records, it does not block; the eBPF live-observation path is implemented but is not the deployed path. See Production Results.)
 
-Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current release v13.5.0 (October 14, 2026 — the tool checker rebuilt, see [docs/releases/v13.5.0.md](docs/releases/v13.5.0.md)); the Research server runs v13.4.3 (deployed July 25, 2026) until the next deploy. The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
+Deployed on the Research server (89.167.66.225) within the [SUBSTRATE](https://aisophical.com) ecosystem; current version v13.5.0 (released and deployed to the Research server October 14, 2026 — the tool checker rebuilt, see [docs/releases/v13.5.0.md](docs/releases/v13.5.0.md)). The broader SUBSTRATE ecosystem includes additional production stacks on separate servers — see [Related Projects](#related-projects) below.
 
-## Production Results (v13.4.3 post-deploy smoke run of the cron audit pipeline, 2026-07-25 08:02 UTC)
+## Production Results (v13.5.0 post-deploy smoke run of the cron audit pipeline, 2026-10-14 05:20 UTC)
 
 | Metric | Value |
 |--------|-------|
-| Events processed | 61 (cron audit over platform-DB `agent_runs`, Research server; 22 unique agents) |
+| Events processed | 47 (cron audit over platform-DB `agent_runs`, Research server; 20 unique agents) |
 | Observe source | `replay` — REAL recorded DB traces, batch-replayed (not simulated `mock`, not live `inject`, not kernel `ebpf`) |
 | Violations detected | 0 (0.0%) — the audited agents are benign internal pipeline agents (mostly source scanners, plus trackers, analyzers, classifiers and reviewers) **and** the replayed `agent_runs` rows become `process_exec` events whose `filename` is `agent:<name>` and whose only argument (the command the rules see) is the row's status value (`success` / `error`), not an executed shell command — the adapter also emits a `file_write` event for any system path mentioned in a run's `output_summary` — so only the path rules (dangerous-path and workspace-boundary — both fire on any system-path `file_write` the adapter emits) and the PII regex can reach this corpus; the dangerous-command rules cannot fire on it; adversarial **detection** is demonstrated only on mock scenarios in [Benchmark Results](#benchmark-results) (Malicious 4/4, Prompt Injection 4/3) |
-| Processing time | 8.21 ms/event (501.0 ms / 61 events) — batch-replay budget, NOT live wall-clock latency. The 501 ms is dominated by a fixed 0.5 s tracer-shutdown wait inside the timed block and does not scale with event count: every nightly run since v13.4.0 measures 500.7–504.2 ms whether it replays 8 or 333 events (on-host series, 129 runs 2026-05-19 → 2026-09-24; the committed smoke JSONs show the same ≈501 ms for 1, 61, 108 and 147 events), so this is not a per-event cost |
+| Processing time | 10.68 ms/event (501.8 ms / 47 events) — batch-replay budget, NOT live wall-clock latency. The 501 ms is dominated by a fixed 0.5 s tracer-shutdown wait inside the timed block and does not scale with event count: every nightly run since v13.4.0 measures 500.7–504.2 ms whether it replays 8 or 333 events (on-host series, 129 runs 2026-05-19 → 2026-09-24; the committed smoke JSONs show the same ≈501 ms for 1, 61, 108 and 147 events), so this is not a per-event cost |
 | HMAC-SHA256 chain | Wired in v13.4.0 (cron path); per-run chain export, cryptographic verify_export |
 | Cron audits | M0.7 baseline window: 7/7 verified (May 19–25, 2026); on-host check 2026-09-24: an `audit_*.json` exists for every calendar day since 2026-03-22 (series not committed to this repo) |
 | Compliance exports | **Summary only** in production (`compliance/summary_*.json`: chain verification + observe-source label, over the replayed events). Full SOC2 / ISO/IEC 27001 / ISO/IEC 42001 documents are generated only by the CLI `export` over mock scenarios — none is produced from production data |
 | Enforcement mode | **Detect-and-record.** The deployed path is a retrospective nightly audit: it evaluates recorded actions, writes decisions into the HMAC chain and reports/alerts. It does **not** gate, block or terminate agent actions — no runtime enforcement path exists in the deployed pipeline |
-| Tests | **590** passing (**614** collected), 24 skipped on this Windows dev host (14 POSIX-only bash ops-exec + 8 Postgres-CI + 2 OPA-parity — all run in CI); 100% on 5 benchmark scenarios (design-target benchmark, not a production accuracy figure) |
+| Tests | **732** passing (**756** collected), 24 skipped on this Windows dev host (14 POSIX-only bash ops-exec + 8 Postgres-CI + 2 OPA-parity — all run in CI); 100% on 5 benchmark scenarios (design-target benchmark, not a production accuracy figure) |
 | Uptime | Continuous since March 22, 2026 |
 
 *Uptime and cron cadence (M0.7, "continuous since") were re-verified on the host on 2026-09-24 from the nightly `audit_*.json` series (at least one file for every calendar day since 2026-03-22 — 187 consecutive days with no gap), which is not committed to this repo. The events / latency / violation figures above are from the committed smoke audit (`docs/deploy-verification/`); the row notes say what each number does and does not measure.*
@@ -142,7 +142,7 @@ Notes: [docs/releases/v13.2.md](docs/releases/v13.2.md).
 
 **Chain:** Every event is recorded in an HMAC-SHA256 tamper-evident chain, keyed with a secret held by the operator who also writes the log — tamper-evident against anyone without the key, not non-repudiation toward a third party (the Ed25519 head-signature path exists in `chain.py` and is not deployed). Each entry references the hash of the previous entry, so any mid-chain modification, reordering, or insertion breaks the chain. (A valid *prefix* is itself a valid chain, so tail-truncation by a secret-holder is detected only via an out-of-band expected count/head — `verify(expected_count=...)` — or an external timestamp anchor, not by the chain alone.) Formal verification outcomes (`verify_artifact` / `session.verify`) append **`formal_verification`** entries with **`counterexample`** when a command or artifact is rejected, so audit exports retain *why* a check failed, not only that it failed.
 
-**Audit:** Daily automated cron audit (04:00 UTC on Research server, currently v13.4.3) verifies the integrity of the chain it just built (in-process), counts violations, records the batch time, exports the per-run chain and writes the compliance summary. It reports and alerts; it does not block. M0.7 baseline window: 7/7 verified (May 19–25, 2026).
+**Audit:** Daily automated cron audit (04:00 UTC on Research server, currently v13.5.0) verifies the integrity of the chain it just built (in-process), counts violations, records the batch time, exports the per-run chain and writes the compliance summary. It reports and alerts; it does not block. M0.7 baseline window: 7/7 verified (May 19–25, 2026).
 
 ## Codebase
 
@@ -269,7 +269,7 @@ What is **fully functional without Linux eBPF** vs. what needs a **real kernel /
 
 ## Production Deployment
 
-substrate-guard (this repository) runs on the **Research server** (89.167.66.225) — currently v13.4.3 (v13.4.0 deployed May 18, 2026; v13.4.1 patch June 2; v13.4.2 patch June 14; v13.4.3 July 25; v13.5.0 released October 14, 2026, not yet deployed). Daily automated cron audit at 04:00 UTC. M0.7 baseline window: 7/7 verified (May 19–25, 2026); zero missed cycles since the May 18 deployment — re-verified on the host on 2026-09-24 (an audit JSON for every calendar day since 2026-03-22); the per-night series is not committed to this repo.
+substrate-guard (this repository) runs on the **Research server** (89.167.66.225) — currently v13.5.0 (v13.4.0 deployed May 18, 2026; v13.4.1 patch June 2; v13.4.2 patch June 14; v13.4.3 July 25; v13.5.0 October 14). Daily automated cron audit at 04:00 UTC. M0.7 baseline window: 7/7 verified (May 19–25, 2026); zero missed cycles since the May 18 deployment — re-verified on the host on 2026-09-24 (an audit JSON for every calendar day since 2026-03-22); the per-night series is not committed to this repo.
 
 ### Related Projects
 
